@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khmer Music - YouTube Downloader</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, sans-serif; 
+      background: linear-gradient(135deg, #1e1e2f, #121212); 
+      color: #fff; 
+      min-height: 100vh;
+    }
+    .header {
+      background: #1e1e1e; 
+      padding: 20px; 
+      text-align: center;
+      border-bottom: 2px solid #8e44ad;
+    }
+    .container { display: flex; flex-wrap: wrap; padding: 20px; gap: 20px; }
+    .sidebar { 
+      width: 280px; 
+      background: #1e1e1e; 
+      padding: 20px; 
+      border-radius: 12px;
+      height: fit-content;
+    }
+    .main { flex: 1; min-width: 300px; }
+    .player { 
+      position: fixed; 
+      bottom: 0; left: 0; right: 0; 
+      background: #1e1e1e; 
+      padding: 15px 20px; 
+      border-top: 2px solid #8e44ad;
+      z-index: 100;
+    }
+    input { 
+      padding: 12px; 
+      width: 70%; 
+      border-radius: 8px; 
+      border: none; 
+      background: #2a2a2a; 
+      color: white; 
+    }
+    button { 
+      padding: 12px 18px; 
+      margin: 5px; 
+      border-radius: 8px; 
+      border: none; 
+      background: #8e44ad; 
+      color: white; 
+      cursor: pointer; 
+      font-weight: bold;
+    }
+    button:hover { background: #9b59b6; }
+    .song-item { 
+      padding: 15px; 
+      background: #2a2a2a; 
+      margin: 10px 0; 
+      border-radius: 10px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .playlist-item { 
+      padding: 12px; 
+      background: #2a2a2a; 
+      margin: 8px 0; 
+      border-radius: 8px; 
+      cursor: pointer;
+    }
+    .playlist-item:hover { background: #8e44ad; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎵 Khmer Music Downloader</h1>
+    <p>ទាញយកចំរៀងពី YouTube រក្សាទុកស្តាប់ Offline</p>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>📚 Playlists</h2>
+      <button onclick="addNewPlaylist()" style="width:100%; margin:10px 0;">+ បង្កើត Playlist ថ្មី</button>
+      <div id="playlist-list"></div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h2>🔗 ទាញយកចំរៀង</h2>
+      <input type="text" id="youtube-url" placeholder="Paste YouTube Link ទីនេះ...">
+      <button onclick="downloadSong()">⬇️ ទាញយក</button>
+
+      <h2 style="margin-top: 30px;">🎶 បទចំរៀងទាំងអស់</h2>
+      <div id="song-list"></div>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div class="player">
+    <div style="display: flex; align-items: center; gap: 15px; max-width: 1200px; margin: 0 auto;">
+      <div id="now-playing" style="min-width: 200px;">ជ្រើសរើសបទដើម្បីលេង...</div>
+      <audio id="audio-player" controls style="flex: 1;"></audio>
+      
+      <div>
+        <button onclick="toggleShuffle()">🔀 Shuffle</button>
+        <button onclick="setSleepTimer()">⏰ Sleep Timer</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Data
+let songs = JSON.parse(localStorage.getItem('khmer_songs')) || [];
+let playlists = JSON.parse(localStorage.getItem('khmer_playlists')) || [];
+let isShuffle = false;
+
+// Render Songs
+function renderSongs() {
+  const container = document.getElementById('song-list');
+  container.innerHTML = '';
+  
+  songs.forEach((song, index) => {
+    const div = document.createElement('div');
+    div.className = 'song-item';
+    div.innerHTML = `
+      <span>${song.title}</span>
+      <div>
+        <button onclick="playSong(${index})">▶️ លេង</button>
+        <button onclick="renameSong(${index})">✏️</button>
+        <button onclick="deleteSong(${index})">🗑️</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Download Song
+function downloadSong() {
+  const urlInput = document.getElementById('youtube-url');
+  const url = urlInput.value.trim();
+  
+  if (!url) return alert("❌ សូមបិទភ្ជាប់ YouTube Link!");
+
+  const title = prompt("បញ្ចូលឈ្មោះបទ:", "បទថ្មី");
+  
+  songs.push({
+    id: Date.now(),
+    title: title || "Unknown Song",
+    url: url
+  });
+  
+  localStorage.setItem('khmer_songs', JSON.stringify(songs));
+  renderSongs();
+  urlInput.value = '';
+  alert("✅ បានបន្ថែមបទថ្មី!\n(ចំពោះការទាញយកពិត សូមប្រើកម្មវិធីដូចជា Seal)");
+}
+
+// Play Song
+function playSong(index) {
+  const song = songs[index];
+  document.getElementById('now-playing').textContent = "▶️ " + song.title;
+  const audio = document.getElementById('audio-player');
+  audio.src = song.url;   // បច្ចុប្បន្នដំណើរការតែមួយចំនួន
+  audio.play();
+}
+
+// Rename & Delete
+function renameSong(index) {
+  const newName = prompt("ប្តូរឈ្មោះបទ៖", songs[index].title);
+  if (newName) {
+    songs[index].title = newName;
+    localStorage.setItem('khmer_songs', JSON.stringify(songs));
+    renderSongs();
+  }
+}
+
+function deleteSong(index) {
+  if (confirm("លុបបទនេះឬ?")) {
+    songs.splice(index, 1);
+    localStorage.setItem('khmer_songs', JSON.stringify(songs));
+    renderSongs();
+  }
+}
+
+// Playlist Functions
+function addNewPlaylist() {
+  const name = prompt("ឈ្មោះ Playlist ថ្មី៖");
+  if (name) {
+    playlists.push({ name: name, songs: [] });
+    localStorage.setItem('khmer_playlists', JSON.stringify(playlists));
+    renderPlaylists();
+  }
+}
+
+function renderPlaylists() {
+  const container = document.getElementById('playlist-list');
+  container.innerHTML = '';
+  playlists.forEach(pl => {
+    const div = document.createElement('div');
+    div.className = 'playlist-item';
+    div.textContent = `📂 ${pl.name}`;
+    div.onclick = () => alert(`Playlist: ${pl.name} (${pl.songs.length} បទ)`);
+    container.appendChild(div);
+  });
+}
+
+function toggleShuffle() {
+  isShuffle = !isShuffle;
+  alert(isShuffle ? "✅ Shuffle បានបើក" : "❌ Shuffle បានបិទ");
+}
+
+function setSleepTimer() {
+  const min = prompt("ឈប់ចំរៀងបន្ទាប់ពីនាទីប៉ុន្មាន?", "30");
+  if (min) {
+    setTimeout(() => {
+      document.getElementById('audio-player').pause();
+      alert("⏰ ចំរៀងបានឈប់ដោយស្វ័យប្រវត្តិ!");
+    }, parseInt(min) * 60000);
+  }
+}
+
+// Initialize
+renderSongs();
+renderPlaylists();
+</script>
+</body>
+</html>
