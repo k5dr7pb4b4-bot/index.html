@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ភ្នាក់ងារ ត្មាតពង</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:'Noto Sans Khmer',sans-serif;
+}
+
+body{
+    margin:0;
+    padding:15px;
+    background:#eef2f7;
+}
+
+.control-panel{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.control-panel h2{
+    margin-top:0;
+}
+
+input,
+select,
+button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    margin-bottom:12px;
+}
+
+button{
+    border:none;
+    background:#0d6efd;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#0b5ed7;
+}
+
+.preview{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+#titlePreview{
+    text-align:center;
+    font-weight:bold;
+}
+
+#datePreview{
+    text-align:center;
+    margin-top:10px;
+    margin-bottom:20px;
+}
+
+.image-wrapper{
+    width:100%;
+    height:550px;
+    overflow:hidden;
+    border:2px dashed #ccc;
+    position:relative;
+    background:#fafafa;
+}
+
+#previewImage{
+    position:absolute;
+    top:0;
+    left:0;
+    transform-origin:center;
+    cursor:grab;
+    user-select:none;
+}
+
+.dropdown-area{
+    margin-top:20px;
+    text-align:center;
+}
+
+#actionSelect{
+    font-size:20px;
+    font-weight:bold;
+}
+
+.save-btn{
+    background:#198754;
+}
+
+.save-btn:hover{
+    background:#157347;
+}
+
+@media(max-width:768px){
+
+.image-wrapper{
+    height:350px;
+}
+
+#actionSelect{
+    font-size:16px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="control-panel">
+
+<h2>ការកំណត់</h2>
+
+<label>ឈ្មោះ</label>
+<input type="text" id="titleInput" value="ភ្នាក់ងារ ត្មាតពង">
+
+<label>ពណ៌អក្សរ</label>
+<input type="color" id="titleColor" value="#000000">
+
+<label>ទំហំអក្សរ</label>
+<input type="number" id="titleSize" value="42">
+
+<label>ថ្ងៃខែឆ្នាំ</label>
+<input type="date" id="dateInput">
+
+<label>Upload រូបភាព</label>
+<input type="file" id="imageUpload" accept="image/*">
+
+<button class="save-btn" onclick="saveAsImage()">
+Save ជារូបភាព PNG
+</button>
+
+</div>
+
+<div class="preview" id="captureArea">
+
+<div id="titlePreview">
+ភ្នាក់ងារ ត្មាតពង
+</div>
+
+<div id="datePreview"></div>
+
+<div class="image-wrapper" id="imageWrapper">
+<img id="previewImage">
+</div>
+
+<div class="dropdown-area">
+
+<select id="actionSelect">
+
+<option>
+សូមជ្រើសរើស
+</option>
+
+<option>
+សូមជួយ <span style="color:darkblue">ចំណាយប៉ុង</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។
+</option>
+
+<option>
+សូមជួយ លុបប៉ុង អោយខ្ញុំមួយផងបង សូមអរគុណ។
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<script>
+
+const today = new Date().toISOString().split('T')[0];
+
+dateInput.value = today;
+datePreview.innerText = today;
+
+function updateTitle(){
+
+titlePreview.innerText = titleInput.value;
+
+titlePreview.style.color =
+titleColor.value;
+
+titlePreview.style.fontSize =
+titleSize.value + "px";
+
+}
+
+titleInput.addEventListener('input',updateTitle);
+titleColor.addEventListener('input',updateTitle);
+titleSize.addEventListener('input',updateTitle);
+
+updateTitle();
+
+dateInput.addEventListener('change',()=>{
+datePreview.innerText = dateInput.value;
+});
+
+imageUpload.addEventListener('change',(e)=>{
+
+const file=e.target.files[0];
+
+if(!file) return;
+
+const reader=new FileReader();
+
+reader.onload=(event)=>{
+
+previewImage.src=event.target.result;
+
+previewImage.onload=()=>{
+
+scale=1;
+
+x=0;
+y=0;
+
+updateTransform();
+
+};
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+let scale=1;
+let x=0;
+let y=0;
+
+function updateTransform(){
+
+previewImage.style.transform=
+`translate(${x}px,${y}px) scale(${scale})`;
+
+}
+
+imageWrapper.addEventListener('wheel',(e)=>{
+
+e.preventDefault();
+
+if(e.deltaY<0){
+
+scale+=0.1;
+
+}else{
+
+scale=Math.max(0.2,scale-0.1);
+
+}
+
+updateTransform();
+
+});
+
+let dragging=false;
+let startX,startY;
+
+previewImage.addEventListener('mousedown',(e)=>{
+
+dragging=true;
+
+startX=e.clientX-x;
+startY=e.clientY-y;
+
+previewImage.style.cursor='grabbing';
+
+});
+
+document.addEventListener('mousemove',(e)=>{
+
+if(!dragging) return;
+
+x=e.clientX-startX;
+y=e.clientY-startY;
+
+updateTransform();
+
+});
+
+document.addEventListener('mouseup',()=>{
+
+dragging=false;
+
+previewImage.style.cursor='grab';
+
+});
+
+function saveAsImage(){
+
+html2canvas(
+document.getElementById('captureArea'),
+{
+scale:4,
+useCORS:true
+}
+).then(canvas=>{
+
+const link=document.createElement('a');
+
+link.download='Report.png';
+
+link.href=canvas.toDataURL('image/png');
+
+link.click();
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
