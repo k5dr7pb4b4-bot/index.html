@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ភ្នាក់ងារ ត្មាតពង</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  font-family: 'Kantumruy Pro', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 16px 60px;
+}
+
+/* TOOLBAR */
+.toolbar {
+  width: 100%;
+  max-width: 560px;
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.toolbar label {
+  color: #a0aec0;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
+}
+.toolbar input[type="text"],
+.toolbar input[type="number"] {
+  width: 100%;
+  background: #0f3460;
+  border: 1px solid #1e4a8a;
+  border-radius: 8px;
+  color: #e2e8f0;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  outline: none;
+}
+.toolbar input[type="color"] {
+  width: 100%;
+  height: 38px;
+  background: #0f3460;
+  border: 1px solid #1e4a8a;
+  border-radius: 8px;
+  padding: 2px 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* CARD */
+#card {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* Header */
+.card-header {
+  background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+  padding: 36px 24px 28px;
+  text-align: center;
+}
+#agencyName {
+  font-family: 'Hanuman', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: #f6c90e;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  text-shadow: 0 2px 12px rgba(246,201,14,0.3);
+}
+
+/* Date */
+.date-row {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 10px 24px;
+  text-align: center;
+}
+#dateDisplay {
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+#dateDisplay:hover { color: #0f3460; }
+.edit-hint { font-size: 11px; color: #adb5bd; font-style: italic; }
+#dateInput {
+  font-size: 13px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #495057;
+  font-family: 'Kantumruy Pro', sans-serif;
+  display: none;
+}
+
+/* Image upload — 1 slot */
+.image-zone {
+  padding: 16px 24px 0;
+  background: #fff;
+}
+.upload-area {
+  border: 2px dashed #ced4da;
+  border-radius: 12px;
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  background: #fafafa;
+  overflow: hidden;
+  min-height: 200px;
+}
+.upload-area:hover { border-color: #0f3460; background: #f0f4ff; }
+
+/* image: interactive pan & zoom */
+.upload-area img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transform-origin: 0 0;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: #adb5bd;
+  pointer-events: none;
+  padding: 20px;
+}
+.upload-placeholder .icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #ced4da;
+}
+.upload-placeholder p { font-size: 13px; }
+#fileInput { display: none; }
+
+.remove-img-btn {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px; height: 26px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+}
+
+/* Message selector */
+.message-zone {
+  padding: 16px 24px 10px;
+  background: #fff;
+}
+.message-zone > label {
+  display: block;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+.msg-select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #ced4da;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  color: #343a40;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230f3460' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.msg-select:focus { border-color: #0f3460; }
+
+/* Selected message */
+.selected-msg {
+  margin: 0 24px 16px;
+  background: #f8f9fa;
+  border-left: 4px solid #0f3460;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #343a40;
+  line-height: 1.7;
+  display: none;
+}
+
+/* Save button */
+.save-btn-wrap {
+  padding: 8px 24px 28px;
+  background: #fff;
+  text-align: center;
+}
+.action-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+#saveBtn {
+  background: linear-gradient(135deg, #0f3460, #1a5276);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(15,52,96,0.35);
+  transition: transform .15s, box-shadow .15s;
+  flex: 1;
+}
+#saveBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(15,52,96,0.45); }
+#saveBtn:active { transform: translateY(0); }
+#saveBtn:disabled { opacity: 0.7; }
+
+#shareBtn {
+  background: linear-gradient(135deg, #0088cc, #006699);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,136,204,0.35);
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+#shareBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,136,204,0.45); }
+#shareBtn:active { transform: translateY(0); }
+#shareBtn:disabled { opacity: 0.7; }
+#shareBtn svg { flex-shrink: 0; }
+
+/* iOS instructions overlay */
+#iosOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 16px;
+}
+#iosOverlay img {
+  max-width: 100%;
+  max-height: 60vh;
+  border-radius: 12px;
+  display: block;
+}
+#iosOverlay p {
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  line-height: 1.8;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+#iosCloseBtn {
+  padding: 11px 32px;
+  background: #f6c90e;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div>
+    <label>ឈ្មោះភ្នាក់ងារ</label>
+    <input type="text" id="nameInput" value="ភ្នាក់ងារ ត្មាតពង" oninput="updateName()">
+  </div>
+  <div>
+    <label>ពណ៌អក្សរ</label>
+    <input type="color" id="colorInput" value="#f6c90e" oninput="updateColor()">
+  </div>
+  <div>
+    <label>ទំហំអក្សរ (px)</label>
+    <input type="number" id="sizeInput" value="36" min="16" max="80" oninput="updateSize()">
+  </div>
+  <div>
+    <label>ពណ៌ Header</label>
+    <input type="color" id="bgInput" value="#0f3460" oninput="updateBg()">
+  </div>
+  <div style="grid-column: span 2;">
+    <button id="saveSettingsBtn" onclick="saveSettings()" style="width:100%;padding:9px;background:#1a5276;color:#fff;border:none;border-radius:8px;font-size:13px;font-family:'Kantumruy Pro',sans-serif;font-weight:600;cursor:pointer;">រក្សាទុកការកំណត់</button>
+    <div id="saveSettingsMsg" style="text-align:center;font-size:11px;color:#68d391;margin-top:5px;display:none;">បានរក្សាទុករួចហើយ</div>
+  </div>
+</div>
+
+<!-- CARD -->
+<div id="card">
+
+  <div class="card-header" id="cardHeader">
+    <div id="agencyName">ភ្នាក់ងារ ត្មាតពង</div>
+  </div>
+
+  <div class="date-row">
+    <span id="dateDisplay" onclick="toggleDate()">
+      <span id="dateText"></span><span class="edit-hint"> [កែ]</span>
+    </span>
+    <input type="date" id="dateInput" onchange="applyDate()" onblur="applyDate()">
+  </div>
+
+  <div class="image-zone">
+    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-placeholder">
+        <div class="icon">+</div>
+        <p>ចុចដើម្បី Upload រូបភាព</p>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+  </div>
+
+  <div class="message-zone" id="messageZone">
+    <label>ជ្រើសរើសសារ</label>
+    <select class="msg-select" id="msgSelect" onchange="selectMsg()">
+      <option value="">-- ជ្រើសរើសសារ --</option>
+      <option value="1">សូមជួយ «ចំណាយប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
+      <option value="2">សូមជួយ «លុបប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
+    </select>
+  </div>
+
+  <div class="selected-msg" id="selectedMsg"></div>
+
+  <div class="save-btn-wrap" id="saveBtnWrap">
+    <div class="action-btns">
+      <button id="saveBtn" onclick="saveImage()">💾 រក្សាទុក</button>
+      <button id="shareBtn" onclick="shareToTelegram()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+        Share Telegram
+      </button>
+    </div>
+    <button id="resetCardBtn" onclick="resetCard()" style="margin-top:4px;background:transparent;color:#6c757d;border:1.5px solid #ced4da;border-radius:12px;padding:10px 28px;font-size:14px;font-family:'Kantumruy Pro',sans-serif;cursor:pointer;display:block;width:100%;">កំណត់ Card ឡើងវិញ</button>
+  </div>
+
+</div>
+
+<!-- iOS overlay -->
+<div id="iosOverlay">
+  <p>សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image"</p>
+  <img id="iosPreviewImg" src="" alt="preview">
+  <button id="iosCloseBtn" onclick="closeIosOverlay()">បិទ</button>
+</div>
+
+<script>
+// ── Settings: Save & Load ──
+function saveSettings() {
+  const s = {
+    name:  document.getElementById('nameInput').value,
+    color: document.getElementById('colorInput').value,
+    size:  document.getElementById('sizeInput').value,
+    bg:    document.getElementById('bgInput').value
+  };
+  localStorage.setItem('agencySettings', JSON.stringify(s));
+  const msg = document.getElementById('saveSettingsMsg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('agencySettings'));
+    if (!s) return;
+    if (s.name)  { document.getElementById('nameInput').value  = s.name;  updateName(); }
+    if (s.color) { document.getElementById('colorInput').value = s.color; updateColor(); }
+    if (s.size)  { document.getElementById('sizeInput').value  = s.size;  updateSize(); }
+    if (s.bg)    { document.getElementById('bgInput').value    = s.bg;    updateBg(); }
+  } catch(e) {}
+}
+
+// ── Date ──
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatDate(iso) {
+  const [y,m,day] = iso.split('-');
+  const kh = ['','មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'];
+  return 'ថ្ងៃទី '+parseInt(day)+' ខែ'+kh[parseInt(m)]+' ឆ្នាំ'+y;
+}
+let currentDate = todayISO();
+document.getElementById('dateText').textContent = formatDate(currentDate);
+document.getElementById('dateInput').value = currentDate;
+loadSettings();
+
+function toggleDate() {
+  const disp = document.getElementById('dateDisplay');
+  const inp  = document.getElementById('dateInput');
+  const showing = inp.style.display === 'inline-block';
+  if (showing) { applyDate(); }
+  else { disp.style.display='none'; inp.style.display='inline-block'; inp.focus(); }
+}
+function applyDate() {
+  const inp = document.getElementById('dateInput');
+  if (inp.style.display === 'none') return;
+  currentDate = inp.value || todayISO();
+  document.getElementById('dateText').textContent = formatDate(currentDate);
+  inp.style.display = 'none';
+  document.getElementById('dateDisplay').style.display = 'inline-flex';
+}
+
+// ── Toolbar ──
+function updateName()  { document.getElementById('agencyName').textContent = document.getElementById('nameInput').value; }
+function updateColor() { document.getElementById('agencyName').style.color = document.getElementById('colorInput').value; }
+function updateSize()  { document.getElementById('agencyName').style.fontSize = (parseInt(document.getElementById('sizeInput').value)||36)+'px'; }
+function updateBg()    { const c=document.getElementById('bgInput').value; document.getElementById('cardHeader').style.background='linear-gradient(135deg,'+c+' 0%,#16213e 100%)'; }
+
+// ── Image upload ──
+function loadImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const area = document.getElementById('uploadArea');
+    area.innerHTML = '';
+    area.onclick = null;
+    const img = document.createElement('img');
+    img.src = ev.target.result;
+    area.appendChild(img);
+    const btn = document.createElement('button');
+    btn.className = 'remove-img-btn';
+    btn.textContent = 'x';
+    btn.onclick = function(e2) { e2.stopPropagation(); resetUpload(); };
+    area.appendChild(btn);
+    initInteractiveImage(img);
+  };
+  reader.readAsDataURL(file);
+}
+function resetUpload() {
+  const area = document.getElementById('uploadArea');
+  area.innerHTML = '<div class="upload-placeholder"><div class="icon">+</div><p>ចុចដើម្បី Upload រូបភាព</p></div>';
+  area.onclick = function(){ document.getElementById('fileInput').click(); };
+  document.getElementById('fileInput').value = '';
+}
+
+// ── Pan & Pinch-to-zoom ──
+let imgState = { scale: 1.2, x: 0, y: 0 };
+
+function applyTransform(img) {
+  img.style.transform = `translate(${imgState.x}px, ${imgState.y}px) scale(${imgState.scale})`;
+}
+
+function initInteractiveImage(img) {
+  imgState = { scale: 1.2, x: 0, y: 0 };
+  img.style.transformOrigin = '0 0';
+  applyTransform(img);
+
+  // Mouse drag (desktop)
+  let dragging = false, startX, startY;
+  img.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX - imgState.x;
+    startY = e.clientY - imgState.y;
+    img.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    imgState.x = e.clientX - startX;
+    imgState.y = e.clientY - startY;
+    applyTransform(img);
+  });
+  window.addEventListener('mouseup', () => { dragging = false; img.style.cursor = 'grab'; });
+
+  // Scroll to zoom (desktop)
+  img.addEventListener('wheel', e => {
+    e.preventDefault();
+    imgState.scale = Math.min(5, Math.max(0.3, imgState.scale + (e.deltaY > 0 ? -0.1 : 0.1)));
+    applyTransform(img);
+  }, { passive: false });
+
+  // Touch pan & pinch (mobile)
+  let lastTouches = null;
+  img.addEventListener('touchstart', e => { lastTouches = e.touches; e.preventDefault(); }, { passive: false });
+  img.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && lastTouches && lastTouches.length === 1) {
+      imgState.x += e.touches[0].clientX - lastTouches[0].clientX;
+      imgState.y += e.touches[0].clientY - lastTouches[0].clientY;
+    } else if (e.touches.length === 2 && lastTouches && lastTouches.length >= 2) {
+      const prev = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
+      const curr = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      imgState.scale = Math.min(5, Math.max(0.3, imgState.scale * (curr / prev)));
+    }
+    lastTouches = e.touches;
+    applyTransform(img);
+  }, { passive: false });
+  img.addEventListener('touchend', e => { lastTouches = e.touches; }, { passive: false });
+
+  // Reset button
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = 'កំណត់ឡើងវិញ';
+  resetBtn.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(15,52,96,0.85);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-family:"Kantumruy Pro",sans-serif;cursor:pointer;z-index:3;white-space:nowrap;';
+  resetBtn.onclick = e => { e.stopPropagation(); imgState={scale:1.2,x:0,y:0}; applyTransform(img); };
+  img.parentElement.appendChild(resetBtn);
+}
+
+// ── Message selector ──
+const msgs = {
+  '1': 'សូមជួយ <span style="color:#003087;font-weight:700;">«ចំណាយប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។',
+  '2': 'សូមជួយ <span style="color:#c0392b;font-weight:700;">«លុបប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។'
+};
+function selectMsg() {
+  const val = document.getElementById('msgSelect').value;
+  const box = document.getElementById('selectedMsg');
+  if (val && msgs[val]) { box.innerHTML = msgs[val]; box.style.display = 'block'; }
+  else { box.style.display = 'none'; }
+}
+
+// ── Reset Card (image + message only, keep toolbar settings) ──
+function resetCard() {
+  // reset image
+  resetUpload();
+  // reset message dropdown
+  document.getElementById('msgSelect').value = '';
+  document.getElementById('selectedMsg').style.display = 'none';
+  document.getElementById('selectedMsg').innerHTML = '';
+  // reset date to today
+  currentDate = todayISO();
+  document.getElementById('dateText').textContent = formatDate(currentDate);
+  document.getElementById('dateInput').value = currentDate;
+  document.getElementById('dateInput').style.display = 'none';
+  document.getElementById('dateDisplay').style.display = 'inline-flex';
+}
+
+// ── iOS overlay ──
+function closeIosOverlay() {
+  document.getElementById('iosOverlay').style.display = 'none';
+}
+
+// ── Render card to canvas (shared helper) ──
+async function renderCardCanvas() {
+  const wrap    = document.getElementById('saveBtnWrap');
+  const msgZone = document.getElementById('messageZone');
+  const hints   = document.querySelectorAll('.edit-hint');
+  const removeBtn  = document.querySelector('.remove-img-btn');
+  const resetBtn   = document.querySelector('#uploadArea button:not(.remove-img-btn)');
+  const resetCardBtn = document.getElementById('resetCardBtn');
+
+  // hide UI-only elements
+  wrap.style.display    = 'none';
+  msgZone.style.display = 'none';
+  hints.forEach(h => h.style.display = 'none');
+  if (removeBtn)    removeBtn.style.display    = 'none';
+  if (resetBtn)     resetBtn.style.display     = 'none';
+  if (resetCardBtn) resetCardBtn.style.display = 'none';
+
+  let canvas;
+  try {
+    canvas = await html2canvas(document.getElementById('card'), {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 0
+    });
+  } finally {
+    // restore
+    wrap.style.display    = 'block';
+    msgZone.style.display = 'block';
+    hints.forEach(h => h.style.display = '');
+    if (removeBtn)    removeBtn.style.display    = 'flex';
+    if (resetBtn)     resetBtn.style.display     = 'block';
+    if (resetCardBtn) resetCardBtn.style.display = 'block';
+  }
+  return canvas;
+}
+
+// ── Save ──
+async function saveImage() {
+  const btn = document.getElementById('saveBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'កំពុងរក្សាទុក...';
+  btn.disabled = true;
+
+  try {
+    const canvas = await renderCardCanvas();
+    const isIOS  = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      const ov  = document.getElementById('iosOverlay');
+      const img = document.getElementById('iosPreviewImg');
+      img.src = canvas.toDataURL('image/png');
+      ov.style.display = 'flex';
+    } else {
+      // Fix: use Blob + object URL so browser always recognises PNG
+      canvas.toBlob(function(blob) {
+        const url  = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'agency-card.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }, 'image/png');
+    }
+  } catch(err) {
+    alert('មានបញ្ហា: ' + err.message);
+  }
+
+  btn.innerHTML = originalText;
+  btn.disabled  = false;
+}
+
+// ── Share to Telegram ──
+async function shareToTelegram() {
+  const btn = document.getElementById('shareBtn');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = 'កំពុងត្រៀម...';
+  btn.disabled = true;
+
+  try {
+    const canvas = await renderCardCanvas();
+
+    // Try Web Share API first (works on Android Chrome, iOS Safari, Telegram in-app browser)
+    if (navigator.canShare) {
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const file = new File([blob], 'agency-card.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Agency Card',
+        });
+        return;
+      }
+    }
+
+    // Fallback: open image in new tab + show instruction to share to Telegram
+    const dataURL = canvas.toDataURL('image/png');
+    const isIOS   = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      // iOS overlay — long press to save, then send to Telegram
+      const ov  = document.getElementById('iosOverlay');
+      const img = document.getElementById('iosPreviewImg');
+      ov.querySelector('p').textContent = 'សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image" ហើយបញ្ជូនទៅ Telegram';
+      img.src = dataURL;
+      ov.style.display = 'flex';
+    } else {
+      // Desktop/Android fallback: download then open Telegram
+      canvas.toBlob(function(blob) {
+        const url  = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'agency-card.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }, 'image/png');
+      // Open Telegram after short delay
+      setTimeout(() => { window.open('https://t.me', '_blank'); }, 800);
+    }
+  } catch(err) {
+    if (err.name !== 'AbortError') {
+      alert('មានបញ្ហា: ' + err.message);
+    }
+  }
+
+  btn.innerHTML = originalHTML;
+  btn.disabled  = false;
+}
+</script>
+</body>
+</html>
