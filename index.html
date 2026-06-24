@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>កែរូបភាពឱ្យច្បាស់ — AI Enhancer</title>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0d1117;
+  font-family: 'Kantumruy Pro', sans-serif;
+  min-height: 100vh;
+  color: #e6edf3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 60px;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #58a6ff;
+  margin-bottom: 4px;
+  text-align: center;
+}
+.subtitle {
+  font-size: 13px;
+  color: #8b949e;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed #30363d;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: #58a6ff;
+  background: rgba(88,166,255,0.05);
+}
+.upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 42px; margin-bottom: 10px; }
+.upload-zone p { color: #8b949e; font-size: 14px; line-height: 1.6; }
+.upload-zone strong { color: #58a6ff; }
+
+/* Strength slider */
+.slider-wrap { margin-top: 20px; }
+.slider-wrap label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: #8b949e; margin-bottom: 8px;
+}
+.slider-wrap label span { color: #58a6ff; font-weight: 600; font-size: 14px; }
+input[type=range] {
+  width: 100%; -webkit-appearance: none; height: 6px;
+  background: #30363d; border-radius: 3px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  background: #58a6ff; border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(88,166,255,.25);
+}
+
+/* Mode selector */
+.mode-wrap { margin-top: 18px; }
+.mode-wrap label { font-size: 13px; color: #8b949e; display: block; margin-bottom: 8px; }
+.mode-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+.mode-btn {
+  background: #0d1117; border: 1.5px solid #30363d; border-radius: 10px;
+  padding: 10px 8px; font-size: 12px; color: #8b949e;
+  font-family: 'Kantumruy Pro', sans-serif;
+  cursor: pointer; transition: all .15s; text-align: center; line-height: 1.4;
+}
+.mode-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+.mode-btn.active { border-color: #58a6ff; background: rgba(88,166,255,.1); color: #58a6ff; font-weight: 600; }
+.mode-btn .icon { font-size: 18px; display: block; margin-bottom: 3px; }
+
+/* Process button */
+#processBtn {
+  width: 100%; margin-top: 20px;
+  background: linear-gradient(135deg, #1f6feb, #388bfd);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px; font-size: 15px; font-weight: 700;
+  font-family: 'Kantumruy Pro', sans-serif;
+  cursor: pointer; transition: opacity .2s, transform .15s;
+  box-shadow: 0 4px 20px rgba(31,111,235,.4);
+}
+#processBtn:hover { transform: translateY(-1px); opacity: .92; }
+#processBtn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* Preview area */
+.preview-card {
+  width: 100%; max-width: 520px;
+  background: #161b22; border: 1px solid #30363d; border-radius: 16px;
+  padding: 20px; display: none;
+}
+.preview-card h2 { font-size: 14px; color: #8b949e; margin-bottom: 14px; }
+
+.compare-wrap {
+  position: relative; border-radius: 10px; overflow: hidden;
+  background: #0d1117; cursor: ew-resize; user-select: none;
+  touch-action: none;
+}
+.compare-wrap img {
+  display: block; width: 100%; height: auto; max-height: 420px;
+  object-fit: contain;
+}
+.compare-overlay {
+  position: absolute; top: 0; left: 0; height: 100%;
+  overflow: hidden; width: 50%;
+}
+.compare-overlay img { position: absolute; top: 0; left: 0; width: 100%; max-width: none; }
+.compare-line {
+  position: absolute; top: 0; left: 50%; width: 2px; height: 100%;
+  background: #fff; transform: translateX(-50%);
+  pointer-events: none;
+}
+.compare-handle {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px; height: 36px; background: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.5);
+  pointer-events: none;
+}
+.label-before, .label-after {
+  position: absolute; top: 8px; font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px; pointer-events: none;
+}
+.label-before { left: 8px; background: rgba(0,0,0,.6); color: #fff; }
+.label-after  { right: 8px; background: rgba(88,166,255,.8); color: #fff; }
+
+/* Status / progress */
+.status-box {
+  margin-top: 16px; padding: 12px 16px;
+  background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.2);
+  border-radius: 10px; font-size: 13px; color: #58a6ff;
+  display: none; line-height: 1.6;
+}
+.status-box.error { background: rgba(248,81,73,.08); border-color: rgba(248,81,73,.3); color: #f85149; }
+
+/* Download button */
+#actionBtns { display: none; }
+#downloadBtn {
+  flex: 1;
+  background: linear-gradient(135deg, #238636, #2ea043);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 13px; font-size: 14px; font-weight: 700;
+  font-family: 'Kantumruy Pro', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(35,134,54,.4);
+}
+#downloadBtn:hover { opacity: .9; }
+#shareBtn {
+  flex: 1;
+  background: linear-gradient(135deg, #0088cc, #006699);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 13px; font-size: 14px; font-weight: 700;
+  font-family: 'Kantumruy Pro', sans-serif;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 7px;
+  box-shadow: 0 4px 16px rgba(0,136,204,.4);
+}
+#shareBtn:hover { opacity: .9; }
+#shareBtn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin .7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Steps */
+.steps { margin-top: 14px; display: none; }
+.step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: #8b949e; padding: 6px 0;
+}
+.step-dot {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 10px;
+  background: #30363d; color: #8b949e; font-weight: 700;
+  transition: all .3s;
+}
+.step-dot.done   { background: #238636; color: #fff; }
+.step-dot.active { background: #1f6feb; color: #fff; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+</style>
+</head>
+<body>
+
+<h1>🔍 AI កែរូបភាព</h1>
+<p class="subtitle">Upload រូប → AI វិភាគ → ទទួលបានរូបច្បាស់ជាង</p>
+
+<div class="card">
+  <!-- Upload -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="image/*">
+    <div class="upload-icon">🖼️</div>
+    <p><strong>ចុចដើម្បី Upload</strong> ឬ ទាញរូបមកទីនេះ</p>
+    <p style="font-size:12px;margin-top:6px;">JPG, PNG, WEBP • អតិបរមា 5MB</p>
+  </div>
+
+  <!-- Mode -->
+  <div class="mode-wrap">
+    <label>ជ្រើសប្រភេទការកែ</label>
+    <div class="mode-grid">
+      <button class="mode-btn active" data-mode="general" onclick="setMode(this)">
+        <span class="icon">✨</span>ច្បាស់ទូទៅ
+      </button>
+      <button class="mode-btn" data-mode="portrait" onclick="setMode(this)">
+        <span class="icon">👤</span>រូបមនុស្ស / ក្មួយ
+      </button>
+      <button class="mode-btn" data-mode="night" onclick="setMode(this)">
+        <span class="icon">🌙</span>រូបងងឹត / យប់
+      </button>
+      <button class="mode-btn" data-mode="text" onclick="setMode(this)">
+        <span class="icon">📝</span>រូបមានអក្សរ
+      </button>
+    </div>
+  </div>
+
+  <!-- Strength -->
+  <div class="slider-wrap">
+    <label>កម្រិតការកែ <span id="strengthVal">70%</span></label>
+    <input type="range" id="strengthSlider" min="1" max="100" value="70"
+      oninput="document.getElementById('strengthVal').textContent=this.value+'%'">
+  </div>
+
+  <div class="status-box" id="statusBox"></div>
+
+  <div class="steps" id="stepsBox">
+    <div class="step"><div class="step-dot" id="s1">1</div><span>ផ្ទុករូបភាព</span></div>
+    <div class="step"><div class="step-dot" id="s2">2</div><span>AI វិភាគ + កែ</span></div>
+    <div class="step"><div class="step-dot" id="s3">3</div><span>បង្ហាញលទ្ធផល</span></div>
+  </div>
+
+  <button id="processBtn" onclick="processImage()" disabled>
+    🔍 កែរូបភាព
+  </button>
+</div>
+
+<!-- Result -->
+<div class="preview-card" id="previewCard">
+  <h2>📊 ប្រៀបធៀប: មុន / ក្រោយ (អូស slider)</h2>
+  <div class="compare-wrap" id="compareWrap">
+    <img id="imgAfter" src="" alt="after">
+    <div class="compare-overlay" id="overlayBefore">
+      <img id="imgBefore" src="" alt="before">
+    </div>
+    <div class="compare-line" id="compareLine"></div>
+    <div class="compare-handle">⇄</div>
+    <span class="label-before">មុន</span>
+    <span class="label-after">ក្រោយ</span>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px;" id="actionBtns">
+    <button id="downloadBtn" onclick="downloadResult()">⬇️ Download</button>
+    <button id="shareBtn" onclick="shareToTelegram()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style="flex-shrink:0"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+      Share Telegram
+    </button>
+  </div>
+</div>
+
+<script>
+let currentMode = 'general';
+let originalFile = null;
+let resultDataURL = null;
+
+// ── File input ──
+document.getElementById('fileInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (f) setFile(f);
+});
+
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) setFile(f);
+});
+
+function setFile(f) {
+  if (f.size > 5 * 1024 * 1024) { showStatus('ឯកសារធំពេក (អតិបរមា 5MB)', true); return; }
+  originalFile = f;
+  zone.querySelector('p').innerHTML = `<strong style="color:#58a6ff">${f.name}</strong>`;
+  zone.querySelector('.upload-icon').textContent = '✅';
+  document.getElementById('processBtn').disabled = false;
+  hideStatus();
+}
+
+function setMode(btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = btn.dataset.mode;
+}
+
+// ── Main process ──
+async function processImage() {
+  if (!originalFile) return;
+
+  const btn = document.getElementById('processBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>កំពុងកែ...';
+
+  showSteps();
+  setStep(1, 'active');
+  hideStatus();
+
+  try {
+    // 1. Read original as base64
+    const origBase64 = await fileToBase64(originalFile);
+    const origDataURL = 'data:' + originalFile.type + ';base64,' + origBase64;
+    setStep(1, 'done'); setStep(2, 'active');
+
+    // 2. Ask Claude AI to describe enhancements + generate CSS filter chain
+    const strength  = document.getElementById('strengthSlider').value;
+    const modeLabel = { general:'ច្បាស់ទូទៅ', portrait:'រូបមនុស្ស', night:'រូបងងឹត', text:'រូបអក្សរ' }[currentMode];
+
+    const prompt = `You are an image enhancement expert. Analyze this image and return ONLY a JSON object (no markdown, no explanation) with:
+{
+  "cssFilter": "CSS filter string e.g. brightness(1.1) contrast(1.2) saturate(1.3) sharpen...",
+  "canvasOps": [list of canvas operation objects],
+  "description": "one sentence in Khmer describing what was enhanced"
+}
+
+Rules:
+- Mode: ${modeLabel}, Strength: ${strength}%
+- For cssFilter: use combinations of brightness(), contrast(), saturate(), hue-rotate(), blur() (for noise reduction use 0), drop-shadow()
+- For canvasOps: array of {type, value} where type is one of: "sharpen", "brightness", "contrast", "saturation", "denoise", "vibrance"
+  - sharpen value: 0.0–${strength/100 * 2.5} 
+  - brightness: 0.8–1.4
+  - contrast: 0.8–1.6
+  - saturation: 0.8–1.8
+  - denoise: 0–5 (radius)
+  - vibrance: 0–${strength/100}
+- Mode-specific:
+  ${currentMode === 'portrait' ? '* Soften skin, boost warmth, reduce noise, gentle brightness' : ''}
+  ${currentMode === 'night' ? '* Increase brightness significantly, denoise, boost contrast' : ''}
+  ${currentMode === 'text' ? '* Max contrast, max sharpness, minimal brightness change' : ''}
+  ${currentMode === 'general' ? '* Balanced sharpness, slight contrast boost, natural saturation' : ''}
+- Scale all effects proportionally to strength ${strength}%
+Return ONLY the JSON object.`;
+
+    let ops = null;
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: originalFile.type, data: origBase64 } },
+              { type: 'text', text: prompt }
+            ]
+          }]
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message || 'API error');
+      if (!data.content || !Array.isArray(data.content)) throw new Error('No content');
+      let text = data.content.map(b => b.text || '').join('').trim();
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON in response');
+      ops = JSON.parse(jsonMatch[0]);
+      if (!Array.isArray(ops.canvasOps)) ops.canvasOps = [];
+    } catch(apiErr) {
+      console.warn('AI fallback:', apiErr.message);
+      ops = getDefaultOps(currentMode, parseInt(strength));
+    }
+
+    setStep(2, 'done'); setStep(3, 'active');
+
+    // 3. Apply enhancements on canvas
+    const enhanced = await applyEnhancements(origDataURL, ops.canvasOps || [], strength);
+    resultDataURL = enhanced;
+
+    // 4. Show compare
+    document.getElementById('imgBefore').src = origDataURL;
+    document.getElementById('imgAfter').src  = enhanced;
+    document.getElementById('previewCard').style.display = 'block';
+    document.getElementById('actionBtns').style.display = 'flex';
+    document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth' });
+
+    setStep(3, 'done');
+    showStatus('✅ ' + (ops.description || 'AI បានកែរូបភាព'), false);
+
+  } catch(err) {
+    showStatus('❌ មានបញ្ហា: ' + err.message, true);
+  }
+
+  btn.innerHTML = '🔍 កែរូបភាពម្តងទៀត';
+  btn.disabled = false;
+}
+
+// ── Canvas enhancement engine ──
+function applyEnhancements(dataURL, ops, strength) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const s = strength / 100;
+
+      // Apply each op
+      for (const op of ops) {
+        switch(op.type) {
+          case 'brightness':
+            applyBrightness(data, (op.value - 1) * s);
+            break;
+          case 'contrast':
+            applyContrast(data, (op.value - 1) * s + 1);
+            break;
+          case 'saturation':
+            applySaturation(data, (op.value - 1) * s + 1);
+            break;
+          case 'sharpen':
+            imageData = applySharpen(ctx, canvas, imageData, Math.min(op.value * s, 2));
+            break;
+          case 'vibrance':
+            applyVibrance(data, op.value * s);
+            break;
+          case 'denoise':
+            imageData = applyDenoise(ctx, canvas, imageData, Math.round(op.value));
+            break;
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.src = dataURL;
+  });
+}
+
+function clamp(v) { return Math.max(0, Math.min(255, v)); }
+
+function applyBrightness(data, amount) {
+  const adj = amount * 255;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i]   = clamp(data[i]   + adj);
+    data[i+1] = clamp(data[i+1] + adj);
+    data[i+2] = clamp(data[i+2] + adj);
+  }
+}
+
+function applyContrast(data, factor) {
+  const intercept = 128 * (1 - factor);
+  for (let i = 0; i < data.length; i += 4) {
+    data[i]   = clamp(data[i]   * factor + intercept);
+    data[i+1] = clamp(data[i+1] * factor + intercept);
+    data[i+2] = clamp(data[i+2] * factor + intercept);
+  }
+}
+
+function applySaturation(data, factor) {
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const gray = 0.299*r + 0.587*g + 0.114*b;
+    data[i]   = clamp(gray + (r - gray) * factor);
+    data[i+1] = clamp(gray + (g - gray) * factor);
+    data[i+2] = clamp(gray + (b - gray) * factor);
+  }
+}
+
+function applyVibrance(data, amount) {
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const max = Math.max(r, g, b);
+    const avg = (r + g + b) / 3;
+    const amt = (max - avg) / 255 * amount;
+    data[i]   = clamp(r + (max - r) * -amt);
+    data[i+1] = clamp(g + (max - g) * -amt);
+    data[i+2] = clamp(b + (max - b) * -amt);
+  }
+}
+
+function applySharpen(ctx, canvas, imageData, amount) {
+  if (amount <= 0) return imageData;
+  const w = canvas.width, h = canvas.height;
+  const src = imageData.data;
+  const out = ctx.createImageData(w, h);
+  const d   = out.data;
+  const k   = amount;
+  // Unsharp mask kernel approximation
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      const i = (y*w + x)*4;
+      for (let c = 0; c < 3; c++) {
+        const center = src[i+c];
+        const lap = center*4
+          - src[((y-1)*w+x)*4+c]
+          - src[((y+1)*w+x)*4+c]
+          - src[(y*w+(x-1))*4+c]
+          - src[(y*w+(x+1))*4+c];
+        d[i+c] = clamp(center + k * lap * 0.5);
+      }
+      d[i+3] = src[i+3];
+    }
+  }
+  return out;
+}
+
+function applyDenoise(ctx, canvas, imageData, radius) {
+  if (radius <= 0) return imageData;
+  radius = Math.min(radius, 3);
+  const w = canvas.width, h = canvas.height;
+  const src = imageData.data;
+  const out = ctx.createImageData(w, h);
+  const d   = out.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let r=0, g=0, b=0, cnt=0;
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          const ny = Math.max(0, Math.min(h-1, y+dy));
+          const nx = Math.max(0, Math.min(w-1, x+dx));
+          const si = (ny*w+nx)*4;
+          r += src[si]; g += src[si+1]; b += src[si+2]; cnt++;
+        }
+      }
+      const oi = (y*w+x)*4;
+      d[oi]   = r/cnt; d[oi+1] = g/cnt; d[oi+2] = b/cnt; d[oi+3] = src[oi+3];
+    }
+  }
+  return out;
+}
+
+// ── Compare slider ──
+(function() {
+  const wrap = document.getElementById('compareWrap');
+  const overlay = document.getElementById('overlayBefore');
+  const line = document.getElementById('compareLine');
+  const handle = document.querySelector('.compare-handle');
+  let dragging = false;
+
+  function setPos(x) {
+    const rect = wrap.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, (x - rect.left) / rect.width * 100));
+    overlay.style.width = pct + '%';
+    line.style.left = pct + '%';
+    handle.style.left = pct + '%';
+  }
+
+  // Fix overlay image width
+  document.getElementById('imgAfter').addEventListener('load', () => {
+    const w = wrap.offsetWidth;
+    document.getElementById('imgBefore').style.width = w + 'px';
+  });
+
+  wrap.addEventListener('mousedown', e => { dragging = true; setPos(e.clientX); });
+  document.addEventListener('mousemove', e => { if (dragging) setPos(e.clientX); });
+  document.addEventListener('mouseup', () => { dragging = false; });
+
+  wrap.addEventListener('touchstart', e => { dragging = true; setPos(e.touches[0].clientX); }, {passive:true});
+  document.addEventListener('touchmove', e => { if (dragging) setPos(e.touches[0].clientX); }, {passive:true});
+  document.addEventListener('touchend', () => { dragging = false; });
+})();
+
+// ── Download ──
+function downloadResult() {
+  if (!resultDataURL) return;
+  dataURLtoBlob(resultDataURL, blob => {
+    const url  = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'enhanced-image.png';
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  });
+}
+
+async function shareToTelegram() {
+  if (!resultDataURL) return;
+  const btn = document.getElementById('shareBtn');
+  const orig = btn.innerHTML;
+  btn.innerHTML = 'កំពុងត្រៀម...';
+  btn.disabled = true;
+  try {
+    const blob = await new Promise(res => dataURLtoBlob(resultDataURL, res));
+    const file = new File([blob], 'enhanced-image.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Enhanced Image' });
+    } else {
+      // Fallback: download + open Telegram
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = 'enhanced-image.png';
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      setTimeout(() => window.open('https://t.me', '_blank'), 800);
+    }
+  } catch(err) {
+    if (err.name !== 'AbortError') alert('មានបញ្ហា: ' + err.message);
+  } finally {
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+
+function dataURLtoBlob(dataURL, cb) {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8 = new Uint8Array(n);
+  while (n--) u8[n] = bstr.charCodeAt(n);
+  cb(new Blob([u8], { type: mime }));
+}
+
+// ── Smart fallback defaults (used when AI API fails) ──
+function getDefaultOps(mode, strength) {
+  const s = strength / 100;
+  const presets = {
+    general: {
+      canvasOps: [
+        { type: 'sharpen',    value: 0.8 * s },
+        { type: 'contrast',   value: 1 + 0.25 * s },
+        { type: 'saturation', value: 1 + 0.2 * s },
+        { type: 'brightness', value: 1 + 0.05 * s }
+      ],
+      description: 'AI បានកែភាពច្បាស់ទូទៅ'
+    },
+    portrait: {
+      canvasOps: [
+        { type: 'denoise',    value: 2 * s },
+        { type: 'brightness', value: 1 + 0.1 * s },
+        { type: 'saturation', value: 1 + 0.15 * s },
+        { type: 'sharpen',    value: 0.4 * s }
+      ],
+      description: 'AI បានកែភាពទន់ស្រឡូតសម្រាប់រូបមនុស្ស'
+    },
+    night: {
+      canvasOps: [
+        { type: 'brightness', value: 1 + 0.4 * s },
+        { type: 'denoise',    value: 3 * s },
+        { type: 'contrast',   value: 1 + 0.3 * s },
+        { type: 'saturation', value: 1 + 0.1 * s }
+      ],
+      description: 'AI បានបង្កើតភ្លឺសម្រាប់រូបយប់'
+    },
+    text: {
+      canvasOps: [
+        { type: 'contrast',   value: 1 + 0.5 * s },
+        { type: 'sharpen',    value: 1.5 * s },
+        { type: 'brightness', value: 1 + 0.02 * s }
+      ],
+      description: 'AI បានបង្កើតភាពច្បាស់ស្រឡះសម្រាប់អក្សរ'
+    }
+  };
+  return presets[mode] || presets.general;
+}
+
+// ── Helpers ──
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Read failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+function showStatus(msg, isErr) {
+  const box = document.getElementById('statusBox');
+  box.textContent = msg;
+  box.className = 'status-box' + (isErr ? ' error' : '');
+  box.style.display = 'block';
+}
+function hideStatus() {
+  document.getElementById('statusBox').style.display = 'none';
+}
+
+function showSteps() {
+  document.getElementById('stepsBox').style.display = 'block';
+  ['s1','s2','s3'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'step-dot';
+  });
+}
+
+function setStep(n, state) {
+  document.getElementById('s'+n).className = 'step-dot ' + state;
+}
+</script>
+</body>
+</html>
