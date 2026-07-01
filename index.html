@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ចូល · ចេញ — កំណត់ត្រាឥវ៉ាន់</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F3EC;
+    --surface:#FFFFFF;
+    --ink:#20261F;
+    --muted:#7A7568;
+    --line:#E6E0D2;
+    --primary:#0F4C3A;
+    --primary-ink:#EFF7F1;
+    --receive:#1D5FAE;
+    --receive-bg:#E9F1FC;
+    --send:#B4650B;
+    --send-bg:#FBEEDD;
+    --paid:#1E7A46;
+    --pending:#C23B3B;
+    --gold:#C99A2E;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(32,38,31,0.06), 0 6px 20px rgba(32,38,31,0.06);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Kantumruy Pro','Battambang',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:84px;
+    min-height:100vh;
+  }
+  .num{font-variant-numeric: tabular-nums;}
+
+  /* Header */
+  header.app{
+    background:var(--primary);
+    color:var(--primary-ink);
+    padding:16px 16px 20px;
+    border-radius:0 0 22px 22px;
+    box-shadow:var(--shadow);
+  }
+  .agency-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .agency-name{
+    font-weight:700; font-size:17px; background:transparent; border:none; color:var(--primary-ink);
+    padding:0; outline:none; width:100%; font-family:inherit;
+  }
+  .agency-name::placeholder{color:rgba(239,247,241,0.55);}
+  .app-date{font-size:12px; opacity:0.8; margin-top:2px;}
+  .gear-btn{
+    background:rgba(255,255,255,0.14); border:none; color:var(--primary-ink);
+    width:34px;height:34px;border-radius:10px; font-size:16px; flex-shrink:0;
+  }
+
+  /* Flow balance bar - signature element */
+  .flow{margin-top:16px;}
+  .flow-labels{display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; opacity:0.9;}
+  .flow-bar{height:10px; border-radius:6px; background:rgba(255,255,255,0.18); overflow:hidden; display:flex;}
+  .flow-bar .seg-r{background:#6FA8E8; height:100%;}
+  .flow-bar .seg-s{background:#E8B26F; height:100%;}
+  .flow-sums{display:flex; justify-content:space-between; margin-top:8px; font-size:13px;}
+  .flow-sums b{font-size:15px;}
+
+  /* Tabs content */
+  main{padding:14px 14px 10px; max-width:640px; margin:0 auto;}
+  .card{
+    background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:14px; margin-bottom:14px;
+  }
+  .card h3{margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%; display:inline-block;}
+  .dot.r{background:var(--receive);} .dot.s{background:var(--send);}
+
+  .field{margin-bottom:10px;}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+    font-size:15px; font-family:inherit; background:#FCFBF8; color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--primary); outline-offset:-1px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+
+  .status-toggle{display:flex; gap:8px;}
+  .status-toggle button{
+    flex:1; padding:9px; border-radius:10px; border:1px solid var(--line); background:#FCFBF8;
+    font-family:inherit; font-size:13px; color:var(--muted);
+  }
+  .status-toggle button.active.paid{background:#E7F5EC; border-color:var(--paid); color:var(--paid); font-weight:600;}
+  .status-toggle button.active.pending{background:#FBEAEA; border-color:var(--pending); color:var(--pending); font-weight:600;}
+
+  .btn{
+    width:100%; padding:12px; border:none; border-radius:12px; font-size:15px; font-weight:600;
+    font-family:inherit; color:#fff;
+  }
+  .btn.receive{background:var(--receive);}
+  .btn.send{background:var(--send);}
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--ink); font-weight:500;}
+  .btn.small{width:auto; padding:8px 12px; font-size:13px; border-radius:9px;}
+  .btn.tg{background:#229ED9;}
+  .btn-row{display:flex; gap:10px; margin-top:4px;}
+
+  /* Entries list */
+  .entry{
+    display:flex; gap:10px; padding:11px 4px; border-bottom:1px solid var(--line);
+  }
+  .entry:last-child{border-bottom:none;}
+  .entry .badge{
+    width:34px;height:34px;border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+  }
+  .badge.r{background:var(--receive-bg); color:var(--receive);}
+  .badge.s{background:var(--send-bg); color:var(--send);}
+  .entry .info{flex:1; min-width:0;}
+  .entry .info .name{font-weight:600; font-size:14px; display:flex; align-items:center; gap:6px;}
+  .entry .info .sub{font-size:12px; color:var(--muted); margin-top:1px;}
+  .entry .amt{text-align:right; flex-shrink:0;}
+  .entry .amt .usd{font-weight:700; font-size:14px;}
+  .entry .amt .khr{font-size:11px; color:var(--muted);}
+  .tag{font-size:10px; padding:1px 6px; border-radius:6px; font-weight:600;}
+  .tag.paid{background:#E7F5EC; color:var(--paid);}
+  .tag.pending{background:#FBEAEA; color:var(--pending);}
+  .entry .del{background:none;border:none;color:var(--muted);font-size:16px;padding:2px 4px;}
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:26px 10px;}
+
+  /* Summary */
+  .sum-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .sum-box{border-radius:12px; padding:12px; }
+  .sum-box.r{background:var(--receive-bg);}
+  .sum-box.s{background:var(--send-bg);}
+  .sum-box .lbl{font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .sum-box .val{font-size:18px; font-weight:700;}
+  .sum-box.r .val{color:var(--receive);}
+  .sum-box.s .val{color:var(--send);}
+  .sum-box .val2{font-size:12px; color:var(--muted); margin-top:2px;}
+  .net-box{margin-top:10px; background:#FBF6E8; border:1px dashed var(--gold); border-radius:12px; padding:12px; text-align:center;}
+  .net-box .lbl{font-size:12px; color:var(--muted);}
+  .net-box .val{font-size:22px; font-weight:700; color:#8A6714; margin-top:4px;}
+
+  /* Filters */
+  .filter-row{display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; padding-bottom:2px;}
+  .chip{
+    flex-shrink:0; padding:7px 13px; border-radius:20px; border:1px solid var(--line); background:#FCFBF8;
+    font-size:13px; color:var(--muted); font-family:inherit;
+  }
+  .chip.active{background:var(--primary); color:var(--primary-ink); border-color:var(--primary);}
+  .search-box input{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px; font-family:inherit; margin-bottom:10px;}
+
+  /* Bottom nav */
+  nav.tabs{
+    position:fixed; bottom:0; left:0; right:0; background:var(--surface);
+    display:flex; border-top:1px solid var(--line); box-shadow:0 -2px 12px rgba(0,0,0,0.05);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    z-index:50;
+  }
+  nav.tabs button{
+    flex:1; background:none; border:none; padding:8px 2px; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:11px;
+  }
+  nav.tabs button .ic{font-size:19px;}
+  nav.tabs button.active{color:var(--primary); font-weight:700;}
+
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+
+  /* Settings modal */
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(20,20,15,0.45); display:none; align-items:flex-end; z-index:100;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--surface); width:100%; border-radius:20px 20px 0 0; padding:18px; max-height:80vh; overflow-y:auto;
+  }
+  .modal h3{margin-top:0;}
+  .modal-close{float:right; background:none; border:none; font-size:18px; color:var(--muted);}
+
+  .toast{
+    position:fixed; bottom:96px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:20px; font-size:13px;
+    opacity:0; transition:opacity 0.25s; pointer-events:none; z-index:200; white-space:nowrap;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="agency-row">
+    <input class="agency-name" id="agencyName" placeholder="ឈ្មោះភ្នាក់ងារ" />
+    <button class="gear-btn" onclick="openSettings()">⚙</button>
+  </div>
+  <div class="app-date" id="headerDate"></div>
+  <div class="flow">
+    <div class="flow-labels">
+      <span>ចូល (ទទួល)</span>
+      <span>ចេញ (ផ្ញើ)</span>
+    </div>
+    <div class="flow-bar"><div class="seg-r" id="segR" style="width:50%"></div><div class="seg-s" id="segS" style="width:50%"></div></div>
+    <div class="flow-sums">
+      <span class="num" id="flowRVal">$0.00</span>
+      <span class="num" id="flowSVal">$0.00</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- RECEIVE TAB -->
+  <div class="tabpanel active" id="tab-receive">
+    <div class="card">
+      <h3><span class="dot r"></span> ទទួលចូល — បញ្ចូលទិន្នន័យ</h3>
+      <div class="field"><label>ឈ្មោះអតិថិជន</label><input id="r-name" placeholder="ឈ្មោះ" /></div>
+      <div class="row2">
+        <div class="field"><label>លេខទូរស័ព្ទ</label><input id="r-phone" type="tel" placeholder="0xx xxx xxx" /></div>
+        <div class="field"><label>ថ្ងៃខែ</label><input id="r-date" type="date" /></div>
+      </div>
+      <div class="field"><label>បរិយាយឥវ៉ាន់</label><input id="r-item" placeholder="ឧ. ប្រអប់ស្បែកជើង / ឯកសារ" /></div>
+      <div class="row2">
+        <div class="field"><label>ទឹកប្រាក់ COD (USD)</label><input id="r-usd" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="field"><label>ទឹកប្រាក់ COD (៛)</label><input id="r-khr" type="number" step="100" placeholder="0" /></div>
+      </div>
+      <div class="field"><label>ស្ថានភាព</label>
+        <div class="status-toggle">
+          <button type="button" id="r-status-pending" class="active pending" onclick="setStatus('r','pending')">មិនទាន់សង</button>
+          <button type="button" id="r-status-paid" class="paid" onclick="setStatus('r','paid')">សងរួច</button>
+        </div>
+      </div>
+      <div class="field"><label>កំណត់សម្គាល់</label><input id="r-note" placeholder="(មិនចាំបាច់)" /></div>
+      <button class="btn receive" onclick="addEntry('receive')">+ បន្ថែមកំណត់ត្រាទទួល</button>
+    </div>
+
+    <div class="card">
+      <h3>បញ្ជីទទួលថ្ងៃនេះ</h3>
+      <div id="list-receive"></div>
+    </div>
+  </div>
+
+  <!-- SEND TAB -->
+  <div class="tabpanel" id="tab-send">
+    <div class="card">
+      <h3><span class="dot s"></span> ផ្ញើចេញ — បញ្ចូលទិន្នន័យ</h3>
+      <div class="field"><label>ឈ្មោះអតិថិជន</label><input id="s-name" placeholder="ឈ្មោះ" /></div>
+      <div class="row2">
+        <div class="field"><label>លេខទូរស័ព្ទ</label><input id="s-phone" type="tel" placeholder="0xx xxx xxx" /></div>
+        <div class="field"><label>ថ្ងៃខែ</label><input id="s-date" type="date" /></div>
+      </div>
+      <div class="field"><label>បរិយាយឥវ៉ាន់ / ទីតាំង</label><input id="s-item" placeholder="ឧ. ភូមិ ភ្នំពេញ..." /></div>
+      <div class="row2">
+        <div class="field"><label>ទឹកប្រាក់ COD (USD)</label><input id="s-usd" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="field"><label>ទឹកប្រាក់ COD (៛)</label><input id="s-khr" type="number" step="100" placeholder="0" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>ថ្លៃសេវា (USD)</label><input id="s-feeusd" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="field"><label>ថ្លៃសេវា (៛)</label><input id="s-feekhr" type="number" step="100" placeholder="0" /></div>
+      </div>
+      <div class="field"><label>ស្ថានភាព</label>
+        <div class="status-toggle">
+          <button type="button" id="s-status-pending" class="active pending" onclick="setStatus('s','pending')">មិនទាន់សង</button>
+          <button type="button" id="s-status-paid" class="paid" onclick="setStatus('s','paid')">សងរួច</button>
+        </div>
+      </div>
+      <div class="field"><label>កំណត់សម្គាល់</label><input id="s-note" placeholder="(មិនចាំបាច់)" /></div>
+      <button class="btn send" onclick="addEntry('send')">+ បន្ថែមកំណត់ត្រាផ្ញើ</button>
+    </div>
+
+    <div class="card">
+      <h3>បញ្ជីផ្ញើថ្ងៃនេះ</h3>
+      <div id="list-send"></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY TAB -->
+  <div class="tabpanel" id="tab-summary">
+    <div class="card">
+      <h3>សង្ខេបថ្ងៃនេះ — <span id="sumDateLabel"></span></h3>
+      <div class="sum-grid">
+        <div class="sum-box r">
+          <div class="lbl">ចូល (ទទួល) · <span id="sumRCount">0</span> ធាតុ</div>
+          <div class="val num" id="sumRUsd">$0.00</div>
+          <div class="val2 num" id="sumRKhr">0 ៛</div>
+        </div>
+        <div class="sum-box s">
+          <div class="lbl">ចេញ (ផ្ញើ) · <span id="sumSCount">0</span> ធាតុ</div>
+          <div class="val num" id="sumSUsd">$0.00</div>
+          <div class="val2 num" id="sumSKhr">0 ៛</div>
+        </div>
+      </div>
+      <div class="net-box">
+        <div class="lbl">ថ្លៃសេវាសរុប (ចេញ)</div>
+        <div class="val num" id="sumFeeVal">$0.00</div>
+      </div>
+      <div class="net-box">
+        <div class="lbl">សមតុល្យសុទ្ធ (ចូល − ចេញ)</div>
+        <div class="val num" id="sumNetVal">$0.00</div>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn tg" onclick="shareTelegram()">📤 ផ្ញើទៅ Telegram</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="copySummary()">📋 ចម្លងសង្ខេប</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>មិនទាន់សងប្រាក់ (ថ្ងៃនេះ)</h3>
+      <div id="list-pending"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tabpanel" id="tab-history">
+    <div class="card">
+      <h3>ប្រវត្តិទាំងអស់</h3>
+      <div class="search-box"><input id="histSearch" placeholder="ស្វែងរក ឈ្មោះ / លេខទូរស័ព្ទ / ឥវ៉ាន់..." oninput="renderHistory()" /></div>
+      <div class="filter-row" id="histFilters">
+        <button class="chip active" data-f="all" onclick="setHistFilter('all')">ទាំងអស់</button>
+        <button class="chip" data-f="receive" onclick="setHistFilter('receive')">ចូល</button>
+        <button class="chip" data-f="send" onclick="setHistFilter('send')">ចេញ</button>
+        <button class="chip" data-f="pending" onclick="setHistFilter('pending')">មិនទាន់សង</button>
+      </div>
+      <div id="list-history"></div>
+    </div>
+    <div class="card">
+      <h3>ទិន្នន័យបម្រុងទុក</h3>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="exportData()">⬇ នាំចេញ JSON</button>
+        <button class="btn ghost" onclick="document.getElementById('importFile').click()">⬆ នាំចូល JSON</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
+      <div class="btn-row">
+        <button class="btn ghost" style="color:var(--pending); border-color:var(--pending);" onclick="clearAll()">🗑 លុបទិន្នន័យទាំងអស់</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<nav class="tabs">
+  <button class="active" data-tab="receive" onclick="switchTab('receive')"><span class="ic">📥</span>ទទួលចូល</button>
+  <button data-tab="send" onclick="switchTab('send')"><span class="ic">📤</span>ផ្ញើចេញ</button>
+  <button data-tab="summary" onclick="switchTab('summary')"><span class="ic">📊</span>សង្ខេប</button>
+  <button data-tab="history" onclick="switchTab('history')"><span class="ic">🗂</span>ប្រវត្តិ</button>
+</nav>
+
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettings()">✕</button>
+    <h3>ការកំណត់</h3>
+    <div class="field"><label>ឈ្មោះភ្នាក់ងារ</label><input id="settingsAgency" placeholder="ឈ្មោះភ្នាក់ងារ" /></div>
+    <div class="field"><label>អត្រាប្តូរប្រាក់ (1 USD = ? ៛)</label><input id="settingsRate" type="number" step="1" placeholder="4100" /></div>
+    <button class="btn receive" onclick="saveSettings()">រក្សាទុក</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY='codflow_entries_v1';
+const SETTINGS_KEY='codflow_settings_v1';
+let entries = [];
+let settings = {agency:'', rate:4100};
+let currentTab='receive';
+let statusState={r:'pending', s:'pending'};
+let histFilter='all';
+
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtUsd(n){ n=Number(n)||0; return '$'+n.toFixed(2); }
+function fmtKhr(n){ n=Math.round(Number(n)||0); return n.toLocaleString('en-US')+' ៛'; }
+function fmtDateKh(dstr){
+  if(!dstr) return '';
+  const d=new Date(dstr+'T00:00:00');
+  const days=['អាទិត្យ','ចន្ទ','អង្គារ','ពុធ','ព្រហស្បតិ៍','សុក្រ','សៅរ៍'];
+  return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+}
+function uid(){ return 'e'+Date.now()+Math.random().toString(36).slice(2,7); }
+
+function load(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    entries = raw ? JSON.parse(raw) : [];
+  }catch(e){ entries=[]; }
+  try{
+    const rawS=localStorage.getItem(SETTINGS_KEY);
+    if(rawS) settings=Object.assign(settings, JSON.parse(rawS));
+  }catch(e){}
+  document.getElementById('agencyName').value = settings.agency||'';
+}
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+function saveSettingsToStorage(){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function switchTab(name){
+  currentTab=name;
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  renderAll();
+}
+
+function setStatus(prefix, val){
+  statusState[prefix]=val;
+  document.getElementById(prefix+'-status-pending').classList.toggle('active', val==='pending');
+  document.getElementById(prefix+'-status-paid').classList.toggle('active', val==='paid');
+}
+
+function addEntry(type){
+  const p = type==='receive' ? 'r' : 's';
+  const name = document.getElementById(p+'-name').value.trim();
+  const phone = document.getElementById(p+'-phone').value.trim();
+  const date = document.getElementById(p+'-date').value || todayStr();
+  const item = document.getElementById(p+'-item').value.trim();
+  const usd = parseFloat(document.getElementById(p+'-usd').value)||0;
+  const khr = parseFloat(document.getElementById(p+'-khr').value)||0;
+  const feeUsd = type==='send' ? (parseFloat(document.getElementById('s-feeusd').value)||0) : 0;
+  const feeKhr = type==='send' ? (parseFloat(document.getElementById('s-feekhr').value)||0) : 0;
+  const note = document.getElementById(p+'-note').value.trim();
+  const status = statusState[p];
+
+  if(!name){ showToast('សូមបញ្ចូលឈ្មោះអតិថិជន'); return; }
+
+  entries.unshift({
+    id: uid(), type, name, phone, date, item,
+    usd, khr, feeUsd, feeKhr, status, note,
+    createdAt: Date.now()
+  });
+  save();
+
+  // reset form
+  ['name','phone','item','usd','khr','note'].forEach(f=>{
+    const el=document.getElementById(p+'-'+f);
+    if(el) el.value='';
+  });
+  if(type==='send'){ document.getElementById('s-feeusd').value=''; document.getElementById('s-feekhr').value=''; }
+  document.getElementById(p+'-date').value = todayStr();
+  setStatus(p,'pending');
+
+  showToast(type==='receive' ? '✅ បានបន្ថែមកំណត់ត្រាទទួល' : '✅ បានបន្ថែមកំណត់ត្រាផ្ញើ');
+  renderAll();
+}
+
+function deleteEntry(id){
+  if(!confirm('លុបកំណត់ត្រានេះ?')) return;
+  entries = entries.filter(e=>e.id!==id);
+  save();
+  renderAll();
+}
+
+function toggleStatus(id){
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  e.status = e.status==='paid' ? 'pending' : 'paid';
+  save();
+  renderAll();
+}
+
+function entryRowHtml(e){
+  const isR = e.type==='receive';
+  const icon = isR ? '📥' : '📤';
+  const badgeCls = isR ? 'r' : 's';
+  return `<div class="entry">
+    <div class="badge ${badgeCls}">${icon}</div>
+    <div class="info">
+      <div class="name">${escapeHtml(e.name)} <span class="tag ${e.status}" style="cursor:pointer" onclick="toggleStatus('${e.id}')">${e.status==='paid'?'សងរួច':'មិនទាន់សង'}</span></div>
+      <div class="sub">${escapeHtml(e.item||'')||'—'} ${e.phone?(' · '+escapeHtml(e.phone)):''}</div>
+      <div class="sub">${fmtDateKh(e.date)}${e.note?(' · '+escapeHtml(e.note)):''}</div>
+    </div>
+    <div class="amt">
+      <div class="usd num">${fmtUsd(e.usd)}</div>
+      <div class="khr num">${fmtKhr(e.khr)}</div>
+      <button class="del" onclick="deleteEntry('${e.id}')">✕</button>
+    </div>
+  </div>`;
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function todaysEntries(type){
+  const t = todayStr();
+  return entries.filter(e=>e.type===type && e.date===t);
+}
+
+function renderList(type){
+  const list = todaysEntries(type);
+  const el = document.getElementById('list-'+type);
+  if(list.length===0){ el.innerHTML='<div class="empty">មិនទាន់មានទិន្នន័យថ្ងៃនេះទេ</div>'; return; }
+  el.innerHTML = list.map(entryRowHtml).join('');
+}
+
+function renderFlow(){
+  const r = todaysEntries('receive');
+  const s = todaysEntries('send');
+  const rSum = r.reduce((a,e)=>a+e.usd,0);
+  const sSum = s.reduce((a,e)=>a+e.usd,0);
+  const total = rSum+sSum;
+  const rPct = total>0 ? (rSum/total*100) : 50;
+  const sPct = 100-rPct;
+  document.getElementById('segR').style.width = rPct+'%';
+  document.getElementById('segS').style.width = sPct+'%';
+  document.getElementById('flowRVal').textContent = fmtUsd(rSum);
+  document.getElementById('flowSVal').textContent = fmtUsd(sSum);
+}
+
+function renderSummary(){
+  const r = todaysEntries('receive');
+  const s = todaysEntries('send');
+  const rUsd=r.reduce((a,e)=>a+e.usd,0), rKhr=r.reduce((a,e)=>a+e.khr,0);
+  const sUsd=s.reduce((a,e)=>a+e.usd,0), sKhr=s.reduce((a,e)=>a+e.khr,0);
+  const feeUsd=s.reduce((a,e)=>a+e.feeUsd,0), feeKhr=s.reduce((a,e)=>a+e.feeKhr,0);
+  document.getElementById('sumDateLabel').textContent = fmtDateKh(todayStr());
+  document.getElementById('sumRCount').textContent = r.length;
+  document.getElementById('sumSCount').textContent = s.length;
+  document.getElementById('sumRUsd').textContent = fmtUsd(rUsd);
+  document.getElementById('sumRKhr').textContent = fmtKhr(rKhr);
+  document.getElementById('sumSUsd').textContent = fmtUsd(sUsd);
+  document.getElementById('sumSKhr').textContent = fmtKhr(sKhr);
+  document.getElementById('sumFeeVal').textContent = fmtUsd(feeUsd) + (feeKhr? ' + '+fmtKhr(feeKhr) : '');
+  const netUsd = rUsd - sUsd;
+  const netKhr = rKhr - sKhr;
+  document.getElementById('sumNetVal').textContent = fmtUsd(netUsd) + (netKhr? ' / '+fmtKhr(netKhr) : '');
+
+  const pending = entries.filter(e=>e.date===todayStr() && e.status==='pending');
+  const pel = document.getElementById('list-pending');
+  pel.innerHTML = pending.length ? pending.map(entryRowHtml).join('') : '<div class="empty">គ្មានវិក័យប័ត្រមិនទាន់សងទេ 🎉</div>';
+}
+
+function setHistFilter(f){
+  histFilter=f;
+  document.querySelectorAll('#histFilters .chip').forEach(c=>c.classList.toggle('active', c.dataset.f===f));
+  renderHistory();
+}
+
+function renderHistory(){
+  const q = (document.getElementById('histSearch').value||'').toLowerCase().trim();
+  let list = entries.slice();
+  if(histFilter==='receive') list=list.filter(e=>e.type==='receive');
+  else if(histFilter==='send') list=list.filter(e=>e.type==='send');
+  else if(histFilter==='pending') list=list.filter(e=>e.status==='pending');
+  if(q){
+    list = list.filter(e=>
+      (e.name||'').toLowerCase().includes(q) ||
+      (e.phone||'').toLowerCase().includes(q) ||
+      (e.item||'').toLowerCase().includes(q)
+    );
+  }
+  const el = document.getElementById('list-history');
+  if(list.length===0){ el.innerHTML='<div class="empty">គ្មានទិន្នន័យត្រូវនឹងលក្ខខណ្ឌនេះទេ</div>'; return; }
+  el.innerHTML = list.map(entryRowHtml).join('');
+}
+
+function renderAll(){
+  renderFlow();
+  document.getElementById('headerDate').textContent = fmtDateKh(todayStr());
+  if(currentTab==='receive') renderList('receive');
+  if(currentTab==='send') renderList('send');
+  if(currentTab==='summary') renderSummary();
+  if(currentTab==='history') renderHistory();
+}
+
+/* Telegram sharing */
+function buildSummaryText(){
+  const r = todaysEntries('receive');
+  const s = todaysEntries('send');
+  const rUsd=r.reduce((a,e)=>a+e.usd,0), rKhr=r.reduce((a,e)=>a+e.khr,0);
+  const sUsd=s.reduce((a,e)=>a+e.usd,0), sKhr=s.reduce((a,e)=>a+e.khr,0);
+  const feeUsd=s.reduce((a,e)=>a+e.feeUsd,0), feeKhr=s.reduce((a,e)=>a+e.feeKhr,0);
+  const netUsd=rUsd-sUsd, netKhr=rKhr-sKhr;
+  const agency = settings.agency ? settings.agency : '';
+  let txt = `📦 សង្ខេប COD ${agency?('- '+agency):''}\n📅 ${fmtDateKh(todayStr())}\n\n`;
+  txt += `📥 ចូល (ទទួល): ${r.length} ធាតុ\n   ${fmtUsd(rUsd)}  |  ${fmtKhr(rKhr)}\n\n`;
+  txt += `📤 ចេញ (ផ្ញើ): ${s.length} ធាតុ\n   ${fmtUsd(sUsd)}  |  ${fmtKhr(sKhr)}\n\n`;
+  txt += `🧾 ថ្លៃសេវាសរុប: ${fmtUsd(feeUsd)}${feeKhr? (' + '+fmtKhr(feeKhr)):''}\n`;
+  txt += `⚖️ សមតុល្យសុទ្ធ: ${fmtUsd(netUsd)}${netKhr? (' / '+fmtKhr(netKhr)):''}\n`;
+  const pending = entries.filter(e=>e.date===todayStr() && e.status==='pending');
+  if(pending.length){
+    txt += `\n⏳ មិនទាន់សង (${pending.length}):\n`;
+    pending.forEach(e=>{
+      txt += `  • ${e.name} — ${fmtUsd(e.usd)}${e.khr?(' / '+fmtKhr(e.khr)):''}\n`;
+    });
+  }
+  return txt;
+}
+function shareTelegram(){
+  const txt = buildSummaryText();
+  const url = 'https://t.me/share/url?url=&text='+encodeURIComponent(txt);
+  window.open(url, '_blank');
+}
+function copySummary(){
+  const txt = buildSummaryText();
+  navigator.clipboard.writeText(txt).then(()=>{
+    showToast('📋 បានចម្លងសង្ខេប');
+  }).catch(()=>{
+    showToast('មិនអាចចម្លងបានទេ');
+  });
+}
+
+/* Settings */
+function openSettings(){
+  document.getElementById('settingsAgency').value = settings.agency||'';
+  document.getElementById('settingsRate').value = settings.rate||4100;
+  document.getElementById('settingsModal').classList.add('show');
+}
+function closeSettings(){ document.getElementById('settingsModal').classList.remove('show'); }
+function saveSettings(){
+  settings.agency = document.getElementById('settingsAgency').value.trim();
+  settings.rate = parseFloat(document.getElementById('settingsRate').value)||4100;
+  saveSettingsToStorage();
+  document.getElementById('agencyName').value = settings.agency;
+  closeSettings();
+  showToast('✅ បានរក្សាទុកការកំណត់');
+}
+document.getElementById('agencyName').addEventListener('input', function(){
+  settings.agency = this.value;
+  saveSettingsToStorage();
+});
+
+/* Backup */
+function exportData(){
+  const blob = new Blob([JSON.stringify({entries, settings}, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cod-flow-backup-'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇ បាននាំចេញទិន្នន័យ');
+}
+function importData(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data.entries) entries = data.entries;
+      if(data.settings) settings = Object.assign(settings, data.settings);
+      save(); saveSettingsToStorage();
+      document.getElementById('agencyName').value = settings.agency||'';
+      renderAll();
+      showToast('✅ បាននាំចូលទិន្នន័យ');
+    }catch(err){
+      showToast('❌ ឯកសារមិនត្រឹមត្រូវ');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value='';
+}
+function clearAll(){
+  if(!confirm('លុបទិន្នន័យទាំងអស់ជាអចិន្ត្រៃយ៍? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។')) return;
+  entries = [];
+  save();
+  renderAll();
+  showToast('🗑 បានលុបទិន្នន័យទាំងអស់');
+}
+
+/* Init */
+function init(){
+  load();
+  document.getElementById('r-date').value = todayStr();
+  document.getElementById('s-date').value = todayStr();
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
