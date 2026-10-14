@@ -194,6 +194,28 @@
   .hist-bar{ display:flex; gap:8px; margin-bottom:12px; }
   .hist-bar .btn{ flex:1; }
 
+  .idle-settings{ display:flex; align-items:center; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .idle-settings input[type="number"]{ width:64px; padding:8px; font-size:15px; text-align:center; }
+  .idle-settings .btn{ flex-shrink:0; }
+
+  .profile-list{ display:flex; flex-direction:column; gap:7px; margin-top:8px; }
+  .profile-row{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 11px; border:1.5px solid var(--line); border-radius:10px; background:var(--paper);
+    cursor:pointer;
+  }
+  .profile-row.active{ border-color: var(--postal); background: var(--postal-soft); }
+  .profile-row .pname{ flex:1; min-width:0; font-size:14.5px; font-weight:600; }
+  .profile-row .pdim{ font-size:12px; color:var(--ink-soft); font-family:"JetBrains Mono", monospace; }
+  .profile-row .ptag{ font-size:10.5px; color:var(--postal); font-weight:700; }
+  .profile-row .prow-actions{ display:flex; gap:4px; }
+  .profile-row .prow-actions button{
+    border:none; background:transparent; font-size:15px; padding:4px 6px; cursor:pointer; color: var(--ink-soft);
+  }
+  .profile-add-row{ display:flex; gap:7px; margin-top:10px; }
+  .profile-add-row input{ flex:1; padding:9px 10px; font-size:14px; }
+  .paper-add-row input[type="number"]{ flex:0 0 72px; }
+
   .search-row{ display:flex; gap:8px; margin-bottom:12px; }
   .search-row input{ flex:1; }
   .btn{
@@ -314,6 +336,18 @@
           <button class="copy-btn" id="scanCopyBtn">ចម្លងលេខ</button>
         </div>
         <div class="note" id="scanNote"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="typeInput">វាយលេខទូរស័ព្ទភ្ញៀវ (បោះពុម្ពស្វ័យប្រវត្តិ ពេលឈប់វាយ)</label>
+      <input type="tel" id="typeInput" inputmode="numeric" autocomplete="off" placeholder="វាយលេខនៅទីនេះ…">
+      <div class="hint" id="idleHint">ឈប់វាយ 4 វិនាទី នឹងបោះពុម្ពស្វ័យប្រវត្តិភ្លាម — មិនចាំបាច់ចុច Enter</div>
+      <div class="idle-settings">
+        <label style="margin:0; white-space:nowrap;">រង់ចាំ (វិនាទី)</label>
+        <input type="number" id="idleSecInput" min="1" step="1" value="4">
+        <button class="btn btn-ghost btn-sm" id="idleSaveBtn">រក្សាទុក</button>
+        <button class="btn btn-ghost btn-sm" id="printSettingsBtn">⚙️ ម៉ាស៊ីន/ក្រដាស</button>
       </div>
     </div>
 
@@ -456,6 +490,31 @@
   </div>
 </div>
 
+<!-- PRINTER / PAPER SETTINGS MODAL -->
+<div class="modal-overlay" id="printerSettingsOverlay">
+  <div class="modal">
+    <button class="modal-close" id="printerSettingsClose">✕</button>
+    <h2>ការកំណត់ម៉ាស៊ីនបោះពុម្ព</h2>
+
+    <label>ម៉ាស៊ីនបោះពុម្ព</label>
+    <div id="printerProfileList" class="profile-list"></div>
+    <div class="profile-add-row">
+      <input type="text" id="newPrinterName" placeholder="ឈ្មោះម៉ាស៊ីន ឧ. Thermal កន្លែងទទួល">
+      <button class="btn btn-primary btn-sm" id="addPrinterBtn">➕ បន្ថែម</button>
+    </div>
+
+    <label style="margin-top:20px;">ទំហំក្រដាស (ដូច Page Setup ក្នុង Word)</label>
+    <div id="paperProfileList" class="profile-list"></div>
+    <div class="profile-add-row paper-add-row">
+      <input type="text" id="newPaperName" placeholder="ឈ្មោះ ឧ. ស្លាក 80×100">
+      <input type="number" id="newPaperW" placeholder="ទទឹង mm" min="10">
+      <input type="number" id="newPaperH" placeholder="កម្ពស់ mm" min="10">
+      <button class="btn btn-primary btn-sm" id="addPaperBtn">➕</button>
+    </div>
+    <div class="hint" style="margin-top:8px; text-align:left;">ចុចលើមួយណាដើម្បីកំណត់ជាប្រើប្រាស់សកម្ម — ប្រអប់ Print Preview នឹងប្រើទំហំនេះភ្លាម</div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -499,6 +558,38 @@
   }
   function saveHistory(list){
     try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+  }
+
+  var PRINTER_KEY = "vet_qr_printers_v1";
+  var PAPER_KEY = "vet_qr_papers_v1";
+  var ACTIVE_PRINTER_KEY = "vet_qr_active_printer_v1";
+  var ACTIVE_PAPER_KEY = "vet_qr_active_paper_v1";
+  var IDLE_SEC_KEY = "vet_qr_idle_seconds_v1";
+
+  var DEFAULT_PAPERS = [
+    { id: "p80x100", name: "ស្លាក 80×100mm", w: 80, h: 100 },
+    { id: "p80x50", name: "ស្លាក 80×50mm", w: 80, h: 50 },
+    { id: "pa4", name: "A4", w: 210, h: 297 }
+  ];
+
+  function loadJSON(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){ return fallback; }
+  }
+  function saveJSON(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  }
+
+  var printers = loadJSON(PRINTER_KEY, []);
+  var papers = loadJSON(PAPER_KEY, DEFAULT_PAPERS.slice());
+  var activePrinterId = loadJSON(ACTIVE_PRINTER_KEY, null);
+  var activePaperId = loadJSON(ACTIVE_PAPER_KEY, papers.length ? papers[0].id : null);
+  var idleSeconds = loadJSON(IDLE_SEC_KEY, 4);
+
+  function activePaper(){
+    return papers.find(function(p){ return p.id === activePaperId; }) || papers[0] || DEFAULT_PAPERS[0];
   }
 
   var records = loadRecords();
@@ -570,6 +661,27 @@
     return canvas;
   }
 
+  function moduleSizeForWidth(text, targetPx, margin){
+    if(typeof qrcode === "undefined") return 6;
+    var probe = qrcode(0, "M");
+    probe.addData(text || "");
+    probe.make();
+    var count = probe.getModuleCount();
+    var ms = Math.floor(targetPx / (count + margin * 2));
+    return Math.max(2, ms);
+  }
+
+  function applyPageSize(){
+    var p = activePaper();
+    var styleEl = document.getElementById("pageSizeStyle");
+    if(!styleEl){
+      styleEl = document.createElement("style");
+      styleEl.id = "pageSizeStyle";
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = "@page{ size:" + p.w + "mm " + p.h + "mm; margin:4mm; }";
+  }
+
   // ---------- scan view ----------
   var scanInput = document.getElementById("scanInput");
   var scanResult = document.getElementById("scanResult");
@@ -581,8 +693,10 @@
   var recentEmpty = document.getElementById("recentEmpty");
 
   function focusScan(){
+    var typeEl = document.getElementById("typeInput");
     if(document.activeElement !== document.getElementById("addPhone") &&
-       document.activeElement !== document.getElementById("editPhone")){
+       document.activeElement !== document.getElementById("editPhone") &&
+       document.activeElement !== typeEl){
       scanInput.focus();
     }
   }
@@ -603,7 +717,7 @@
       var li = document.createElement("li");
       var timeStr = new Date(e.at).toLocaleTimeString("km-KH", {hour:"2-digit", minute:"2-digit"});
       li.innerHTML =
-        '<span class="l"><span class="mono">' + escapeHtml(e.phone) + '</span><span class="t">' + (e.found ? "✅ " : "⚠️ ") + timeStr + '</span></span>' +
+        '<span class="l"><span class="mono">' + escapeHtml(e.phone) + '</span><span class="t">' + (e.source === "typed" ? "⌨️ " : (e.found ? "✅ " : "⚠️ ")) + timeStr + '</span></span>' +
         '<span class="r"><button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">ចម្លងលេខ</button></span>';
       li.querySelector('[data-copy]').addEventListener("click", function(ev){
         copyToClipboard(ev.target.getAttribute("data-copy"), ev.target);
@@ -836,19 +950,31 @@
   // print preview (pops up on screen first, like Word's print preview)
   var printPreviewOverlay = document.getElementById("printPreviewOverlay");
 
-  function openPrintPreview(r){
+  function openPrintPreview(r, auto){
+    activeId = r.id;
+    applyPageSize();
+    var p = activePaper();
+    var targetPx = Math.round(p.w * 7.8); // ~ paper width at print resolution
+    var ms = moduleSizeForWidth(r.phone, targetPx * 0.78, 3);
+
     var pvCanvas = document.getElementById("printPreviewCanvas");
-    drawQR(pvCanvas, r.phone, 8, 3);
+    drawQR(pvCanvas, r.phone, ms, 3);
     document.getElementById("printPreviewNum").textContent = r.phone;
     document.getElementById("printPreviewNote").textContent = r.note || "";
 
     // keep the hidden @media-print area in sync too, in case the browser supports native printing
     var pCanvas = document.getElementById("printCanvas");
-    drawQR(pCanvas, r.phone, 10, 3);
+    drawQR(pCanvas, r.phone, ms, 3);
     document.getElementById("printNum").textContent = r.phone;
     document.getElementById("printNote").textContent = r.note || "";
 
     printPreviewOverlay.classList.add("show");
+
+    if(auto){
+      setTimeout(function(){
+        try{ window.print(); }catch(e){}
+      }, 180);
+    }
   }
   function closePrintPreview(){
     printPreviewOverlay.classList.remove("show");
@@ -1100,7 +1226,7 @@
       row.innerHTML =
         '<input type="checkbox" data-idx="' + idx + '">' +
         '<div style="flex:1; min-width:0;">' +
-          '<div class="num mono">' + (e.found ? "✅ " : "⚠️ ") + escapeHtml(e.phone) + '</div>' +
+          '<div class="num mono">' + (e.source === "typed" ? "⌨️ " : (e.found ? "✅ " : "⚠️ ")) + escapeHtml(e.phone) + '</div>' +
           '<div class="t">' + dateStr + '</div>' +
         '</div>' +
         '<button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">ចម្លង</button>';
@@ -1134,6 +1260,207 @@
     saveHistory(history);
     renderHistory();
   });
+
+  // ---------- type-to-print (idle timer) ----------
+  var typeInput = document.getElementById("typeInput");
+  var idleSecInput = document.getElementById("idleSecInput");
+  var idleHint = document.getElementById("idleHint");
+  var idleTimer = null;
+
+  function setIdleHintText(){
+    idleHint.textContent = "ឈប់វាយ " + idleSeconds + " វិនាទី នឹងបោះពុម្ពស្វ័យប្រវត្តិភ្លាម — មិនចាំបាច់ចុច Enter";
+  }
+  idleSecInput.value = idleSeconds;
+  setIdleHintText();
+
+  document.getElementById("idleSaveBtn").addEventListener("click", function(){
+    var v = parseInt(idleSecInput.value, 10);
+    if(!v || v < 1) v = 1;
+    idleSeconds = v;
+    idleSecInput.value = v;
+    saveJSON(IDLE_SEC_KEY, idleSeconds);
+    setIdleHintText();
+  });
+
+  function armIdleTimer(){
+    if(idleTimer){ clearTimeout(idleTimer); idleTimer = null; }
+    var val = norm(typeInput.value);
+    if(val.length < 3) return;
+    idleTimer = setTimeout(function(){
+      triggerAutoPrint(val);
+    }, idleSeconds * 1000);
+  }
+  typeInput.addEventListener("input", armIdleTimer);
+  typeInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      if(idleTimer){ clearTimeout(idleTimer); idleTimer = null; }
+      triggerAutoPrint(typeInput.value);
+    }
+  });
+
+  function triggerAutoPrint(phoneRaw){
+    var phone = norm(phoneRaw);
+    if(!phone) return;
+    var rec = records.find(function(x){ return x.phone === phone; });
+    if(!rec){
+      rec = { id: uid(), phone: phone, note: "", createdAt: Date.now(), updatedAt: Date.now() };
+      records.push(rec);
+      saveRecords(records);
+      renderList();
+    }
+    handleScan(phone);
+    recent[0] && (recent[0].source = "typed");
+    history[0] && (history[0].source = "typed");
+    saveRecent(recent);
+    saveHistory(history);
+    renderRecent();
+    openPrintPreview(rec, true);
+    typeInput.value = "";
+    setTimeout(function(){ typeInput.focus(); }, 220);
+  }
+
+  // ---------- printer / paper settings ----------
+  var printerSettingsOverlay = document.getElementById("printerSettingsOverlay");
+  var printerProfileList = document.getElementById("printerProfileList");
+  var paperProfileList = document.getElementById("paperProfileList");
+
+  function openPrinterSettings(){
+    renderPrinterList();
+    renderPaperList();
+    printerSettingsOverlay.classList.add("show");
+  }
+  function closePrinterSettings(){
+    printerSettingsOverlay.classList.remove("show");
+    focusScan();
+  }
+  document.getElementById("printSettingsBtn").addEventListener("click", openPrinterSettings);
+  document.getElementById("printerSettingsClose").addEventListener("click", closePrinterSettings);
+  printerSettingsOverlay.addEventListener("click", function(e){ if(e.target === printerSettingsOverlay) closePrinterSettings(); });
+
+  function renderPrinterList(){
+    printerProfileList.innerHTML = "";
+    if(!printers.length){
+      var empty = document.createElement("div");
+      empty.className = "empty";
+      empty.style.padding = "10px";
+      empty.textContent = "មិនទាន់មានម៉ាស៊ីនបោះពុម្ពទេ — បន្ថែមខាងក្រោម";
+      printerProfileList.appendChild(empty);
+      return;
+    }
+    printers.forEach(function(pr){
+      var row = document.createElement("div");
+      row.className = "profile-row" + (pr.id === activePrinterId ? " active" : "");
+      row.innerHTML =
+        '<span class="pname">' + escapeHtml(pr.name) + (pr.id === activePrinterId ? ' <span class="ptag">(កំពុងប្រើ)</span>' : '') + '</span>' +
+        '<span class="prow-actions"><button data-act="edit">✎</button><button data-act="del">🗑</button></span>';
+      row.addEventListener("click", function(ev){
+        if(ev.target.closest("[data-act]")) return;
+        activePrinterId = pr.id;
+        saveJSON(ACTIVE_PRINTER_KEY, activePrinterId);
+        renderPrinterList();
+      });
+      row.querySelector('[data-act="edit"]').addEventListener("click", function(ev){
+        ev.stopPropagation();
+        var name = prompt("ឈ្មោះម៉ាស៊ីនបោះពុម្ព", pr.name);
+        if(name === null) return;
+        name = norm(name);
+        if(!name) return;
+        pr.name = name;
+        saveJSON(PRINTER_KEY, printers);
+        renderPrinterList();
+      });
+      row.querySelector('[data-act="del"]').addEventListener("click", function(ev){
+        ev.stopPropagation();
+        if(!confirm("លុបម៉ាស៊ីន \"" + pr.name + "\"?")) return;
+        printers = printers.filter(function(x){ return x.id !== pr.id; });
+        saveJSON(PRINTER_KEY, printers);
+        if(activePrinterId === pr.id){
+          activePrinterId = printers.length ? printers[0].id : null;
+          saveJSON(ACTIVE_PRINTER_KEY, activePrinterId);
+        }
+        renderPrinterList();
+      });
+      printerProfileList.appendChild(row);
+    });
+  }
+
+  document.getElementById("addPrinterBtn").addEventListener("click", function(){
+    var nameInput = document.getElementById("newPrinterName");
+    var name = norm(nameInput.value);
+    if(!name) return;
+    var pr = { id: uid(), name: name };
+    printers.push(pr);
+    saveJSON(PRINTER_KEY, printers);
+    if(!activePrinterId){ activePrinterId = pr.id; saveJSON(ACTIVE_PRINTER_KEY, activePrinterId); }
+    nameInput.value = "";
+    renderPrinterList();
+  });
+
+  function renderPaperList(){
+    paperProfileList.innerHTML = "";
+    papers.forEach(function(p){
+      var row = document.createElement("div");
+      row.className = "profile-row" + (p.id === activePaperId ? " active" : "");
+      row.innerHTML =
+        '<span class="pname">' + escapeHtml(p.name) + (p.id === activePaperId ? ' <span class="ptag">(កំពុងប្រើ)</span>' : '') + '</span>' +
+        '<span class="pdim">' + p.w + '×' + p.h + 'mm</span>' +
+        '<span class="prow-actions"><button data-act="edit">✎</button><button data-act="del">🗑</button></span>';
+      row.addEventListener("click", function(ev){
+        if(ev.target.closest("[data-act]")) return;
+        activePaperId = p.id;
+        saveJSON(ACTIVE_PAPER_KEY, activePaperId);
+        applyPageSize();
+        renderPaperList();
+      });
+      row.querySelector('[data-act="edit"]').addEventListener("click", function(ev){
+        ev.stopPropagation();
+        var name = prompt("ឈ្មោះទំហំក្រដាស", p.name);
+        if(name === null) return;
+        var w = prompt("ទទឹង (mm)", p.w);
+        if(w === null) return;
+        var h = prompt("កម្ពស់ (mm)", p.h);
+        if(h === null) return;
+        name = norm(name); w = parseFloat(w); h = parseFloat(h);
+        if(!name || !w || !h) return;
+        p.name = name; p.w = w; p.h = h;
+        saveJSON(PAPER_KEY, papers);
+        if(p.id === activePaperId) applyPageSize();
+        renderPaperList();
+      });
+      row.querySelector('[data-act="del"]').addEventListener("click", function(ev){
+        ev.stopPropagation();
+        if(papers.length <= 1){ alert("ត្រូវមានទំហំក្រដាសយ៉ាងហោចណាស់មួយ។"); return; }
+        if(!confirm("លុបទំហំក្រដាស \"" + p.name + "\"?")) return;
+        papers = papers.filter(function(x){ return x.id !== p.id; });
+        saveJSON(PAPER_KEY, papers);
+        if(activePaperId === p.id){
+          activePaperId = papers[0].id;
+          saveJSON(ACTIVE_PAPER_KEY, activePaperId);
+          applyPageSize();
+        }
+        renderPaperList();
+      });
+      paperProfileList.appendChild(row);
+    });
+  }
+
+  document.getElementById("addPaperBtn").addEventListener("click", function(){
+    var nameInput = document.getElementById("newPaperName");
+    var wInput = document.getElementById("newPaperW");
+    var hInput = document.getElementById("newPaperH");
+    var name = norm(nameInput.value);
+    var w = parseFloat(wInput.value);
+    var h = parseFloat(hInput.value);
+    if(!name || !w || !h){ alert("សូមបំពេញឈ្មោះ ទទឹង និងកម្ពស់ទំហំក្រដាស។"); return; }
+    var p = { id: uid(), name: name, w: w, h: h };
+    papers.push(p);
+    saveJSON(PAPER_KEY, papers);
+    nameInput.value = ""; wInput.value = ""; hInput.value = "";
+    renderPaperList();
+  });
+
+  applyPageSize();
 
   // ---------- init ----------
   renderList();
