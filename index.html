@@ -250,6 +250,22 @@
   .detail-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:18px; }
   .detail-actions .btn{ width:100%; }
 
+  .print-preview-modal{ max-width:420px; }
+  .pp-toolbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .pp-toolbar h2{ margin:0; }
+  .print-page{
+    background:#ffffff; color:#111111; border-radius:4px;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.28);
+    padding: 22px 16px 20px; text-align:center;
+    border:1px solid #ddd;
+  }
+  .print-page canvas{ max-width:100%; height:auto; }
+  .pp-num{ font-family:"JetBrains Mono", monospace; font-size:21px; font-weight:700; margin-top:10px; color:#111; }
+  .pp-note{ font-size:13px; color:#555; margin-top:3px; }
+  .pp-pagelabel{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:10px; }
+  .pp-actions{ display:flex; gap:8px; margin-top:16px; }
+  .pp-actions .btn{ flex:1; }
+
   #printArea{ display:none; }
   @media print{
     body > *:not(#printArea){ display:none !important; }
@@ -389,6 +405,29 @@
   <canvas id="printCanvas"></canvas>
   <div class="p-num" id="printNum"></div>
   <div class="p-note" id="printNote"></div>
+</div>
+
+<!-- PRINT PREVIEW MODAL (shown on screen, like Word's print preview) -->
+<div class="modal-overlay" id="printPreviewOverlay">
+  <div class="modal print-preview-modal">
+    <div class="pp-toolbar">
+      <h2>ទិដ្ឋភាពមុនបោះពុម្ព</h2>
+      <button class="modal-close" id="printPreviewClose">✕</button>
+    </div>
+    <div class="print-page">
+      <canvas id="printPreviewCanvas"></canvas>
+      <div class="pp-num" id="printPreviewNum"></div>
+      <div class="pp-note" id="printPreviewNote"></div>
+    </div>
+    <div class="pp-pagelabel">សំបុត្រ QR — ទំហំសម្រាប់បិទលើកញ្ចប់</div>
+    <div class="pp-actions">
+      <button class="btn btn-primary" id="printPreviewPrintBtn">🖨️ បោះពុម្ពឥឡូវនេះ</button>
+      <button class="btn btn-ghost" id="printPreviewPngBtn">⬇️ Save PNG</button>
+    </div>
+    <div class="pp-actions">
+      <button class="btn btn-ghost btn-block" id="printPreviewShareBtn">📤 ចែករំលែក</button>
+    </div>
+  </div>
 </div>
 
 <!-- CAMERA SCAN OVERLAY -->
@@ -565,7 +604,7 @@
       var timeStr = new Date(e.at).toLocaleTimeString("km-KH", {hour:"2-digit", minute:"2-digit"});
       li.innerHTML =
         '<span class="l"><span class="mono">' + escapeHtml(e.phone) + '</span><span class="t">' + (e.found ? "✅ " : "⚠️ ") + timeStr + '</span></span>' +
-        '<span class="r"><button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">Copy</button></span>';
+        '<span class="r"><button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">ចម្លងលេខ</button></span>';
       li.querySelector('[data-copy]').addEventListener("click", function(ev){
         copyToClipboard(ev.target.getAttribute("data-copy"), ev.target);
       });
@@ -794,15 +833,46 @@
     renderList();
   });
 
-  // print
-  document.getElementById("detailPrintBtn").addEventListener("click", function(){
-    var r = records.find(function(x){ return x.id === activeId; });
-    if(!r) return;
+  // print preview (pops up on screen first, like Word's print preview)
+  var printPreviewOverlay = document.getElementById("printPreviewOverlay");
+
+  function openPrintPreview(r){
+    var pvCanvas = document.getElementById("printPreviewCanvas");
+    drawQR(pvCanvas, r.phone, 8, 3);
+    document.getElementById("printPreviewNum").textContent = r.phone;
+    document.getElementById("printPreviewNote").textContent = r.note || "";
+
+    // keep the hidden @media-print area in sync too, in case the browser supports native printing
     var pCanvas = document.getElementById("printCanvas");
     drawQR(pCanvas, r.phone, 10, 3);
     document.getElementById("printNum").textContent = r.phone;
     document.getElementById("printNote").textContent = r.note || "";
+
+    printPreviewOverlay.classList.add("show");
+  }
+  function closePrintPreview(){
+    printPreviewOverlay.classList.remove("show");
+    focusScan();
+  }
+  document.getElementById("detailPrintBtn").addEventListener("click", function(){
+    var r = records.find(function(x){ return x.id === activeId; });
+    if(!r) return;
+    openPrintPreview(r);
+  });
+  document.getElementById("printPreviewClose").addEventListener("click", closePrintPreview);
+  printPreviewOverlay.addEventListener("click", function(e){ if(e.target === printPreviewOverlay) closePrintPreview(); });
+  document.getElementById("printPreviewPrintBtn").addEventListener("click", function(){
     window.print();
+  });
+  document.getElementById("printPreviewPngBtn").addEventListener("click", function(){
+    var r = records.find(function(x){ return x.id === activeId; });
+    if(!r) return;
+    downloadLabelPng(r);
+  });
+  document.getElementById("printPreviewShareBtn").addEventListener("click", function(){
+    var r = records.find(function(x){ return x.id === activeId; });
+    if(!r) return;
+    shareLabel(r);
   });
 
   // save PNG
@@ -829,9 +899,7 @@
     return out;
   }
 
-  document.getElementById("detailPngBtn").addEventListener("click", function(){
-    var r = records.find(function(x){ return x.id === activeId; });
-    if(!r) return;
+  function downloadLabelPng(r){
     var out = buildLabelCanvas(r, 10);
     out.toBlob(function(blob){
       var url = URL.createObjectURL(blob);
@@ -843,12 +911,15 @@
       a.remove();
       setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
     }, "image/png");
+  }
+  document.getElementById("detailPngBtn").addEventListener("click", function(){
+    var r = records.find(function(x){ return x.id === activeId; });
+    if(!r) return;
+    downloadLabelPng(r);
   });
 
   // share
-  document.getElementById("detailShareBtn").addEventListener("click", function(){
-    var r = records.find(function(x){ return x.id === activeId; });
-    if(!r) return;
+  function shareLabel(r){
     var out = buildLabelCanvas(r, 10);
     out.toBlob(function(blob){
       var file = new File([blob], "qr-" + r.phone + ".png", { type: "image/png" });
@@ -863,6 +934,11 @@
         alert("ទូរស័ព្ទនេះមិនអាចចែករំលែកផ្ទាល់បានទេ — បានរក្សាទុករូបភាពជំនួសវិញ។");
       }
     }, "image/png");
+  }
+  document.getElementById("detailShareBtn").addEventListener("click", function(){
+    var r = records.find(function(x){ return x.id === activeId; });
+    if(!r) return;
+    shareLabel(r);
   });
 
   // ---------- backup ----------
