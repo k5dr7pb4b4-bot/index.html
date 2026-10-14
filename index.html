@@ -151,11 +151,13 @@
   .recent .recent-actions{ display:flex; gap:6px; }
   .recent ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
   .recent li{
-    display:flex; justify-content:space-between; align-items:center;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:9px 12px; background:var(--paper-raised); border:1px solid var(--line); border-radius:10px;
     font-size:14px;
   }
-  .recent li span.t{ color:var(--ink-soft); font-size:12px; }
+  .recent li .l{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .recent li span.t{ color:var(--ink-soft); font-size:12px; flex-shrink:0; }
+  .recent li .r{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
 
   .cam-overlay{
     position:fixed; inset:0; background:#000; z-index:60; display:none;
@@ -561,7 +563,12 @@
     recent.forEach(function(e){
       var li = document.createElement("li");
       var timeStr = new Date(e.at).toLocaleTimeString("km-KH", {hour:"2-digit", minute:"2-digit"});
-      li.innerHTML = '<span class="mono">' + escapeHtml(e.phone) + '</span><span class="t">' + (e.found ? "✅ " : "⚠️ ") + timeStr + '</span>';
+      li.innerHTML =
+        '<span class="l"><span class="mono">' + escapeHtml(e.phone) + '</span><span class="t">' + (e.found ? "✅ " : "⚠️ ") + timeStr + '</span></span>' +
+        '<span class="r"><button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">Copy</button></span>';
+      li.querySelector('[data-copy]').addEventListener("click", function(ev){
+        copyToClipboard(ev.target.getAttribute("data-copy"), ev.target);
+      });
       recentList.appendChild(li);
     });
   }
