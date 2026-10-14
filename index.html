@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/2.0.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
   :root{
     box-sizing: border-box;
@@ -136,9 +137,18 @@
   .scan-result .status{ font-size:12.5px; font-weight:700; text-transform: none; margin-bottom:6px; }
   .scan-result.found .status{ color: var(--postal); }
   .scan-result.notfound .status{ color: var(--amber); }
+  .scan-result .num-row{ display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
+  .copy-btn{
+    border:1.5px solid currentColor; background:transparent; border-radius:8px;
+    padding:5px 10px; font-size:12.5px; font-weight:700; cursor:pointer; color:inherit;
+    font-family:inherit;
+  }
+  .scan-cam-btn{ margin-top:10px; }
 
   .recent{ margin-top: 16px; }
-  .recent h3{ font-size:13px; color:var(--ink-soft); margin:0 0 8px 2px; font-weight:600; }
+  .recent .recent-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .recent h3{ font-size:13px; color:var(--ink-soft); margin:0 0 0 2px; font-weight:600; }
+  .recent .recent-actions{ display:flex; gap:6px; }
   .recent ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
   .recent li{
     display:flex; justify-content:space-between; align-items:center;
@@ -146,6 +156,41 @@
     font-size:14px;
   }
   .recent li span.t{ color:var(--ink-soft); font-size:12px; }
+
+  .cam-overlay{
+    position:fixed; inset:0; background:#000; z-index:60; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+  }
+  .cam-overlay.show{ display:flex; }
+  .cam-overlay video{ width:100%; max-width:480px; border-radius:12px; }
+  .cam-overlay .cam-frame{ position:relative; width:100%; max-width:480px; }
+  .cam-overlay .cam-box{
+    position:absolute; inset: 14%; border:3px solid var(--amber); border-radius:16px;
+    box-shadow: 0 0 0 999px rgba(0,0,0,0.35);
+  }
+  .cam-overlay .cam-hint{ color:#fff; font-size:13.5px; margin-top:16px; text-align:center; padding:0 20px; }
+  .cam-overlay .cam-close{
+    position:absolute; top:calc(16px + env(safe-area-inset-top,0px)); right:16px;
+    background:rgba(255,255,255,0.15); color:#fff; border:none; border-radius:10px;
+    padding:9px 13px; font-size:14px; cursor:pointer;
+  }
+  .cam-overlay .cam-flash{
+    position:absolute; inset:0; background:var(--postal); opacity:0; border-radius:12px;
+    transition: opacity .15s;
+  }
+  .cam-overlay .cam-flash.flash{ opacity:0.55; }
+  .cam-overlay .cam-err{ color:#fff; text-align:center; padding:0 24px; font-size:14px; line-height:1.7; }
+
+  .hist-row{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:var(--paper);
+  }
+  .hist-row + .hist-row{ margin-top:7px; }
+  .hist-row input[type="checkbox"]{ width:18px; height:18px; flex-shrink:0; accent-color: var(--postal); }
+  .hist-row .num{ font-weight:700; font-size:14.5px; }
+  .hist-row .t{ font-size:11.5px; color:var(--ink-soft); }
+  .hist-bar{ display:flex; gap:8px; margin-bottom:12px; }
+  .hist-bar .btn{ flex:1; }
 
   .search-row{ display:flex; gap:8px; margin-bottom:12px; }
   .search-row input{ flex:1; }
@@ -243,16 +288,27 @@
       <label for="scanInput">ស្កេន QR Code (ម៉ាស៊ីន Syble) ឬបញ្ចូលលេខផ្ទាល់</label>
       <input type="text" id="scanInput" inputmode="numeric" autocomplete="off" placeholder="រង់ចាំការស្កេន…">
       <div class="hint">ចង្អុលម៉ាស៊ីន scan មក QR code របស់អតិថិជន — លេខនឹងលោតឡើងភ្លាមៗ</div>
+      <button class="btn btn-amber btn-block scan-cam-btn" id="openCamBtn">📷 ស្កេនតាមកាមេរ៉ាទូរស័ព្ទ</button>
       <div class="scan-result" id="scanResult">
         <div class="status" id="scanStatus"></div>
-        <div class="num mono" id="scanNum"></div>
+        <div class="num-row">
+          <div class="num mono" id="scanNum"></div>
+          <button class="copy-btn" id="scanCopyBtn">ចម្លងលេខ</button>
+        </div>
         <div class="note" id="scanNote"></div>
       </div>
     </div>
 
-    <div class="recent" id="recentWrap" style="display:none;">
-      <h3>ស្កេនថ្មីៗ</h3>
+    <div class="recent">
+      <div class="recent-head">
+        <h3>ស្កេនជាប់ៗគ្នា (10 ជួរចុងក្រោយ)</h3>
+        <div class="recent-actions">
+          <button class="btn btn-ghost btn-sm" id="historyBtn">ប្រវត្តិ</button>
+          <button class="btn btn-ghost btn-sm" id="resetSessionBtn">Reset</button>
+        </div>
+      </div>
       <ul id="recentList"></ul>
+      <div class="empty" id="recentEmpty" style="padding:16px 10px; display:none;">មិនទាន់មានការស្កេននៅឡើយទេ</div>
     </div>
   </section>
 
@@ -333,12 +389,41 @@
   <div class="p-note" id="printNote"></div>
 </div>
 
+<!-- CAMERA SCAN OVERLAY -->
+<div class="cam-overlay" id="camOverlay">
+  <button class="cam-close" id="camCloseBtn">✕ បិទ</button>
+  <div class="cam-frame" id="camFrame">
+    <video id="camVideo" playsinline muted autoplay></video>
+    <div class="cam-box"></div>
+    <div class="cam-flash" id="camFlash"></div>
+  </div>
+  <div class="cam-hint" id="camHint">ដាក់ QR code ឱ្យស្ថិតក្នុងប្រអប់ — វានឹងស្កេនបន្តបន្ទាប់គ្នា</div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="historyOverlay">
+  <div class="modal">
+    <button class="modal-close" id="historyClose">✕</button>
+    <h2>ប្រវត្តិស្កេន (រក្សាទុក 3 ខែ)</h2>
+    <div class="hist-bar">
+      <button class="btn btn-ghost btn-sm" id="histSelectAllBtn">ជ្រើសរើសទាំងអស់</button>
+      <button class="btn btn-rust btn-sm" id="histDeleteSelectedBtn">លុបដែលបានជ្រើស</button>
+      <button class="btn btn-rust btn-sm" id="histDeleteAllBtn">លុបទាំងអស់</button>
+    </div>
+    <div id="histList"></div>
+    <div class="empty" id="histEmpty" style="display:none;">មិនទាន់មានប្រវត្តិស្កេនទេ</div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
   var STORAGE_KEY = "vet_qr_phone_records_v1";
   var RECENT_KEY = "vet_qr_recent_scans_v1";
+  var HISTORY_KEY = "vet_qr_scan_history_v1";
+  var HISTORY_RETENTION_MS = 90 * 24 * 60 * 60 * 1000; // ~3 months
+  var SESSION_CAP = 10;
 
   // ---------- storage ----------
   function loadRecords(){
@@ -357,11 +442,27 @@
     }catch(e){ return []; }
   }
   function saveRecent(list){
-    try{ localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0,8))); }catch(e){}
+    try{ localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, SESSION_CAP))); }catch(e){}
+  }
+  function loadHistory(){
+    try{
+      var raw = localStorage.getItem(HISTORY_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      var cutoff = Date.now() - HISTORY_RETENTION_MS;
+      var kept = list.filter(function(e){ return (e.at || 0) >= cutoff; });
+      if(kept.length !== list.length){
+        try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(kept)); }catch(e2){}
+      }
+      return kept;
+    }catch(e){ return []; }
+  }
+  function saveHistory(list){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
   }
 
   var records = loadRecords();
   var recent = loadRecent();
+  var history = loadHistory();
 
   function uid(){ return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function norm(s){ return (s || "").toString().trim(); }
@@ -399,6 +500,15 @@
   function drawQR(canvas, text, moduleSize, margin){
     moduleSize = moduleSize || 8;
     margin = margin === undefined ? 3 : margin;
+    if(typeof qrcode === "undefined"){
+      var ctx0 = canvas.getContext("2d");
+      canvas.width = 120; canvas.height = 120;
+      ctx0.fillStyle = "#f4d9d9"; ctx0.fillRect(0,0,120,120);
+      ctx0.fillStyle = "#7c3113"; ctx0.font = "12px sans-serif"; ctx0.textAlign="center";
+      ctx0.fillText("QR មិនផ្ទុក", 60, 55);
+      ctx0.fillText("សូម Reload", 60, 72);
+      return canvas;
+    }
     var qr = qrcode(0, "M");
     qr.addData(text || "");
     qr.make();
@@ -427,6 +537,7 @@
   var scanNote = document.getElementById("scanNote");
   var recentWrap = document.getElementById("recentWrap");
   var recentList = document.getElementById("recentList");
+  var recentEmpty = document.getElementById("recentEmpty");
 
   function focusScan(){
     if(document.activeElement !== document.getElementById("addPhone") &&
@@ -437,14 +548,16 @@
 
   function pushRecent(entry){
     recent.unshift(entry);
-    recent = recent.slice(0, 8);
+    recent = recent.slice(0, SESSION_CAP);
     saveRecent(recent);
     renderRecent();
+
+    history.unshift(entry);
+    saveHistory(history);
   }
   function renderRecent(){
-    if(!recent.length){ recentWrap.style.display = "none"; return; }
-    recentWrap.style.display = "block";
     recentList.innerHTML = "";
+    recentEmpty.style.display = recent.length ? "none" : "block";
     recent.forEach(function(e){
       var li = document.createElement("li");
       var timeStr = new Date(e.at).toLocaleTimeString("km-KH", {hour:"2-digit", minute:"2-digit"});
@@ -453,6 +566,41 @@
     });
   }
   renderRecent();
+
+  document.getElementById("resetSessionBtn").addEventListener("click", function(){
+    if(!recent.length) return;
+    if(!confirm("សម្អាតបញ្ជីស្កេនជាប់ៗគ្នានេះ? (ប្រវត្តិពេញលេញនៅតែរក្សាទុក)")) return;
+    recent = [];
+    saveRecent(recent);
+    renderRecent();
+  });
+
+  document.getElementById("scanCopyBtn").addEventListener("click", function(){
+    var val = scanNum.textContent;
+    if(!val) return;
+    copyToClipboard(val, document.getElementById("scanCopyBtn"));
+  });
+
+  function copyToClipboard(text, btn){
+    function done(ok){
+      if(!btn) return;
+      var original = btn.textContent;
+      btn.textContent = ok ? "បានចម្លង ✓" : "មិនបានទេ";
+      setTimeout(function(){ btn.textContent = original; }, 1400);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(function(){ done(false); });
+    }else{
+      try{
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        done(true);
+      }catch(e){ done(false); }
+    }
+  }
 
   function handleScan(value){
     value = norm(value);
@@ -754,6 +902,154 @@
       e.target.value = "";
     };
     reader.readAsText(file);
+  });
+
+  // ---------- camera scan ----------
+  var camOverlay = document.getElementById("camOverlay");
+  var camVideo = document.getElementById("camVideo");
+  var camHint = document.getElementById("camHint");
+  var camFlash = document.getElementById("camFlash");
+  var camStream = null;
+  var camRAF = null;
+  var camCanvas = document.createElement("canvas");
+  var camCtx = camCanvas.getContext("2d", { willReadFrequently: true });
+  var lastCamValue = "";
+  var lastCamAt = 0;
+
+  function camSetHint(text){ camHint.textContent = text; }
+
+  function openCamera(){
+    if(typeof jsQR === "undefined"){
+      alert("មុខងារស្កេនតាមកាមេរ៉ាមិនអាចផ្ទុកបានទេ — សូម reload ទំព័រ ហើយសាកល្បងម្តងទៀត។");
+      return;
+    }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      alert("កម្មវិធីរុករកនេះមិនគាំទ្រការប្រើកាមេរ៉ាទេ។");
+      return;
+    }
+    camOverlay.classList.add("show");
+    camSetHint("កំពុងបើកកាមេរ៉ា…");
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false })
+      .then(function(stream){
+        camStream = stream;
+        camVideo.srcObject = stream;
+        camVideo.play();
+        camSetHint("ដាក់ QR code ឱ្យស្ថិតក្នុងប្រអប់ — វានឹងស្កេនបន្តបន្ទាប់គ្នា");
+        camRAF = requestAnimationFrame(camTick);
+      })
+      .catch(function(){
+        camSetHint("");
+        camVideo.style.display = "none";
+        var err = document.createElement("div");
+        err.className = "cam-err";
+        err.textContent = "មិនអាចបើកកាមេរ៉ាបានទេ — សូមអនុញ្ញាតសិទ្ធិកាមេរ៉ាសម្រាប់ទំព័រនេះ ឬប្រើការស្កេនតាមម៉ាស៊ីន Syble ជំនួសវិញ។";
+        document.getElementById("camFrame").appendChild(err);
+      });
+  }
+
+  function closeCamera(){
+    camOverlay.classList.remove("show");
+    if(camRAF){ cancelAnimationFrame(camRAF); camRAF = null; }
+    if(camStream){
+      camStream.getTracks().forEach(function(t){ t.stop(); });
+      camStream = null;
+    }
+    camVideo.srcObject = null;
+    camVideo.style.display = "";
+    var err = document.querySelector(".cam-err");
+    if(err) err.remove();
+    focusScan();
+  }
+
+  function camTick(){
+    if(!camStream) return;
+    if(camVideo.readyState === camVideo.HAVE_ENOUGH_DATA){
+      camCanvas.width = camVideo.videoWidth;
+      camCanvas.height = camVideo.videoHeight;
+      camCtx.drawImage(camVideo, 0, 0, camCanvas.width, camCanvas.height);
+      try{
+        var imgData = camCtx.getImageData(0, 0, camCanvas.width, camCanvas.height);
+        var code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "dontInvert" });
+        if(code && code.data){
+          var now = Date.now();
+          if(code.data !== lastCamValue || (now - lastCamAt) > 2200){
+            lastCamValue = code.data;
+            lastCamAt = now;
+            camFlash.classList.add("flash");
+            setTimeout(function(){ camFlash.classList.remove("flash"); }, 160);
+            handleScan(code.data);
+            camSetHint("បានស្កេន៖ " + code.data + " — បន្តដាក់លេខបន្ទាប់");
+          }
+        }
+      }catch(e){ /* ignore frame decode errors */ }
+    }
+    camRAF = requestAnimationFrame(camTick);
+  }
+
+  document.getElementById("openCamBtn").addEventListener("click", openCamera);
+  document.getElementById("camCloseBtn").addEventListener("click", closeCamera);
+
+  // ---------- scan history (3-month log) ----------
+  var historyOverlay = document.getElementById("historyOverlay");
+  var histList = document.getElementById("histList");
+  var histEmpty = document.getElementById("histEmpty");
+
+  function openHistory(){
+    renderHistory();
+    historyOverlay.classList.add("show");
+  }
+  function closeHistory(){
+    historyOverlay.classList.remove("show");
+    focusScan();
+  }
+  document.getElementById("historyBtn").addEventListener("click", openHistory);
+  document.getElementById("historyClose").addEventListener("click", closeHistory);
+  historyOverlay.addEventListener("click", function(e){ if(e.target === historyOverlay) closeHistory(); });
+
+  function renderHistory(){
+    histList.innerHTML = "";
+    histEmpty.style.display = history.length ? "none" : "block";
+    history.forEach(function(e, idx){
+      var row = document.createElement("div");
+      row.className = "hist-row";
+      var d = new Date(e.at);
+      var dateStr = d.toLocaleDateString("km-KH") + " " + d.toLocaleTimeString("km-KH", {hour:"2-digit", minute:"2-digit"});
+      row.innerHTML =
+        '<input type="checkbox" data-idx="' + idx + '">' +
+        '<div style="flex:1; min-width:0;">' +
+          '<div class="num mono">' + (e.found ? "✅ " : "⚠️ ") + escapeHtml(e.phone) + '</div>' +
+          '<div class="t">' + dateStr + '</div>' +
+        '</div>' +
+        '<button class="copy-btn" data-copy="' + escapeHtml(e.phone) + '">ចម្លង</button>';
+      row.querySelector('[data-copy]').addEventListener("click", function(ev){
+        copyToClipboard(ev.target.getAttribute("data-copy"), ev.target);
+      });
+      histList.appendChild(row);
+    });
+  }
+
+  document.getElementById("histSelectAllBtn").addEventListener("click", function(){
+    var boxes = histList.querySelectorAll('input[type="checkbox"]');
+    var allChecked = Array.prototype.every.call(boxes, function(b){ return b.checked; });
+    boxes.forEach(function(b){ b.checked = !allChecked; });
+  });
+
+  document.getElementById("histDeleteSelectedBtn").addEventListener("click", function(){
+    var boxes = histList.querySelectorAll('input[type="checkbox"]:checked');
+    if(!boxes.length){ alert("សូមជ្រើសរើសជួរណាមួយជាមុនសិន។"); return; }
+    if(!confirm("លុប " + boxes.length + " ជួរដែលបានជ្រើសរើស?")) return;
+    var idxToRemove = Array.prototype.map.call(boxes, function(b){ return parseInt(b.getAttribute("data-idx"), 10); });
+    history = history.filter(function(e, idx){ return idxToRemove.indexOf(idx) === -1; });
+    saveHistory(history);
+    renderHistory();
+  });
+
+  document.getElementById("histDeleteAllBtn").addEventListener("click", function(){
+    if(!history.length) return;
+    if(!confirm("លុបប្រវត្តិស្កេនទាំងអស់ " + history.length + " ជួរ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។")) return;
+    history = [];
+    saveHistory(history);
+    renderHistory();
   });
 
   // ---------- init ----------
