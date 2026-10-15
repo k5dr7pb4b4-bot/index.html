@@ -74,12 +74,12 @@ body {
 /* Header */
 .card-header {
   background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-  padding: 36px 24px 28px;
+  padding: 18px 24px 16px;
   text-align: center;
 }
 #agencyName {
   font-family: 'Hanuman', serif;
-  font-size: 36px;
+  font-size: 20px;
   font-weight: 900;
   color: #f6c90e;
   letter-spacing: 1px;
@@ -91,7 +91,8 @@ body {
 .date-row {
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
-  padding: 10px 24px;
+  padding: 2px 24px;
+  line-height: 1.4;
   text-align: center;
 }
 #dateDisplay {
@@ -116,13 +117,12 @@ body {
 
 /* Image upload — 1 slot */
 .image-zone {
-  padding: 16px 24px 0;
+  padding: 8px 24px 0;
   background: #fff;
 }
 .upload-area {
   border: 2px dashed #ced4da;
   border-radius: 12px;
-  min-height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +131,7 @@ body {
   position: relative;
   background: #fafafa;
   overflow: hidden;
-  min-height: 200px;
+  min-height: 100px;
 }
 .upload-area:hover { border-color: #0f3460; background: #f0f4ff; }
 
@@ -322,7 +322,7 @@ body {
   </div>
   <div>
     <label>ទំហំអក្សរ (px)</label>
-    <input type="number" id="sizeInput" value="36" min="16" max="80" oninput="updateSize()">
+    <input type="number" id="sizeInput" value="20" min="10" max="80" oninput="updateSize()">
   </div>
   <div>
     <label>ពណ៌ Header</label>
@@ -352,7 +352,7 @@ body {
     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
       <div class="upload-placeholder">
         <div class="icon">+</div>
-        <p>ចុចដើម្បី Upload រូបភាព</p>
+        <p>ចុច ឬ ទាញរូបភាពមកដាក់ ឬ Paste</p>
       </div>
     </div>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
@@ -410,7 +410,7 @@ function loadSettings() {
     if (!s) return;
     if (s.name)  { document.getElementById('nameInput').value  = s.name;  updateName(); }
     if (s.color) { document.getElementById('colorInput').value = s.color; updateColor(); }
-    if (s.size)  { document.getElementById('sizeInput').value  = s.size;  updateSize(); }
+    if (s.size && String(s.size) !== '36') { document.getElementById('sizeInput').value  = s.size;  updateSize(); }
     if (s.bg)    { document.getElementById('bgInput').value    = s.bg;    updateBg(); }
   } catch(e) {}
 }
@@ -449,19 +449,26 @@ function applyDate() {
 // ── Toolbar ──
 function updateName()  { document.getElementById('agencyName').textContent = document.getElementById('nameInput').value; }
 function updateColor() { document.getElementById('agencyName').style.color = document.getElementById('colorInput').value; }
-function updateSize()  { document.getElementById('agencyName').style.fontSize = (parseInt(document.getElementById('sizeInput').value)||36)+'px'; }
+function updateSize()  { document.getElementById('agencyName').style.fontSize = (parseInt(document.getElementById('sizeInput').value)||20)+'px'; }
 function updateBg()    { const c=document.getElementById('bgInput').value; document.getElementById('cardHeader').style.background='linear-gradient(135deg,'+c+' 0%,#16213e 100%)'; }
 
 // ── Image upload ──
 function loadImage(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+  loadImageFile(e.target.files[0]);
+}
+function loadImageFile(file) {
+  if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
   const reader = new FileReader();
   reader.onload = function(ev) {
     const area = document.getElementById('uploadArea');
     area.innerHTML = '';
     area.onclick = null;
     const img = document.createElement('img');
+    img.draggable = false;
+    img.onload = function() {
+      // box height = half of the image's natural display height (min 100px)
+      area.style.height = Math.max(100, Math.round(img.offsetHeight / 2)) + 'px';
+    };
     img.src = ev.target.result;
     area.appendChild(img);
     const btn = document.createElement('button');
@@ -477,8 +484,41 @@ function resetUpload() {
   const area = document.getElementById('uploadArea');
   area.innerHTML = '<div class="upload-placeholder"><div class="icon">+</div><p>ចុចដើម្បី Upload រូបភាព</p></div>';
   area.onclick = function(){ document.getElementById('fileInput').click(); };
+  area.style.height = '';
   document.getElementById('fileInput').value = '';
 }
+
+// ── Drag & drop from outside + paste (Ctrl+V) ──
+(function() {
+  const area = document.getElementById('uploadArea');
+  ['dragenter','dragover'].forEach(ev => area.addEventListener(ev, e => {
+    e.preventDefault();
+    area.style.borderColor = '#0f3460';
+    area.style.background = '#f0f4ff';
+  }));
+  ['dragleave','drop'].forEach(ev => area.addEventListener(ev, e => {
+    e.preventDefault();
+    area.style.borderColor = '';
+    area.style.background = '';
+  }));
+  area.addEventListener('drop', e => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length) { loadImageFile(dt.files[0]); }
+  });
+  // stop the browser from opening a dropped image when missing the box
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', e => e.preventDefault());
+  document.addEventListener('paste', e => {
+    const items = (e.clipboardData && e.clipboardData.items) || [];
+    for (const it of items) {
+      if (it.type && it.type.indexOf('image/') === 0) {
+        loadImageFile(it.getAsFile());
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+})();
 
 // ── Pan & Pinch-to-zoom ──
 let imgState = { scale: 1.2, x: 0, y: 0 };
@@ -544,8 +584,8 @@ function initInteractiveImage(img) {
 
 // ── Message selector ──
 const msgs = {
-  '1': 'សូមជួយ <span style="color:#003087;font-weight:700;">«ចំណាយប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។',
-  '2': 'សូមជួយ <span style="color:#c0392b;font-weight:700;">«លុបប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។'
+  '1': 'សូមជួយ <span style="color:#003087;font-weight:900;font-size:30px;line-height:1.5;">«ចំណាយប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។',
+  '2': 'សូមជួយ <span style="color:#c0392b;font-weight:900;font-size:30px;line-height:1.5;">«លុបប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។'
 };
 function selectMsg() {
   const val = document.getElementById('msgSelect').value;
