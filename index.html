@@ -8,7 +8,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0d1117; --surface: #161b22; --card: #1c2230; --border: #2d3748;
+      --bg: #202a3b; --surface: #161b22; --card: #1c2230; --border: #2d3748;
       --gold: #e6b84a; --gold-dim: #a8822a; --teal: #38c9a0; --teal-dim: #1f7a60;
       --text: #e8eaf0; --muted: #8892a4; --danger: #e05252;
       --radius: 14px; --mono: 'DM Mono', monospace; --khmer: 'Hanuman', serif;
@@ -51,6 +51,8 @@
     .calc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 480px; overflow: hidden; }
     .calc-block { padding: 22px 24px; }
     .calc-block + .calc-block { border-top: 1px solid var(--border); }
+    .calc-block.top { padding-bottom: 10px; }
+    .calc-block.bottom { padding-top: 10px; }
     .block-label {
       display: flex; align-items: center; gap: 8px; font-size: 0.75rem;
       font-family: var(--mono); color: var(--muted); text-transform: uppercase;
@@ -75,22 +77,34 @@
     .amount-input:focus { border-color: var(--gold); }
     .amount-input.teal:focus { border-color: var(--teal); }
 
-    .swap-wrap { display: flex; align-items: center; justify-content: center; position: relative; gap: 24px; }
+    .swap-wrap { display: flex; align-items: center; justify-content: center; position: relative; padding: 0; height: 36px; }
     .swap-wrap::before { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: var(--border); }
-    .swap-btn {
-      position: relative; z-index: 1; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center;
-      justify-content: center; cursor: pointer; font-size: 1.1rem; transition: 0.2s; color: var(--gold);
+    .reset-all-btn {
+      position: relative; z-index: 1; background: var(--surface); border: 1.5px solid var(--danger);
+      border-radius: 999px; padding: 6px 22px; cursor: pointer; font-family: var(--khmer);
+      font-size: 0.85rem; color: var(--danger); transition: 0.2s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .swap-btn:hover { border-color: var(--gold); background: var(--card); transform: rotate(180deg); }
-    .clear-fields-btn {
-      position: relative; z-index: 1; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center;
-      justify-content: center; cursor: pointer; font-size: 1rem; transition: 0.2s; color: var(--muted);
-      opacity: 0.4; pointer-events: none;
+    .reset-all-btn:hover { background: var(--danger); color: #fff; }
+    .reset-all-btn:active { transform: scale(0.95); }
+
+    .copy-btn {
+      flex-shrink: 0; min-width: 74px; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 10px 8px; cursor: pointer; font-family: var(--khmer);
+      font-size: 0.8rem; white-space: nowrap; transition: 0.18s; text-align: center;
+      -webkit-tap-highlight-color: transparent;
     }
-    .clear-fields-btn.active { opacity: 1; pointer-events: auto; color: var(--danger); border-color: var(--danger); }
-    .clear-fields-btn.active:hover { background: var(--danger); color: #fff; transform: rotate(90deg); }
+    .copy-btn.gold { color: var(--gold); border-color: var(--gold-dim); }
+    .copy-btn.gold:hover { background: #29200d; }
+    .copy-btn.teal { color: var(--teal); border-color: var(--teal-dim); }
+    .copy-btn.teal:hover { background: #0e2a20; }
+    .copy-btn.done { background: var(--teal); border-color: var(--teal); color: #08241b; }
+    .copy-btn:active { transform: scale(0.94); }
+
+    /* hide number spinner arrows */
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     .result-bar {
       background: var(--surface); border-top: 1px solid var(--border); padding: 14px 24px;
@@ -156,6 +170,9 @@
       .amount-input { font-size: 1.1rem; padding: 10px 12px; }
       h1 { font-size: 1.3rem; }
       .ck { padding: 16px 4px; font-size: 1rem; }
+      .calc-block { padding-left: 16px; padding-right: 16px; }
+      .input-row { gap: 6px; }
+      .copy-btn { min-width: 64px; font-size: 0.75rem; padding: 10px 4px; }
       .calc-val { font-size: 1.35rem; }
     }
   </style>
@@ -184,25 +201,25 @@
 
 <div class="calc-card">
 
-  <div class="calc-block">
+  <div class="calc-block top">
     <div class="block-label"><span class="dot dot-gold"></span>ពី ដុល្លារ → រៀល</div>
     <div class="input-row">
       <span class="currency-badge badge-gold">USD $</span>
       <input class="amount-input" id="usdInput" type="number" min="0" placeholder="0.00" oninput="calcFromUSD()" />
+      <button class="copy-btn gold" onclick="copyNum('usd',this)">ចម្លងលេខ</button>
     </div>
   </div>
 
   <div class="swap-wrap">
-    <button class="clear-fields-btn" id="clearFieldsBtn" onclick="clearFields()" title="លុបចំនួន" style="visibility:hidden">✕</button>
-    <button class="swap-btn" onclick="swapValues()">⇅</button>
-    <button class="clear-fields-btn" id="clearFieldsBtn2" onclick="clearFields()" title="លុបចំនួន">✕</button>
+    <button class="reset-all-btn" onclick="resetAll()">សារដើម</button>
   </div>
 
-  <div class="calc-block">
+  <div class="calc-block bottom">
     <div class="block-label"><span class="dot dot-teal"></span>ពី រៀល → ដុល្លារ</div>
     <div class="input-row">
       <span class="currency-badge badge-teal">KHR ៛</span>
       <input class="amount-input teal" id="khrInput" type="number" min="0" placeholder="0" oninput="calcFromKHR()" />
+      <button class="copy-btn teal" onclick="copyNum('khr',this)">ចម្លងលេខ</button>
     </div>
   </div>
 
@@ -277,19 +294,28 @@
     else if(khrInput.value!=='') calcFromKHR();
   });
 
-  const clearFieldsBtn  = document.getElementById('clearFieldsBtn');
-  const clearFieldsBtn2 = document.getElementById('clearFieldsBtn2');
 
-  function updateClearBtn(){
-    const has = usdInput.value!==''||khrInput.value!=='';
-    clearFieldsBtn.classList.toggle('active', has);
-    clearFieldsBtn.style.visibility = 'hidden';
-    clearFieldsBtn2.classList.toggle('active', has);
-  }
-  function clearFields(){
+  function updateClearBtn(){}
+  function resetAll(){
     usdInput.value=''; khrInput.value='';
     formulaEl.textContent='បំពេញចំនួនខាងលើ';
-    updateClearBtn();
+    cAC();
+  }
+  function copyNum(which,btn){
+    const v=(which==='usd'?usdInput:khrInput).value;
+    if(v==='') return;
+    const done=()=>{
+      const old=btn.textContent; btn.textContent='បានចម្លង ✓'; btn.classList.add('done');
+      setTimeout(()=>{btn.textContent='ចម្លងលេខ'; btn.classList.remove('done');},1200);
+    };
+    const fallback=()=>{
+      const t=document.createElement('textarea'); t.value=v; t.style.position='fixed'; t.style.opacity='0';
+      document.body.appendChild(t); t.select();
+      try{document.execCommand('copy');}catch(e){}
+      document.body.removeChild(t); done();
+    };
+    if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(v).then(done,fallback); }
+    else fallback();
   }
 
   function calcFromUSD(){
@@ -304,13 +330,6 @@
     if(isNaN(khr)||khrInput.value===''){usdInput.value='';formulaEl.textContent='បំពេញចំនួនខាងលើ';updateClearBtn();return;}
     const usd=khr/rate; usdInput.value=usd.toFixed(2);
     formulaEl.textContent=fmtKHR(khr)+' ÷ '+rate.toLocaleString()+' = '+fmtUSD(usd);
-    updateClearBtn();
-  }
-  function swapValues(){
-    rate=getRate(); const u=usdInput.value,k=khrInput.value;
-    usdInput.value=''; khrInput.value='';
-    if(k!==''){khrInput.value=k;calcFromKHR();}
-    else if(u!==''){usdInput.value=u;calcFromUSD();}
     updateClearBtn();
   }
   function resetRate(){
