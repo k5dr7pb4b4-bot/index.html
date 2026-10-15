@@ -16,34 +16,34 @@
     body {
       background: var(--bg); color: var(--text); font-family: var(--khmer);
       min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; padding: 40px 16px 60px;
+      align-items: center; padding: 20px 16px 40px;
     }
-    header { text-align: center; margin-bottom: 36px; }
-    .flag-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 2rem; margin-bottom: 10px; }
-    .flag-row span.arrow { color: var(--gold); font-size: 1.4rem; }
-    h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px; }
+    header { text-align: center; margin-bottom: 14px; line-height: 1.2; }
+    .flag-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.4rem; margin-bottom: 2px; }
+    .flag-row span.arrow { color: var(--gold); font-size: 1rem; }
+    h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.3px; line-height: 1.3; }
     h1 em { color: var(--gold); font-style: normal; }
-    .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; font-family: var(--mono); }
+    .subtitle { color: var(--muted); font-size: 0.72rem; margin-top: 0; font-family: var(--mono); }
 
     .rate-card {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 18px 22px; width: 100%; max-width: 480px; margin-bottom: 20px;
+      padding: 8px 14px; width: 100%; max-width: 480px; margin-bottom: 12px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .rate-label { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); line-height: 1.6; }
-    .rate-label strong { display: block; color: var(--gold); font-size: 1.05rem; }
+    .rate-label { font-size: 0.68rem; color: var(--muted); font-family: var(--mono); line-height: 1.4; }
+    .rate-label strong { display: block; color: var(--gold); font-size: 0.88rem; }
     .rate-input-wrap {
       display: flex; align-items: center; gap: 6px; background: var(--surface);
-      border: 1.5px solid var(--gold-dim); border-radius: 8px; padding: 6px 12px; flex-shrink: 0;
+      border: 1.5px solid var(--gold-dim); border-radius: 8px; padding: 3px 9px; flex-shrink: 0;
     }
     .rate-input-wrap input {
       background: transparent; border: none; outline: none; font-family: var(--mono);
-      font-size: 1.1rem; font-weight: 500; color: var(--gold); width: 80px; text-align: right;
+      font-size: 0.95rem; font-weight: 500; color: var(--gold); width: 62px; text-align: right;
     }
     .rate-input-wrap .unit { color: var(--muted); font-size: 0.8rem; font-family: var(--mono); }
     .rate-reset {
       background: none; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.75rem;
+      border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 0.7rem;
       font-family: var(--khmer); transition: 0.2s;
     }
     .rate-reset:hover { border-color: var(--gold); color: var(--gold); }
@@ -123,11 +123,11 @@
 
     .calc-screen {
       background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px 16px; margin-bottom: 12px; text-align: right; min-height: 66px;
+      padding: 6px 12px; margin-bottom: 10px; text-align: right; min-height: 40px;
       display: flex; flex-direction: column; justify-content: flex-end;
     }
-    .calc-expr { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); min-height: 18px; word-break: break-all; }
-    .calc-val  { font-family: var(--mono); font-size: 1.65rem; font-weight: 500; color: var(--text); word-break: break-all; }
+    .calc-expr { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); min-height: 13px; line-height: 1.2; word-break: break-all; }
+    .calc-val  { font-family: var(--mono); font-size: 1.15rem; line-height: 1.25; font-weight: 500; color: var(--text); word-break: break-all; }
 
     .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
@@ -168,12 +168,12 @@
 
     @media (max-width: 500px) {
       .amount-input { font-size: 1.1rem; padding: 10px 12px; }
-      h1 { font-size: 1.3rem; }
+      h1 { font-size: 1.05rem; }
       .ck { padding: 16px 4px; font-size: 1rem; }
       .calc-block { padding-left: 16px; padding-right: 16px; }
       .input-row { gap: 6px; }
       .copy-btn { min-width: 64px; font-size: 0.75rem; padding: 10px 4px; }
-      .calc-val { font-size: 1.35rem; }
+      .calc-val { font-size: 1.05rem; }
     }
   </style>
 </head>
