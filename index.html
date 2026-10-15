@@ -1,404 +1,711 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ម៉ាស៊ីនគិតប្រាក់ | KHR ↔ USD</title>
-  <link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #202a3b; --surface: #161b22; --card: #1c2230; --border: #2d3748;
-      --gold: #e6b84a; --gold-dim: #a8822a; --teal: #38c9a0; --teal-dim: #1f7a60;
-      --text: #e8eaf0; --muted: #8892a4; --danger: #e05252;
-      --radius: 14px; --mono: 'DM Mono', monospace; --khmer: 'Hanuman', serif;
-    }
-    body {
-      background: var(--bg); color: var(--text); font-family: var(--khmer);
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; padding: 20px 16px 40px;
-    }
-    header { text-align: center; margin-bottom: 14px; line-height: 1.2; }
-    .flag-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.4rem; margin-bottom: 2px; }
-    .flag-row span.arrow { color: var(--gold); font-size: 1rem; }
-    h1 { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.3px; line-height: 1.3; }
-    h1 em { color: var(--gold); font-style: normal; }
-    .subtitle { color: var(--muted); font-size: 0.72rem; margin-top: 0; font-family: var(--mono); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ភ្នាក់ងារ ត្មាតពង</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .rate-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 8px 14px; width: 100%; max-width: 480px; margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .rate-label { font-size: 0.68rem; color: var(--muted); font-family: var(--mono); line-height: 1.4; }
-    .rate-label strong { display: block; color: var(--gold); font-size: 0.88rem; }
-    .rate-input-wrap {
-      display: flex; align-items: center; gap: 6px; background: var(--surface);
-      border: 1.5px solid var(--gold-dim); border-radius: 8px; padding: 3px 9px; flex-shrink: 0;
-    }
-    .rate-input-wrap input {
-      background: transparent; border: none; outline: none; font-family: var(--mono);
-      font-size: 0.95rem; font-weight: 500; color: var(--gold); width: 62px; text-align: right;
-    }
-    .rate-input-wrap .unit { color: var(--muted); font-size: 0.8rem; font-family: var(--mono); }
-    .rate-reset {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 0.7rem;
-      font-family: var(--khmer); transition: 0.2s;
-    }
-    .rate-reset:hover { border-color: var(--gold); color: var(--gold); }
+body {
+  background: #1a1a2e;
+  font-family: 'Kantumruy Pro', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 16px 60px;
+}
 
-    .calc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 480px; overflow: hidden; }
-    .calc-block { padding: 22px 24px; }
-    .calc-block + .calc-block { border-top: 1px solid var(--border); }
-    .calc-block.top { padding-bottom: 10px; }
-    .calc-block.bottom { padding-top: 10px; }
-    .block-label {
-      display: flex; align-items: center; gap: 8px; font-size: 0.75rem;
-      font-family: var(--mono); color: var(--muted); text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 12px;
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-gold { background: var(--gold); }
-    .dot-teal { background: var(--teal); }
-    .input-row { display: flex; align-items: center; gap: 10px; }
-    .currency-badge {
-      font-size: 0.9rem; font-weight: 700; font-family: var(--mono); background: var(--surface);
-      border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; flex-shrink: 0;
-    }
-    .badge-gold { color: var(--gold); border-color: var(--gold-dim); }
-    .badge-teal { color: var(--teal); border-color: var(--teal-dim); }
-    .amount-input {
-      flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 10px; padding: 12px 16px; font-family: var(--mono);
-      font-size: 1.4rem; font-weight: 500; color: var(--text); outline: none;
-      transition: border-color 0.2s; width: 100%;
-    }
-    .amount-input:focus { border-color: var(--gold); }
-    .amount-input.teal:focus { border-color: var(--teal); }
+/* TOOLBAR */
+.toolbar {
+  width: 100%;
+  max-width: 560px;
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.toolbar label {
+  color: #a0aec0;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
+}
+.toolbar input[type="text"],
+.toolbar input[type="number"] {
+  width: 100%;
+  background: #0f3460;
+  border: 1px solid #1e4a8a;
+  border-radius: 8px;
+  color: #e2e8f0;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  outline: none;
+}
+.toolbar input[type="color"] {
+  width: 100%;
+  height: 38px;
+  background: #0f3460;
+  border: 1px solid #1e4a8a;
+  border-radius: 8px;
+  padding: 2px 6px;
+  cursor: pointer;
+  outline: none;
+}
 
-    .swap-wrap { display: flex; align-items: center; justify-content: center; position: relative; padding: 0; height: 36px; }
-    .swap-wrap::before { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: var(--border); }
-    .reset-all-btn {
-      position: relative; z-index: 1; background: var(--surface); border: 1.5px solid var(--danger);
-      border-radius: 999px; padding: 6px 22px; cursor: pointer; font-family: var(--khmer);
-      font-size: 0.85rem; color: var(--danger); transition: 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .reset-all-btn:hover { background: var(--danger); color: #fff; }
-    .reset-all-btn:active { transform: scale(0.95); }
+/* CARD */
+#card {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
 
-    .copy-btn {
-      flex-shrink: 0; min-width: 74px; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 8px; padding: 10px 8px; cursor: pointer; font-family: var(--khmer);
-      font-size: 0.8rem; white-space: nowrap; transition: 0.18s; text-align: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .copy-btn.gold { color: var(--gold); border-color: var(--gold-dim); }
-    .copy-btn.gold:hover { background: #29200d; }
-    .copy-btn.teal { color: var(--teal); border-color: var(--teal-dim); }
-    .copy-btn.teal:hover { background: #0e2a20; }
-    .copy-btn.done { background: var(--teal); border-color: var(--teal); color: #08241b; }
-    .copy-btn:active { transform: scale(0.94); }
+/* Header */
+.card-header {
+  background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+  padding: 36px 24px 28px;
+  text-align: center;
+}
+#agencyName {
+  font-family: 'Hanuman', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: #f6c90e;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  text-shadow: 0 2px 12px rgba(246,201,14,0.3);
+}
 
-    /* hide number spinner arrows */
-    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* Date */
+.date-row {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 10px 24px;
+  text-align: center;
+}
+#dateDisplay {
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+#dateDisplay:hover { color: #0f3460; }
+.edit-hint { font-size: 11px; color: #adb5bd; font-style: italic; }
+#dateInput {
+  font-size: 13px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #495057;
+  font-family: 'Kantumruy Pro', sans-serif;
+  display: none;
+}
 
-    .result-bar {
-      background: var(--surface); border-top: 1px solid var(--border); padding: 14px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
-    }
-    .result-bar .rate-info { color: var(--gold-dim); }
+/* Image upload — 1 slot */
+.image-zone {
+  padding: 16px 24px 0;
+  background: #fff;
+}
+.upload-area {
+  border: 2px dashed #ced4da;
+  border-radius: 12px;
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  background: #fafafa;
+  overflow: hidden;
+  min-height: 200px;
+}
+.upload-area:hover { border-color: #0f3460; background: #f0f4ff; }
 
-    /* ── Calculator section ── */
-    .builtin-calc { border-top: 1px solid var(--border); padding: 16px 20px 20px; }
+/* image: interactive pan & zoom */
+.upload-area img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transform-origin: 0 0;
+}
 
-    .calc-label {
-      font-size: 0.72rem; color: var(--muted); font-family: var(--mono);
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
-    }
+.upload-placeholder {
+  text-align: center;
+  color: #adb5bd;
+  pointer-events: none;
+  padding: 20px;
+}
+.upload-placeholder .icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #ced4da;
+}
+.upload-placeholder p { font-size: 13px; }
+#fileInput { display: none; }
 
-    .calc-screen {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-      padding: 6px 12px; margin-bottom: 10px; text-align: right; min-height: 40px;
-      display: flex; flex-direction: column; justify-content: flex-end;
-    }
-    .calc-expr { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); min-height: 13px; line-height: 1.2; word-break: break-all; }
-    .calc-val  { font-family: var(--mono); font-size: 1.15rem; line-height: 1.25; font-weight: 500; color: var(--text); word-break: break-all; }
+.remove-img-btn {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px; height: 26px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+}
 
-    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+/* Message selector */
+.message-zone {
+  padding: 16px 24px 10px;
+  background: #fff;
+}
+.message-zone > label {
+  display: block;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+.msg-select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #ced4da;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  color: #343a40;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230f3460' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.msg-select:focus { border-color: #0f3460; }
 
-    .ck {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
-      padding: 15px 6px; font-size: 1.15rem; font-family: var(--mono); font-weight: 500;
-      color: var(--text); cursor: pointer;
-      transition: background 0.1s, border-color 0.1s, transform 0.07s;
-      text-align: center; -webkit-tap-highlight-color: transparent; user-select: none;
-    }
-    .ck:active { transform: scale(0.9); }
-    .ck:hover  { background: var(--card); border-color: var(--gold-dim); }
-    .ck.op { color: var(--gold); border-color: var(--gold-dim); }
-    .ck.op:hover { background: #29200d; }
-    .ck.ac { color: var(--danger); border-color: var(--danger); font-size: 0.95rem; }
-    .ck.ac:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-    .ck.back { color: var(--muted); }
-    .ck.back:hover { border-color: var(--danger); color: var(--danger); }
-    .ck.eq {
-      background: var(--gold); border-color: var(--gold); color: #1a1200;
-      font-weight: 700; font-size: 1.4rem;
-    }
-    .ck.eq:hover { background: #f0c84e; }
+/* Selected message */
+.selected-msg {
+  margin: 0 24px 16px;
+  background: #f8f9fa;
+  border-left: 4px solid #0f3460;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #343a40;
+  line-height: 1.7;
+  display: none;
+}
 
-    .send-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .send-btn {
-      background: var(--surface); border: 1.5px solid var(--border); border-radius: 9px;
-      padding: 10px 6px; font-family: var(--khmer); font-size: 0.82rem;
-      cursor: pointer; transition: 0.18s; text-align: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .send-btn.to-usd { color: var(--gold); border-color: var(--gold-dim); }
-    .send-btn.to-usd:hover { background: #29200d; }
-    .send-btn.to-khr { color: var(--teal); border-color: var(--teal-dim); }
-    .send-btn.to-khr:hover { background: #0e2a20; }
+/* Save button */
+.save-btn-wrap {
+  padding: 8px 24px 28px;
+  background: #fff;
+  text-align: center;
+}
+.action-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+#saveBtn {
+  background: linear-gradient(135deg, #0f3460, #1a5276);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(15,52,96,0.35);
+  transition: transform .15s, box-shadow .15s;
+  flex: 1;
+}
+#saveBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(15,52,96,0.45); }
+#saveBtn:active { transform: translateY(0); }
+#saveBtn:disabled { opacity: 0.7; }
 
-    footer { margin-top: 32px; color: var(--muted); font-size: 0.75rem; font-family: var(--mono); text-align: center; }
+#shareBtn {
+  background: linear-gradient(135deg, #0088cc, #006699);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,136,204,0.35);
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+#shareBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,136,204,0.45); }
+#shareBtn:active { transform: translateY(0); }
+#shareBtn:disabled { opacity: 0.7; }
+#shareBtn svg { flex-shrink: 0; }
 
-    @media (max-width: 500px) {
-      .amount-input { font-size: 1.1rem; padding: 10px 12px; }
-      h1 { font-size: 1.05rem; }
-      .ck { padding: 16px 4px; font-size: 1rem; }
-      .calc-block { padding-left: 16px; padding-right: 16px; }
-      .input-row { gap: 6px; }
-      .copy-btn { min-width: 64px; font-size: 0.75rem; padding: 10px 4px; }
-      .calc-val { font-size: 1.05rem; }
-    }
-  </style>
+/* iOS instructions overlay */
+#iosOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 16px;
+}
+#iosOverlay img {
+  max-width: 100%;
+  max-height: 60vh;
+  border-radius: 12px;
+  display: block;
+}
+#iosOverlay p {
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  line-height: 1.8;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+#iosCloseBtn {
+  padding: 11px 32px;
+  background: #f6c90e;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+</style>
 </head>
 <body>
 
-<header>
-  <div class="flag-row">🇰🇭 <span class="arrow">⇄</span> 🇺🇸</div>
-  <h1>ម៉ាស៊ីនប្តូរ<em>រូបិយប័ណ្ណ</em></h1>
-  <div class="subtitle">KHR (រៀល) ↔ USD (ដុល្លារ)</div>
-</header>
-
-<div class="rate-card">
-  <div class="rate-label">
-    <strong>អត្រាប្តូរប្រាក់</strong>
-    1 USD = ? KHR (អ្នកអាចកែបាន)
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div>
+    <label>ឈ្មោះភ្នាក់ងារ</label>
+    <input type="text" id="nameInput" value="ភ្នាក់ងារ ត្មាតពង" oninput="updateName()">
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div class="rate-input-wrap">
-      <input type="number" id="rateInput" value="4000" min="1" max="99999" step="1" />
-      <span class="unit">៛</span>
-    </div>
-    <button class="rate-reset" onclick="resetRate()">លំនាំដើម</button>
+  <div>
+    <label>ពណ៌អក្សរ</label>
+    <input type="color" id="colorInput" value="#f6c90e" oninput="updateColor()">
+  </div>
+  <div>
+    <label>ទំហំអក្សរ (px)</label>
+    <input type="number" id="sizeInput" value="36" min="16" max="80" oninput="updateSize()">
+  </div>
+  <div>
+    <label>ពណ៌ Header</label>
+    <input type="color" id="bgInput" value="#0f3460" oninput="updateBg()">
+  </div>
+  <div style="grid-column: span 2;">
+    <button id="saveSettingsBtn" onclick="saveSettings()" style="width:100%;padding:9px;background:#1a5276;color:#fff;border:none;border-radius:8px;font-size:13px;font-family:'Kantumruy Pro',sans-serif;font-weight:600;cursor:pointer;">រក្សាទុកការកំណត់</button>
+    <div id="saveSettingsMsg" style="text-align:center;font-size:11px;color:#68d391;margin-top:5px;display:none;">បានរក្សាទុករួចហើយ</div>
   </div>
 </div>
 
-<div class="calc-card">
+<!-- CARD -->
+<div id="card">
 
-  <div class="calc-block top">
-    <div class="block-label"><span class="dot dot-gold"></span>ពី ដុល្លារ → រៀល</div>
-    <div class="input-row">
-      <span class="currency-badge badge-gold">USD $</span>
-      <input class="amount-input" id="usdInput" type="number" min="0" placeholder="0.00" oninput="calcFromUSD()" />
-      <button class="copy-btn gold" onclick="copyNum('usd',this)">ចម្លងលេខ</button>
-    </div>
+  <div class="card-header" id="cardHeader">
+    <div id="agencyName">ភ្នាក់ងារ ត្មាតពង</div>
   </div>
 
-  <div class="swap-wrap">
-    <button class="reset-all-btn" onclick="resetAll()">សារដើម</button>
+  <div class="date-row">
+    <span id="dateDisplay" onclick="toggleDate()">
+      <span id="dateText"></span><span class="edit-hint"> [កែ]</span>
+    </span>
+    <input type="date" id="dateInput" onchange="applyDate()" onblur="applyDate()">
   </div>
 
-  <div class="calc-block bottom">
-    <div class="block-label"><span class="dot dot-teal"></span>ពី រៀល → ដុល្លារ</div>
-    <div class="input-row">
-      <span class="currency-badge badge-teal">KHR ៛</span>
-      <input class="amount-input teal" id="khrInput" type="number" min="0" placeholder="0" oninput="calcFromKHR()" />
-      <button class="copy-btn teal" onclick="copyNum('khr',this)">ចម្លងលេខ</button>
+  <div class="image-zone">
+    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-placeholder">
+        <div class="icon">+</div>
+        <p>ចុចដើម្បី Upload រូបភាព</p>
+      </div>
     </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
   </div>
 
-  <div class="result-bar">
-    <span id="formula">បំពេញចំនួនខាងលើ</span>
-    <span class="rate-info" id="rateDisplay">1$ = 4,000៛</span>
+  <div class="message-zone" id="messageZone">
+    <label>ជ្រើសរើសសារ</label>
+    <select class="msg-select" id="msgSelect" onchange="selectMsg()">
+      <option value="">-- ជ្រើសរើសសារ --</option>
+      <option value="1">សូមជួយ «ចំណាយប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
+      <option value="2">សូមជួយ «លុបប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
+    </select>
   </div>
 
-  <!-- Calculator -->
-  <div class="builtin-calc">
-    <div class="calc-label">· CALCULATOR ·</div>
-    <div class="calc-screen">
-      <div class="calc-expr" id="calcExpr"></div>
-      <div class="calc-val"  id="calcVal">0</div>
+  <div class="selected-msg" id="selectedMsg"></div>
+
+  <div class="save-btn-wrap" id="saveBtnWrap">
+    <div class="action-btns">
+      <button id="saveBtn" onclick="saveImage()">💾 រក្សាទុក</button>
+      <button id="shareBtn" onclick="shareToTelegram()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+        Share Telegram
+      </button>
     </div>
-    <div class="calc-grid">
-      <button class="ck ac"   onclick="cAC()">AC</button>
-      <button class="ck back" onclick="cBack()">⌫</button>
-      <button class="ck op"   onclick="cOp('%')">%</button>
-      <button class="ck op"   onclick="cOp('÷')">÷</button>
-
-      <button class="ck" onclick="cNum('7')">7</button>
-      <button class="ck" onclick="cNum('8')">8</button>
-      <button class="ck" onclick="cNum('9')">9</button>
-      <button class="ck op" onclick="cOp('×')">×</button>
-
-      <button class="ck" onclick="cNum('4')">4</button>
-      <button class="ck" onclick="cNum('5')">5</button>
-      <button class="ck" onclick="cNum('6')">6</button>
-      <button class="ck op" onclick="cOp('−')">−</button>
-
-      <button class="ck" onclick="cNum('1')">1</button>
-      <button class="ck" onclick="cNum('2')">2</button>
-      <button class="ck" onclick="cNum('3')">3</button>
-      <button class="ck op" onclick="cOp('+')">+</button>
-
-      <button class="ck" onclick="cNum('0')" style="grid-column:span 2">0</button>
-      <button class="ck" onclick="cDot()">.</button>
-      <button class="ck eq" onclick="cEq()">=</button>
-    </div>
-    <div class="send-row">
-      <button class="send-btn to-usd" onclick="sendTo('usd')">→ ដាក់ជា USD $</button>
-      <button class="send-btn to-khr" onclick="sendTo('khr')">→ ដាក់ជា KHR ៛</button>
-    </div>
+    <button id="resetCardBtn" onclick="resetCard()" style="margin-top:4px;background:transparent;color:#6c757d;border:1.5px solid #ced4da;border-radius:12px;padding:10px 28px;font-size:14px;font-family:'Kantumruy Pro',sans-serif;cursor:pointer;display:block;width:100%;">កំណត់ Card ឡើងវិញ</button>
   </div>
 
 </div>
 
-<footer>កែ​អត្រាប្ដូរប្រាក់​ខាង​លើ​បាន​គ្រប់​ពេល · ទិន្នន័យ​គ្រាន់​តែ​សម្រាប់​យោង</footer>
+<!-- iOS overlay -->
+<div id="iosOverlay">
+  <p>សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image"</p>
+  <img id="iosPreviewImg" src="" alt="preview">
+  <button id="iosCloseBtn" onclick="closeIosOverlay()">បិទ</button>
+</div>
 
 <script>
-  const DEFAULT_RATE = 4000;
-  let rate = DEFAULT_RATE;
+// ── Settings: Save & Load ──
+function saveSettings() {
+  const s = {
+    name:  document.getElementById('nameInput').value,
+    color: document.getElementById('colorInput').value,
+    size:  document.getElementById('sizeInput').value,
+    bg:    document.getElementById('bgInput').value
+  };
+  localStorage.setItem('agencySettings', JSON.stringify(s));
+  const msg = document.getElementById('saveSettingsMsg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+}
 
-  const usdInput    = document.getElementById('usdInput');
-  const khrInput    = document.getElementById('khrInput');
-  const rateInput   = document.getElementById('rateInput');
-  const formulaEl   = document.getElementById('formula');
-  const rateDisplay = document.getElementById('rateDisplay');
-  const calcExprEl  = document.getElementById('calcExpr');
-  const calcValEl   = document.getElementById('calcVal');
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('agencySettings'));
+    if (!s) return;
+    if (s.name)  { document.getElementById('nameInput').value  = s.name;  updateName(); }
+    if (s.color) { document.getElementById('colorInput').value = s.color; updateColor(); }
+    if (s.size)  { document.getElementById('sizeInput').value  = s.size;  updateSize(); }
+    if (s.bg)    { document.getElementById('bgInput').value    = s.bg;    updateBg(); }
+  } catch(e) {}
+}
 
-  /* ── Exchange ── */
-  function getRate(){ const v=parseFloat(rateInput.value); return(v&&v>0)?v:DEFAULT_RATE; }
-  function fmtUSD(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function fmtKHR(n){ return n.toLocaleString('km-KH',{maximumFractionDigits:0})+'​៛'; }
-  function fmtRate(r){ return '1$ = '+r.toLocaleString('en-US')+'​៛'; }
+// ── Date ──
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatDate(iso) {
+  const [y,m,day] = iso.split('-');
+  const kh = ['','មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'];
+  return 'ថ្ងៃទី '+parseInt(day)+' ខែ'+kh[parseInt(m)]+' ឆ្នាំ'+y;
+}
+let currentDate = todayISO();
+document.getElementById('dateText').textContent = formatDate(currentDate);
+document.getElementById('dateInput').value = currentDate;
+loadSettings();
 
-  rateInput.addEventListener('input',()=>{
-    rate=getRate(); rateDisplay.textContent=fmtRate(rate);
-    if(usdInput.value!=='') calcFromUSD();
-    else if(khrInput.value!=='') calcFromKHR();
+function toggleDate() {
+  const disp = document.getElementById('dateDisplay');
+  const inp  = document.getElementById('dateInput');
+  const showing = inp.style.display === 'inline-block';
+  if (showing) { applyDate(); }
+  else { disp.style.display='none'; inp.style.display='inline-block'; inp.focus(); }
+}
+function applyDate() {
+  const inp = document.getElementById('dateInput');
+  if (inp.style.display === 'none') return;
+  currentDate = inp.value || todayISO();
+  document.getElementById('dateText').textContent = formatDate(currentDate);
+  inp.style.display = 'none';
+  document.getElementById('dateDisplay').style.display = 'inline-flex';
+}
+
+// ── Toolbar ──
+function updateName()  { document.getElementById('agencyName').textContent = document.getElementById('nameInput').value; }
+function updateColor() { document.getElementById('agencyName').style.color = document.getElementById('colorInput').value; }
+function updateSize()  { document.getElementById('agencyName').style.fontSize = (parseInt(document.getElementById('sizeInput').value)||36)+'px'; }
+function updateBg()    { const c=document.getElementById('bgInput').value; document.getElementById('cardHeader').style.background='linear-gradient(135deg,'+c+' 0%,#16213e 100%)'; }
+
+// ── Image upload ──
+function loadImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const area = document.getElementById('uploadArea');
+    area.innerHTML = '';
+    area.onclick = null;
+    const img = document.createElement('img');
+    img.src = ev.target.result;
+    area.appendChild(img);
+    const btn = document.createElement('button');
+    btn.className = 'remove-img-btn';
+    btn.textContent = 'x';
+    btn.onclick = function(e2) { e2.stopPropagation(); resetUpload(); };
+    area.appendChild(btn);
+    initInteractiveImage(img);
+  };
+  reader.readAsDataURL(file);
+}
+function resetUpload() {
+  const area = document.getElementById('uploadArea');
+  area.innerHTML = '<div class="upload-placeholder"><div class="icon">+</div><p>ចុចដើម្បី Upload រូបភាព</p></div>';
+  area.onclick = function(){ document.getElementById('fileInput').click(); };
+  document.getElementById('fileInput').value = '';
+}
+
+// ── Pan & Pinch-to-zoom ──
+let imgState = { scale: 1.2, x: 0, y: 0 };
+
+function applyTransform(img) {
+  img.style.transform = `translate(${imgState.x}px, ${imgState.y}px) scale(${imgState.scale})`;
+}
+
+function initInteractiveImage(img) {
+  imgState = { scale: 1.2, x: 0, y: 0 };
+  img.style.transformOrigin = '0 0';
+  applyTransform(img);
+
+  // Mouse drag (desktop)
+  let dragging = false, startX, startY;
+  img.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX - imgState.x;
+    startY = e.clientY - imgState.y;
+    img.style.cursor = 'grabbing';
+    e.preventDefault();
   });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    imgState.x = e.clientX - startX;
+    imgState.y = e.clientY - startY;
+    applyTransform(img);
+  });
+  window.addEventListener('mouseup', () => { dragging = false; img.style.cursor = 'grab'; });
 
+  // Scroll to zoom (desktop)
+  img.addEventListener('wheel', e => {
+    e.preventDefault();
+    imgState.scale = Math.min(5, Math.max(0.3, imgState.scale + (e.deltaY > 0 ? -0.1 : 0.1)));
+    applyTransform(img);
+  }, { passive: false });
 
-  function updateClearBtn(){}
-  function resetAll(){
-    usdInput.value=''; khrInput.value='';
-    formulaEl.textContent='បំពេញចំនួនខាងលើ';
-    cAC();
+  // Touch pan & pinch (mobile)
+  let lastTouches = null;
+  img.addEventListener('touchstart', e => { lastTouches = e.touches; e.preventDefault(); }, { passive: false });
+  img.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && lastTouches && lastTouches.length === 1) {
+      imgState.x += e.touches[0].clientX - lastTouches[0].clientX;
+      imgState.y += e.touches[0].clientY - lastTouches[0].clientY;
+    } else if (e.touches.length === 2 && lastTouches && lastTouches.length >= 2) {
+      const prev = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
+      const curr = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      imgState.scale = Math.min(5, Math.max(0.3, imgState.scale * (curr / prev)));
+    }
+    lastTouches = e.touches;
+    applyTransform(img);
+  }, { passive: false });
+  img.addEventListener('touchend', e => { lastTouches = e.touches; }, { passive: false });
+
+  // Reset button
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = 'កំណត់ឡើងវិញ';
+  resetBtn.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(15,52,96,0.85);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-family:"Kantumruy Pro",sans-serif;cursor:pointer;z-index:3;white-space:nowrap;';
+  resetBtn.onclick = e => { e.stopPropagation(); imgState={scale:1.2,x:0,y:0}; applyTransform(img); };
+  img.parentElement.appendChild(resetBtn);
+}
+
+// ── Message selector ──
+const msgs = {
+  '1': 'សូមជួយ <span style="color:#003087;font-weight:700;">«ចំណាយប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។',
+  '2': 'សូមជួយ <span style="color:#c0392b;font-weight:700;">«លុបប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។'
+};
+function selectMsg() {
+  const val = document.getElementById('msgSelect').value;
+  const box = document.getElementById('selectedMsg');
+  if (val && msgs[val]) { box.innerHTML = msgs[val]; box.style.display = 'block'; }
+  else { box.style.display = 'none'; }
+}
+
+// ── Reset Card (image + message only, keep toolbar settings) ──
+function resetCard() {
+  // reset image
+  resetUpload();
+  // reset message dropdown
+  document.getElementById('msgSelect').value = '';
+  document.getElementById('selectedMsg').style.display = 'none';
+  document.getElementById('selectedMsg').innerHTML = '';
+  // reset date to today
+  currentDate = todayISO();
+  document.getElementById('dateText').textContent = formatDate(currentDate);
+  document.getElementById('dateInput').value = currentDate;
+  document.getElementById('dateInput').style.display = 'none';
+  document.getElementById('dateDisplay').style.display = 'inline-flex';
+}
+
+// ── iOS overlay ──
+function closeIosOverlay() {
+  document.getElementById('iosOverlay').style.display = 'none';
+}
+
+// ── Render card to canvas (shared helper) ──
+async function renderCardCanvas() {
+  const wrap    = document.getElementById('saveBtnWrap');
+  const msgZone = document.getElementById('messageZone');
+  const hints   = document.querySelectorAll('.edit-hint');
+  const removeBtn  = document.querySelector('.remove-img-btn');
+  const resetBtn   = document.querySelector('#uploadArea button:not(.remove-img-btn)');
+  const resetCardBtn = document.getElementById('resetCardBtn');
+
+  // hide UI-only elements
+  wrap.style.display    = 'none';
+  msgZone.style.display = 'none';
+  hints.forEach(h => h.style.display = 'none');
+  if (removeBtn)    removeBtn.style.display    = 'none';
+  if (resetBtn)     resetBtn.style.display     = 'none';
+  if (resetCardBtn) resetCardBtn.style.display = 'none';
+
+  let canvas;
+  try {
+    canvas = await html2canvas(document.getElementById('card'), {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 0
+    });
+  } finally {
+    // restore
+    wrap.style.display    = 'block';
+    msgZone.style.display = 'block';
+    hints.forEach(h => h.style.display = '');
+    if (removeBtn)    removeBtn.style.display    = 'flex';
+    if (resetBtn)     resetBtn.style.display     = 'block';
+    if (resetCardBtn) resetCardBtn.style.display = 'block';
   }
-  function copyNum(which,btn){
-    const v=(which==='usd'?usdInput:khrInput).value;
-    if(v==='') return;
-    const done=()=>{
-      const old=btn.textContent; btn.textContent='បានចម្លង ✓'; btn.classList.add('done');
-      setTimeout(()=>{btn.textContent='ចម្លងលេខ'; btn.classList.remove('done');},1200);
-    };
-    const fallback=()=>{
-      const t=document.createElement('textarea'); t.value=v; t.style.position='fixed'; t.style.opacity='0';
-      document.body.appendChild(t); t.select();
-      try{document.execCommand('copy');}catch(e){}
-      document.body.removeChild(t); done();
-    };
-    if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(v).then(done,fallback); }
-    else fallback();
+  return canvas;
+}
+
+// ── Save ──
+async function saveImage() {
+  const btn = document.getElementById('saveBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'កំពុងរក្សាទុក...';
+  btn.disabled = true;
+
+  try {
+    const canvas = await renderCardCanvas();
+    const isIOS  = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      const ov  = document.getElementById('iosOverlay');
+      const img = document.getElementById('iosPreviewImg');
+      img.src = canvas.toDataURL('image/png');
+      ov.style.display = 'flex';
+    } else {
+      // Fix: use Blob + object URL so browser always recognises PNG
+      canvas.toBlob(function(blob) {
+        const url  = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'agency-card.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }, 'image/png');
+    }
+  } catch(err) {
+    alert('មានបញ្ហា: ' + err.message);
   }
 
-  function calcFromUSD(){
-    rate=getRate(); const usd=parseFloat(usdInput.value);
-    if(isNaN(usd)||usdInput.value===''){khrInput.value='';formulaEl.textContent='បំពេញចំនួនខាងលើ';updateClearBtn();return;}
-    const khr=usd*rate; khrInput.value=Math.round(khr);
-    formulaEl.textContent=fmtUSD(usd)+' × '+rate.toLocaleString()+' = '+fmtKHR(khr);
-    updateClearBtn();
-  }
-  function calcFromKHR(){
-    rate=getRate(); const khr=parseFloat(khrInput.value);
-    if(isNaN(khr)||khrInput.value===''){usdInput.value='';formulaEl.textContent='បំពេញចំនួនខាងលើ';updateClearBtn();return;}
-    const usd=khr/rate; usdInput.value=usd.toFixed(2);
-    formulaEl.textContent=fmtKHR(khr)+' ÷ '+rate.toLocaleString()+' = '+fmtUSD(usd);
-    updateClearBtn();
-  }
-  function resetRate(){
-    rateInput.value=DEFAULT_RATE; rate=DEFAULT_RATE; rateDisplay.textContent=fmtRate(DEFAULT_RATE);
-    if(usdInput.value!=='') calcFromUSD(); else if(khrInput.value!=='') calcFromKHR();
-  }
+  btn.innerHTML = originalText;
+  btn.disabled  = false;
+}
 
-  /* ── Calculator ── */
-  let cCur='0', cPrev=null, cOper=null, cJustEq=false, cExprStr='';
+// ── Share to Telegram ──
+async function shareToTelegram() {
+  const btn = document.getElementById('shareBtn');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = 'កំពុងត្រៀម...';
+  btn.disabled = true;
 
-  function fmtCalc(s){
-    const n=parseFloat(s); if(isNaN(n)) return s;
-    return parseFloat(n.toPrecision(10)).toString();
-  }
-  function updateScreen(){ calcValEl.textContent=fmtCalc(cCur); calcExprEl.textContent=cExprStr; }
+  try {
+    const canvas = await renderCardCanvas();
 
-  function cNum(d){
-    if(cJustEq){cCur='0';cPrev=null;cOper=null;cExprStr='';cJustEq=false;}
-    cCur=(cCur==='0'&&d!=='.')?d:cCur+d;
-    updateScreen();
-  }
-  function cDot(){
-    if(cJustEq){cCur='0';cPrev=null;cOper=null;cExprStr='';cJustEq=false;}
-    if(!cCur.includes('.')) cCur+='.';
-    updateScreen();
-  }
-  function cOp(op){
-    cJustEq=false;
-    const cur=parseFloat(cCur);
-    if(cOper!==null&&cPrev!==null){
-      const res=applyOp(cPrev,cOper,cur);
-      cPrev=res; cCur=String(res);
-    } else { cPrev=cur; }
-    cOper=op; cExprStr=fmtCalc(String(cPrev))+' '+op; cCur='0';
-    updateScreen();
-  }
-  function cEq(){
-    if(cOper===null||cPrev===null) return;
-    const cur=parseFloat(cCur);
-    const res=applyOp(cPrev,cOper,cur);
-    cExprStr=fmtCalc(String(cPrev))+' '+cOper+' '+fmtCalc(String(cur))+' =';
-    cCur=String(res); cPrev=null; cOper=null; cJustEq=true;
-    updateScreen();
-  }
-  function applyOp(a,op,b){
-    if(op==='+') return a+b;
-    if(op==='−') return a-b;
-    if(op==='×') return a*b;
-    if(op==='÷') return b===0?0:a/b;
-    if(op==='%') return a*(b/100);
-    return b;
-  }
-  function cAC(){ cCur='0';cPrev=null;cOper=null;cJustEq=false;cExprStr='';updateScreen(); }
-  function cBack(){
-    if(cJustEq){cAC();return;}
-    cCur=cCur.length>1?cCur.slice(0,-1):'0';
-    updateScreen();
-  }
+    // Try Web Share API (Android Chrome, iOS Safari, Telegram in-app browser)
+    if (navigator.canShare) {
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const file = new File([blob], 'agency-card.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+    }
 
-  function sendTo(field){
-    const val=parseFloat(cCur); if(isNaN(val)||val<=0) return;
-    if(field==='usd'){ usdInput.value=val.toFixed(2); calcFromUSD(); }
-    else { khrInput.value=Math.round(val); calcFromKHR(); }
-    updateClearBtn();
-    usdInput.scrollIntoView({behavior:'smooth',block:'center'});
-  }
+    // Fallback
+    const dataURL = canvas.toDataURL('image/png');
+    const isIOS   = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-  rateDisplay.textContent=fmtRate(DEFAULT_RATE);
-  updateScreen();
+    if (isIOS) {
+      const ov  = document.getElementById('iosOverlay');
+      const img = document.getElementById('iosPreviewImg');
+      ov.querySelector('p').textContent = 'សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image" ហើយបញ្ជូនទៅ Telegram';
+      img.src = dataURL;
+      ov.style.display = 'flex';
+    } else {
+      canvas.toBlob(function(blob) {
+        const url  = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'agency-card.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }, 'image/png');
+      setTimeout(() => { window.open('https://t.me', '_blank'); }, 800);
+    }
+
+  } catch(err) {
+    // AbortError = user cancelled share sheet — not a real error
+    if (err.name !== 'AbortError') {
+      alert('មានបញ្ហា: ' + err.message);
+    }
+  } finally {
+    // ALWAYS restore button regardless of success / cancel / error
+    btn.innerHTML = originalHTML;
+    btn.disabled  = false;
+  }
+}
 </script>
 </body>
 </html>
