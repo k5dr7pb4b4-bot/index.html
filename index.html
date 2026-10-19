@@ -1,752 +1,297 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ភ្នាក់ងារ ត្មាតពង</title>
-<link href="https://fonts.googleapis.com/css2?family=Hanuman:wght@400;700;900&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ទូទាត់ COD</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: #1a1a2e;
-  font-family: 'Kantumruy Pro', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 16px 60px;
-}
-
-/* TOOLBAR */
-.toolbar {
-  width: 100%;
-  max-width: 560px;
-  background: #16213e;
-  border: 1px solid #0f3460;
-  border-radius: 14px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.toolbar label {
-  color: #a0aec0;
-  font-size: 12px;
-  display: block;
-  margin-bottom: 4px;
-}
-.toolbar input[type="text"],
-.toolbar input[type="number"] {
-  width: 100%;
-  background: #0f3460;
-  border: 1px solid #1e4a8a;
-  border-radius: 8px;
-  color: #e2e8f0;
-  padding: 7px 10px;
-  font-size: 13px;
-  font-family: 'Kantumruy Pro', sans-serif;
-  outline: none;
-}
-.toolbar input[type="color"] {
-  width: 100%;
-  height: 38px;
-  background: #0f3460;
-  border: 1px solid #1e4a8a;
-  border-radius: 8px;
-  padding: 2px 6px;
-  cursor: pointer;
-  outline: none;
-}
-
-/* CARD */
-#card {
-  width: 100%;
-  max-width: 560px;
-  background: #ffffff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-
-/* Header */
-.card-header {
-  background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-  padding: 18px 24px 16px;
-  text-align: center;
-}
-#agencyName {
-  font-family: 'Hanuman', serif;
-  font-size: 20px;
-  font-weight: 900;
-  color: #f6c90e;
-  letter-spacing: 1px;
-  line-height: 1.3;
-  text-shadow: 0 2px 12px rgba(246,201,14,0.3);
-}
-
-/* Date */
-.date-row {
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 2px 24px;
-  line-height: 1.4;
-  text-align: center;
-}
-#dateDisplay {
-  font-size: 14px;
-  color: #495057;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-#dateDisplay:hover { color: #0f3460; }
-.edit-hint { font-size: 11px; color: #adb5bd; font-style: italic; }
-#dateInput {
-  font-size: 13px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  padding: 4px 8px;
-  color: #495057;
-  font-family: 'Kantumruy Pro', sans-serif;
-  display: none;
-}
-
-/* Image upload — 1 slot */
-.image-zone {
-  padding: 8px 24px 0;
-  background: #fff;
-}
-.upload-area {
-  border: 2px dashed #ced4da;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color .2s, background .2s;
-  position: relative;
-  background: #fafafa;
-  overflow: hidden;
-  min-height: 100px;
-}
-.upload-area:hover { border-color: #0f3460; background: #f0f4ff; }
-
-/* image: interactive pan & zoom */
-.upload-area img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 10px;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-  transform-origin: 0 0;
-}
-
-.upload-placeholder {
-  text-align: center;
-  color: #adb5bd;
-  pointer-events: none;
-  padding: 20px;
-}
-.upload-placeholder .icon {
-  font-size: 32px;
-  margin-bottom: 6px;
-  font-weight: 700;
-  color: #ced4da;
-}
-.upload-placeholder p { font-size: 13px; }
-#fileInput { display: none; }
-
-.remove-img-btn {
-  position: absolute;
-  top: 6px; right: 6px;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 26px; height: 26px;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 2;
-}
-
-/* Message selector */
-.message-zone {
-  padding: 16px 24px 10px;
-  background: #fff;
-}
-.message-zone > label {
-  display: block;
-  font-size: 13px;
-  color: #6c757d;
-  margin-bottom: 8px;
-}
-.msg-select {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid #ced4da;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: 'Kantumruy Pro', sans-serif;
-  color: #343a40;
-  background: #fff;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230f3460' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-}
-.msg-select:focus { border-color: #0f3460; }
-
-/* Selected message */
-.selected-msg {
-  margin: 0 24px 16px;
-  background: #f8f9fa;
-  border-left: 4px solid #0f3460;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 14px;
-  color: #343a40;
-  line-height: 1.7;
-  display: none;
-}
-
-/* Save button */
-.save-btn-wrap {
-  padding: 8px 24px 28px;
-  background: #fff;
-  text-align: center;
-}
-.action-btns {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-#saveBtn {
-  background: linear-gradient(135deg, #0f3460, #1a5276);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 13px 28px;
-  font-size: 15px;
-  font-family: 'Kantumruy Pro', sans-serif;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(15,52,96,0.35);
-  transition: transform .15s, box-shadow .15s;
-  flex: 1;
-}
-#saveBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(15,52,96,0.45); }
-#saveBtn:active { transform: translateY(0); }
-#saveBtn:disabled { opacity: 0.7; }
-
-#shareBtn {
-  flex: 1;
-  justify-content: center;
-  background: linear-gradient(135deg, #0088cc, #006699);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 13px 20px;
-  font-size: 15px;
-  font-family: 'Kantumruy Pro', sans-serif;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,136,204,0.35);
-  transition: transform .15s, box-shadow .15s;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  white-space: nowrap;
-}
-#shareBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,136,204,0.45); }
-#shareBtn:active { transform: translateY(0); }
-#shareBtn:disabled { opacity: 0.7; }
-#shareBtn svg { flex-shrink: 0; }
-
-/* iOS instructions overlay */
-#iosOverlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.88);
-  z-index: 9999;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 16px;
-}
-#iosOverlay img {
-  max-width: 100%;
-  max-height: 60vh;
-  border-radius: 12px;
-  display: block;
-}
-#iosOverlay p {
-  color: #fff;
-  font-size: 15px;
-  text-align: center;
-  line-height: 1.8;
-  font-family: 'Kantumruy Pro', sans-serif;
-}
-#iosCloseBtn {
-  padding: 11px 32px;
-  background: #f6c90e;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Kantumruy Pro', sans-serif;
-}
+:root{--bg:#f6f1e9;--card:#fff;--ink:#231a12;--mute:#7a6d60;--line:#e2d8ca;--or:#e8660c;--or2:#fff0e4;--usd:#1b7a4b;--khr:#2b5fa8;--danger:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120d;--card:#241d16;--ink:#f4ece1;--mute:#a89a8a;--line:#3a3025;--or:#ff8a3d;--or2:#33231a;--usd:#5fd39a;--khr:#7fb0f0;--danger:#ff8a80;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Khmer","Khmer OS",system-ui,sans-serif;font-size:15px}
+body{padding:10px 10px 40px;max-width:760px;margin:0 auto}
+h1{font-size:18px;margin:6px 2px 10px}
+h2{font-size:15px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+button{font:inherit;border:0;border-radius:8px;padding:9px 12px;background:var(--or);color:#fff;font-weight:600;cursor:pointer}
+button.g{background:var(--or2);color:var(--or);border:1px solid var(--or)}
+button.x{background:transparent;color:var(--danger);padding:4px 8px;font-size:18px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--or);outline-offset:1px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px;min-width:0}
+input:disabled{opacity:.45}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#cam{display:none;position:relative;margin-top:8px}
+#cam video{width:100%;border-radius:8px;max-height:300px;object-fit:cover;background:#000}
+#cam .box{position:absolute;inset:20% 20%;border:3px solid var(--or);border-radius:10px;pointer-events:none}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.col{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}
+.col.u{border-top:4px solid var(--usd)}.col.k{border-top:4px solid var(--khr)}
+.col h2{display:flex;justify-content:space-between}
+.item{border-bottom:1px dashed var(--line);padding:6px 0}
+.item .t{display:flex;align-items:center;gap:4px;font-weight:600;font-size:16px}
+.item .t span{flex:1;word-break:break-all}
+.item small{color:var(--mute);display:block;font-size:11px;word-break:break-all}
+.item .e{display:flex;gap:4px;margin-top:4px}
+.item .e select{flex:0 0 46%;font-size:12px;padding:4px}
+.item .e input{flex:1;width:0;font-size:13px;padding:4px}
+.tot{margin-top:8px;font-size:17px;font-weight:700}
+.u .tot{color:var(--usd)}.k .tot{color:var(--khr)}
+.empty{color:var(--mute);font-size:13px;padding:8px 0}
+.share{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.share button{padding:12px 6px}
+#bq{max-width:150px;border-radius:8px;border:1px solid var(--line);display:block;margin:8px 0}
+.acc{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.acc div{flex:1;min-width:0;word-break:break-all}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--or)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(92vw,360px);padding:14px}
+.qb img{width:100%;max-width:200px;display:block;margin:8px auto 0;border-radius:6px;background:#fff;padding:6px}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1;background:var(--or2);color:var(--or);border:1px solid var(--line)}
+.seg button.on{background:var(--or);color:#fff}
+#amt{width:100%;font-size:26px;text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;display:none;z-index:99;max-width:90vw}
 </style>
 </head>
 <body>
+<h1>ទូទាត់ COD ទៅក្រុមហ៊ុន</h1>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div>
-    <label>ឈ្មោះភ្នាក់ងារ</label>
-    <input type="text" id="nameInput" value="ភ្នាក់ងារ ត្មាតពង" oninput="updateName()">
+<div class="card">
+  <div class="row">
+    <button id="bScan">ស្កេន QR កញ្ចប់</button>
+    <button class="g" id="bMan">+ បញ្ចូលដោយដៃ</button>
+    <button class="g" id="bImg">ថតរូបអាន COD</button>
+    <input type="file" id="fImg" accept="image/*" capture="environment" hidden>
   </div>
-  <div>
-    <label>ពណ៌អក្សរ</label>
-    <input type="color" id="colorInput" value="#f6c90e" oninput="updateColor()">
-  </div>
-  <div>
-    <label>ទំហំអក្សរ (px)</label>
-    <input type="number" id="sizeInput" value="20" min="10" max="80" oninput="updateSize()">
-  </div>
-  <div>
-    <label>ពណ៌ Header</label>
-    <input type="color" id="bgInput" value="#0f3460" oninput="updateBg()">
-  </div>
-  <div style="grid-column: span 2;">
-    <button id="saveSettingsBtn" onclick="saveSettings()" style="width:100%;padding:9px;background:#1a5276;color:#fff;border:none;border-radius:8px;font-size:13px;font-family:'Kantumruy Pro',sans-serif;font-weight:600;cursor:pointer;">រក្សាទុកការកំណត់</button>
-    <div id="saveSettingsMsg" style="text-align:center;font-size:11px;color:#68d391;margin-top:5px;display:none;">បានរក្សាទុករួចហើយ</div>
+  <div id="cam"><video id="v" playsinline muted></video><div class="box"></div></div>
+</div>
+
+<div class="cols">
+  <div class="col u"><h2><span>ដុល្លារ $</span><span id="nU">0</span></h2><div id="lU"></div><div class="tot" id="tU"></div><div id="qU" class="qb"></div></div>
+  <div class="col k"><h2><span>ប្រាក់រៀល ៛</span><span id="nK">0</span></h2><div id="lK"></div><div class="tot" id="tK"></div><div id="qK" class="qb"></div></div>
+</div>
+
+<div class="card" style="margin-top:10px">
+  <h2>ធនាគារ</h2>
+  <div class="row"><input type="checkbox" id="qOn" aria-label="ជ្រើស QR"><b>QR ABA</b>
+    <button class="g" id="bQ">ដាក់/ប្តូររូប QR</button><button class="x" id="bQd" aria-label="លុប QR">✕</button>
+    <input type="file" id="fQ" accept="image/*" hidden></div>
+  <img id="bq" alt="QR ABA" hidden>
+  <b style="display:block;margin-top:10px">លេខគណនី</b>
+  <div id="accs"></div>
+  <div class="row" style="margin-top:8px">
+    <input id="an" placeholder="ឈ្មោះ/ធនាគារ" style="flex:1 1 40%"><input id="ano" placeholder="លេខគណនី" inputmode="numeric" style="flex:1 1 40%">
+    <button id="aAdd">រក្សាទុក</button>
   </div>
 </div>
 
-<!-- CARD -->
-<div id="card">
-
-  <div class="card-header" id="cardHeader">
-    <div id="agencyName">ភ្នាក់ងារ ត្មាតពង</div>
-  </div>
-
-  <div class="date-row">
-    <span id="dateDisplay" onclick="toggleDate()">
-      <span id="dateText"></span><span class="edit-hint"> [កែ]</span>
-    </span>
-    <input type="date" id="dateInput" onchange="applyDate()" onblur="applyDate()">
-  </div>
-
-  <div class="image-zone">
-    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-      <div class="upload-placeholder">
-        <div class="icon">+</div>
-        <p>ចុច ឬ ទាញរូបភាពមកដាក់ ឬ Paste</p>
-      </div>
-    </div>
-    <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
-  </div>
-
-  <div class="message-zone" id="messageZone">
-    <label>ជ្រើសរើសសារ</label>
-    <select class="msg-select" id="msgSelect" onchange="selectMsg()">
-      <option value="">-- ជ្រើសរើសសារ --</option>
-      <option value="1">សូមជួយ «ចំណាយប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
-      <option value="2">សូមជួយ «លុបប៉ុង» អោយខ្ញុំមួយផងបង សូមអរគុណ។</option>
-    </select>
-  </div>
-
-  <div class="selected-msg" id="selectedMsg"></div>
-
-  <div class="save-btn-wrap" id="saveBtnWrap">
-    <div class="action-btns">
-      <button id="shareBtn" onclick="shareToTelegram()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
-        Share Telegram
-      </button>
-    </div>
-    <button id="resetCardBtn" onclick="resetCard()" style="margin-top:4px;background:transparent;color:#6c757d;border:1.5px solid #ced4da;border-radius:12px;padding:10px 28px;font-size:14px;font-family:'Kantumruy Pro',sans-serif;cursor:pointer;display:block;width:100%;">កំណត់ Card ឡើងវិញ</button>
-  </div>
-
+<div class="share">
+  <button id="sU" style="background:var(--usd)">ចែករំលែក ដុល្លារ</button>
+  <button id="sK" style="background:var(--khr)">ចែករំលែក ប្រាក់រៀល</button>
+</div>
+<div class="row" style="margin-top:10px;justify-content:space-between">
+  <span style="color:var(--mute);font-size:12px">ទិន្នន័យរក្សាទុកក្នុងទូរស័ព្ទនេះ</span>
+  <button id="bSave">រក្សាទុក</button><button class="g" id="bClr">លុបទាំងអស់</button>
 </div>
 
-<!-- iOS overlay -->
-<div id="iosOverlay">
-  <p>សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image"</p>
-  <img id="iosPreviewImg" src="" alt="preview">
-  <button id="iosCloseBtn" onclick="closeIosOverlay()">បិទ</button>
-</div>
+<dialog id="dlg">
+  <b>បន្ថែមទឹកប្រាក់ COD</b>
+  <small id="dcode" style="display:block;color:var(--mute);word-break:break-all"></small>
+  <div class="seg"><button id="cU" class="on">$ ដុល្លារ</button><button id="cK">៛ រៀល</button></div>
+  <input id="amt" inputmode="decimal" placeholder="0">
+  <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="dNone">គ្មាន COD</button><button class="g" id="dNo">បោះបង់</button><button id="dOk">បន្ថែម</button></div>
+</dialog>
+<dialog id="cdlg"><div id="cmsg" style="margin-bottom:12px"></div><div class="row" style="justify-content:flex-end"><button class="g" id="cNo">បោះបង់</button><button id="cYes" style="background:var(--danger)">យល់ព្រម</button></div></dialog>
+<dialog id="adlg"><b>កែគណនី</b><input id="en" placeholder="ឈ្មោះ/ធនាគារ" style="width:100%;margin:8px 0"><input id="eno" placeholder="លេខគណនី" inputmode="numeric" style="width:100%"><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="eNo">បោះបង់</button><button id="eOk">រក្សាទុក</button></div></dialog>
+<dialog id="sdlg"><b>ចែករំលែក</b><textarea id="stxt" hidden rows="8" readonly style="width:100%;margin:8px 0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px"></textarea><img id="simg" alt="QR" hidden style="max-width:240px;width:100%;background:#fff;display:block;margin:0 auto 8px"><small style="color:var(--mute)">ចុចយូរលើរូប QR រួចជ្រើសរើស «Share»</small><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="sClose">បិទ</button><button id="sCopy" hidden>ចម្លងអត្ថបទ</button></div></dialog>
+<div id="toast"></div>
 
 <script>
-// ── Settings: Save & Load ──
-function saveSettings() {
-  const s = {
-    name:  document.getElementById('nameInput').value,
-    color: document.getElementById('colorInput').value,
-    size:  document.getElementById('sizeInput').value,
-    bg:    document.getElementById('bgInput').value
-  };
-  localStorage.setItem('agencySettings', JSON.stringify(s));
-  const msg = document.getElementById('saveSettingsMsg');
-  msg.style.display = 'block';
-  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+const $=id=>document.getElementById(id);
+let S={items:[],skip:[],emv:null,qr:null,qrOn:false,accs:[],last:'USD'};
+const KEY='codpay.v1';
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const fmt=(n,c)=>c==='USD'?Number(n).toFixed(2):Math.round(n).toLocaleString('en-US');
+const sum=c=>S.items.filter(i=>i.cur===c).reduce((a,i)=>a+i.amt,0);
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2200)}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.frequency.value=880;o.connect(a.destination);o.start();setTimeout(()=>o.stop(),90)}catch(e){}}
+
+function render(){
+  for(const [c,l,n,t] of [['USD','lU','nU','tU'],['KHR','lK','nK','tK']]){
+    const list=S.items.filter(i=>i.cur===c);
+    $(l).innerHTML=list.length?list.map((i,k)=>`<div class="item"><div class="t"><span>${k+1}. ${fmt(i.amt,c)}</span><button class="x" onclick="del('${i.id}')" aria-label="លុប">✕</button></div>${i.code||i.ai?`<small>${esc(i.code)}${i.ai?' · AI':''}</small>`:''}
+      <div class="e"><select onchange="selEdit('${i.id}',this)" aria-label="កែទឹកប្រាក់"><option value="">កែទឹកប្រាក់</option><option value="USD">កែជា $</option><option value="KHR">កែជា ៛</option></select>
+      <input id="in${i.id}" disabled inputmode="decimal" placeholder="..." onkeydown="if(event.key==='Enter')applyEdit('${i.id}')" onchange="applyEdit('${i.id}')"></div></div>`).join(''):'<div class="empty">មិនទាន់មាន</div>';
+    $(n).textContent=list.length+' កញ្ចប់';
+    $(t).innerHTML='សរុប: '+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+' <button class="g" style="padding:4px 10px;font-size:13px" onclick="copyNum(\''+c+'\')">ចម្លង</button>';
+  }
+  drawQR();$('qOn').checked=!!S.qrOn;
+  $('bq').hidden=!S.qr;if(S.qr)$('bq').src=S.qr;
+  $('accs').innerHTML=S.accs.length?S.accs.map(a=>`<div class="acc"><input type="checkbox" ${a.on?'checked':''} onchange="tickAcc('${a.id}',this.checked)" aria-label="ជ្រើស"><div><b>${esc(a.name)}</b><br>${esc(a.no)}</div><button class="g" onclick="editAcc('${a.id}')">កែ</button><button class="x" onclick="delAcc('${a.id}')" aria-label="លុប">✕</button></div>`).join(''):'<div class="empty">មិនទាន់មានលេខគណនី</div>';
+}
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+function del(id){S.items=S.items.filter(i=>i.id!==id);save();render()}
+function selEdit(id,sel){const inp=$('in'+id);inp.dataset.cur=sel.value;inp.disabled=!sel.value;inp.value='';if(sel.value)inp.focus()}
+function applyEdit(id){
+  const inp=$('in'+id);if(!inp||inp.disabled)return;
+  const v=parseFloat(String(inp.value).replace(/,/g,''));const c=inp.dataset.cur;
+  if(!c||!(v>=0)||inp.value==='')return;
+  const it=S.items.find(i=>i.id===id);if(!it)return;
+  it.cur=c;it.amt=c==='USD'?Math.round(v*100)/100:Math.round(v);save();render();
 }
 
-function loadSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem('agencySettings'));
-    if (!s) return;
-    if (s.name)  { document.getElementById('nameInput').value  = s.name;  updateName(); }
-    if (s.color) { document.getElementById('colorInput').value = s.color; updateColor(); }
-    if (s.size && String(s.size) !== '36') { document.getElementById('sizeInput').value  = s.size;  updateSize(); }
-    if (s.bg)    { document.getElementById('bgInput').value    = s.bg;    updateBg(); }
-  } catch(e) {}
+/* dialog */
+let dCur='USD',dCode='';
+function setCur(c){dCur=c;$('cU').classList.toggle('on',c==='USD');$('cK').classList.toggle('on',c==='KHR')}
+$('cU').onclick=()=>setCur('USD');$('cK').onclick=()=>setCur('KHR');
+function openAmt(code,cur,amt){
+  dCode=code||'';$('dcode').textContent=dCode;setCur(cur||S.last||'USD');$('amt').value=amt||'';
+  if(!$('dlg').open)$('dlg').showModal();setTimeout(()=>$('amt').focus(),50);
 }
-
-// ── Date ──
-function todayISO() {
-  const d = new Date();
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function formatDate(iso) {
-  const [y,m,day] = iso.split('-');
-  const kh = ['','មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'];
-  return 'ថ្ងៃទី '+parseInt(day)+' ខែ'+kh[parseInt(m)]+' ឆ្នាំ'+y;
-}
-let currentDate = todayISO();
-document.getElementById('dateText').textContent = formatDate(currentDate);
-document.getElementById('dateInput').value = currentDate;
-loadSettings();
-
-function toggleDate() {
-  const disp = document.getElementById('dateDisplay');
-  const inp  = document.getElementById('dateInput');
-  const showing = inp.style.display === 'inline-block';
-  if (showing) { applyDate(); }
-  else { disp.style.display='none'; inp.style.display='inline-block'; inp.focus(); }
-}
-function applyDate() {
-  const inp = document.getElementById('dateInput');
-  if (inp.style.display === 'none') return;
-  currentDate = inp.value || todayISO();
-  document.getElementById('dateText').textContent = formatDate(currentDate);
-  inp.style.display = 'none';
-  document.getElementById('dateDisplay').style.display = 'inline-flex';
-}
-
-// ── Toolbar ──
-function updateName()  { document.getElementById('agencyName').textContent = document.getElementById('nameInput').value; }
-function updateColor() { document.getElementById('agencyName').style.color = document.getElementById('colorInput').value; }
-function updateSize()  { document.getElementById('agencyName').style.fontSize = (parseInt(document.getElementById('sizeInput').value)||20)+'px'; }
-function updateBg()    { const c=document.getElementById('bgInput').value; document.getElementById('cardHeader').style.background='linear-gradient(135deg,'+c+' 0%,#16213e 100%)'; }
-
-// ── Image upload ──
-function loadImage(e) {
-  loadImageFile(e.target.files[0]);
-}
-function loadImageFile(file) {
-  if (!file || !file.type || file.type.indexOf('image/') !== 0) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    const area = document.getElementById('uploadArea');
-    area.innerHTML = '';
-    area.onclick = null;
-    const img = document.createElement('img');
-    img.draggable = false;
-    img.onload = function() {
-      // box height = half of the image's natural display height (min 100px)
-      area.style.height = Math.max(100, Math.round(img.offsetHeight / 2)) + 'px';
-    };
-    img.src = ev.target.result;
-    area.appendChild(img);
-    const btn = document.createElement('button');
-    btn.className = 'remove-img-btn';
-    btn.textContent = 'x';
-    btn.onclick = function(e2) { e2.stopPropagation(); resetUpload(); };
-    area.appendChild(btn);
-    initInteractiveImage(img);
-  };
-  reader.readAsDataURL(file);
-}
-function resetUpload() {
-  const area = document.getElementById('uploadArea');
-  area.innerHTML = '<div class="upload-placeholder"><div class="icon">+</div><p>ចុចដើម្បី Upload រូបភាព</p></div>';
-  area.onclick = function(){ document.getElementById('fileInput').click(); };
-  area.style.height = '';
-  document.getElementById('fileInput').value = '';
-}
-
-// ── Drag & drop from outside + paste (Ctrl+V) ──
-(function() {
-  const area = document.getElementById('uploadArea');
-  ['dragenter','dragover'].forEach(ev => area.addEventListener(ev, e => {
-    e.preventDefault();
-    area.style.borderColor = '#0f3460';
-    area.style.background = '#f0f4ff';
-  }));
-  ['dragleave','drop'].forEach(ev => area.addEventListener(ev, e => {
-    e.preventDefault();
-    area.style.borderColor = '';
-    area.style.background = '';
-  }));
-  area.addEventListener('drop', e => {
-    const dt = e.dataTransfer;
-    if (dt && dt.files && dt.files.length) { loadImageFile(dt.files[0]); }
-  });
-  // stop the browser from opening a dropped image when missing the box
-  window.addEventListener('dragover', e => e.preventDefault());
-  window.addEventListener('drop', e => e.preventDefault());
-  document.addEventListener('paste', e => {
-    const items = (e.clipboardData && e.clipboardData.items) || [];
-    for (const it of items) {
-      if (it.type && it.type.indexOf('image/') === 0) {
-        loadImageFile(it.getAsFile());
-        e.preventDefault();
-        break;
-      }
-    }
-  });
-})();
-
-// ── Pan & Pinch-to-zoom ──
-let imgState = { scale: 1.2, x: 0, y: 0 };
-
-function applyTransform(img) {
-  img.style.transform = `translate(${imgState.x}px, ${imgState.y}px) scale(${imgState.scale})`;
-}
-
-function initInteractiveImage(img) {
-  imgState = { scale: 1.2, x: 0, y: 0 };
-  img.style.transformOrigin = '0 0';
-  applyTransform(img);
-
-  // Mouse drag (desktop)
-  let dragging = false, startX, startY;
-  img.addEventListener('mousedown', e => {
-    dragging = true;
-    startX = e.clientX - imgState.x;
-    startY = e.clientY - imgState.y;
-    img.style.cursor = 'grabbing';
-    e.preventDefault();
-  });
-  window.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    imgState.x = e.clientX - startX;
-    imgState.y = e.clientY - startY;
-    applyTransform(img);
-  });
-  window.addEventListener('mouseup', () => { dragging = false; img.style.cursor = 'grab'; });
-
-  // Scroll to zoom (desktop)
-  img.addEventListener('wheel', e => {
-    e.preventDefault();
-    imgState.scale = Math.min(5, Math.max(0.3, imgState.scale + (e.deltaY > 0 ? -0.1 : 0.1)));
-    applyTransform(img);
-  }, { passive: false });
-
-  // Touch pan & pinch (mobile)
-  let lastTouches = null;
-  img.addEventListener('touchstart', e => { lastTouches = e.touches; e.preventDefault(); }, { passive: false });
-  img.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if (e.touches.length === 1 && lastTouches && lastTouches.length === 1) {
-      imgState.x += e.touches[0].clientX - lastTouches[0].clientX;
-      imgState.y += e.touches[0].clientY - lastTouches[0].clientY;
-    } else if (e.touches.length === 2 && lastTouches && lastTouches.length >= 2) {
-      const prev = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
-      const curr = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-      imgState.scale = Math.min(5, Math.max(0.3, imgState.scale * (curr / prev)));
-    }
-    lastTouches = e.touches;
-    applyTransform(img);
-  }, { passive: false });
-  img.addEventListener('touchend', e => { lastTouches = e.touches; }, { passive: false });
-
-  // Reset button
-  const resetBtn = document.createElement('button');
-  resetBtn.textContent = 'កំណត់ឡើងវិញ';
-  resetBtn.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(15,52,96,0.85);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-family:"Kantumruy Pro",sans-serif;cursor:pointer;z-index:3;white-space:nowrap;';
-  resetBtn.onclick = e => { e.stopPropagation(); imgState={scale:1.2,x:0,y:0}; applyTransform(img); };
-  img.parentElement.appendChild(resetBtn);
-}
-
-// ── Message selector ──
-const msgs = {
-  '1': 'សូមជួយ <span style="color:#003087;font-weight:900;font-size:25px;line-height:1.5;">«ចំណាយប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។',
-  '2': 'សូមជួយ <span style="color:#c0392b;font-weight:900;font-size:25px;line-height:1.5;">«លុបប៉ុង»</span> អោយខ្ញុំមួយផងបង សូមអរគុណ។'
+$('dNo').onclick=()=>$('dlg').close();
+$('dNone').onclick=()=>{if(dCode&&!S.skip.includes(dCode)){S.skip.push(dCode);save()}$('dlg').close();toast('គ្មាន COD រំលង')};
+$('dOk').onclick=()=>{
+  const v=parseFloat(String($('amt').value).replace(/,/g,''));
+  if(!(v>0)){toast('សូមបញ្ចូលចំនួនទឹកប្រាក់');return}
+  S.items.push({id:uid(),code:dCode,cur:dCur,amt:dCur==='USD'?Math.round(v*100)/100:Math.round(v)});
+  S.last=dCur;save();render();$('dlg').close();
 };
-function selectMsg() {
-  const val = document.getElementById('msgSelect').value;
-  const box = document.getElementById('selectedMsg');
-  if (val && msgs[val]) { box.innerHTML = msgs[val]; box.style.display = 'block'; }
-  else { box.style.display = 'none'; }
+$('amt').addEventListener('keydown',e=>{if(e.key==='Enter')$('dOk').click()});
+$('bMan').onclick=()=>openAmt('');
+
+/* scan */
+function parseQR(txt){
+  const m=txt.match(/(\d[\d,]*(?:\.\d+)?)\s*(\$|USD|៛|KHR|riel)/i)||txt.match(/(\$|USD|៛|KHR)\s*(\d[\d,]*(?:\.\d+)?)/i);
+  if(!m)return null;
+  const a=isNaN(m[1].replace(/,/g,''))?m[2]:m[1],u=isNaN(m[1].replace(/,/g,''))?m[1]:m[2];
+  return{amt:a.replace(/,/g,''),cur:/\$|usd/i.test(u)?'USD':'KHR'};
 }
-
-// ── Reset Card (image + message only, keep toolbar settings) ──
-function resetCard() {
-  // reset image
-  resetUpload();
-  // reset message dropdown
-  document.getElementById('msgSelect').value = '';
-  document.getElementById('selectedMsg').style.display = 'none';
-  document.getElementById('selectedMsg').innerHTML = '';
-  // reset date to today
-  currentDate = todayISO();
-  document.getElementById('dateText').textContent = formatDate(currentDate);
-  document.getElementById('dateInput').value = currentDate;
-  document.getElementById('dateInput').style.display = 'none';
-  document.getElementById('dateDisplay').style.display = 'inline-flex';
+function onCode(txt){
+  txt=String(txt).trim();if(!txt)return false;
+  if(S.items.some(i=>i.code===txt)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return false}
+  if(S.skip.includes(txt)){toast('គ្មាន COD (រំលង)');return false}
+  beep();const p=parseQR(txt);
+  if(p){S.items.push({id:uid(),code:txt,cur:p.cur,amt:+p.amt});S.last=p.cur;save();render();toast('បានបន្ថែម '+fmt(p.amt,p.cur));return true}
+  openAmt(txt);return true;
 }
-
-// ── iOS overlay ──
-function closeIosOverlay() {
-  document.getElementById('iosOverlay').style.display = 'none';
+let stream=null,det=null,running=false,cool=0,lastTxt='';
+const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
+async function startCam(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    $('v').srcObject=stream;await $('v').play();$('cam').style.display='block';$('bScan').textContent='បិទកាមេរ៉ា';
+    if('BarcodeDetector' in window){try{det=new BarcodeDetector({formats:['qr_code']})}catch(e){det=null}}
+    if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
+    running=true;lastTxt='';loop();
+  }catch(e){toast('បើកកាមេរ៉ាមិនបាន សូមប្រើ «ស្កេនពីរូប» ឬបញ្ចូលដោយដៃ')}
 }
-
-// ── Render card to canvas (shared helper) ──
-async function renderCardCanvas() {
-  const wrap    = document.getElementById('saveBtnWrap');
-  const msgZone = document.getElementById('messageZone');
-  const hints   = document.querySelectorAll('.edit-hint');
-  const removeBtn  = document.querySelector('.remove-img-btn');
-  const resetBtn   = document.querySelector('#uploadArea button:not(.remove-img-btn)');
-  const resetCardBtn = document.getElementById('resetCardBtn');
-
-  // hide UI-only elements
-  wrap.style.display    = 'none';
-  msgZone.style.display = 'none';
-  hints.forEach(h => h.style.display = 'none');
-  if (removeBtn)    removeBtn.style.display    = 'none';
-  if (resetBtn)     resetBtn.style.display     = 'none';
-  if (resetCardBtn) resetCardBtn.style.display = 'none';
-
-  let canvas;
-  try {
-    canvas = await html2canvas(document.getElementById('card'), {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      imageTimeout: 0
-    });
-  } finally {
-    // restore
-    wrap.style.display    = 'block';
-    msgZone.style.display = 'block';
-    hints.forEach(h => h.style.display = '');
-    if (removeBtn)    removeBtn.style.display    = 'flex';
-    if (resetBtn)     resetBtn.style.display     = 'block';
-    if (resetCardBtn) resetCardBtn.style.display = 'block';
+function stopCam(){running=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('cam').style.display='none';$('bScan').textContent='ស្កេន QR កញ្ចប់'}
+$('bScan').onclick=()=>running?stopCam():startCam();
+async function loop(){
+  if(!running)return;
+  const v=$('v');
+  if(!$('dlg').open&&Date.now()>cool&&v.videoWidth){
+    let txt=null,loc=null;
+    try{
+      if(det){const r=await det.detect(v);if(r.length){txt=r[0].rawValue;loc=r[0].cornerPoints}}
+      else if(window.jsQR){cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);const d=cx.getImageData(0,0,cv.width,cv.height);const r=jsQR(d.data,d.width,d.height);if(r){txt=r.data;const L=r.location;loc=[L.topLeftCorner,L.topRightCorner,L.bottomRightCorner,L.bottomLeftCorner]}}
+    }catch(e){}
+    if(txt&&txt!==lastTxt){lastTxt=txt;cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);scanFrame(cv,txt,loc);cool=Date.now()+700}
   }
-  return canvas;
+  setTimeout(loop,150);
 }
+$('bImg').onclick=()=>$('fImg').click();
+$('fImg').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const img=new Image();
+  img.onload=()=>{
+    const s=Math.min(1,1600/Math.max(img.width,img.height));cv.width=img.width*s;cv.height=img.height*s;cx.drawImage(img,0,0,cv.width,cv.height);
+    const r=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);
+    scanFrame(cv,r?r.data:'',r?[r.location.topLeftCorner,r.location.topRightCorner,r.location.bottomRightCorner,r.location.bottomLeftCorner]:null);
+  };img.src=URL.createObjectURL(f);e.target.value='';
+};
 
-// ── Save ──
-async function saveImage() {
-  const btn = document.getElementById('saveBtn');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'កំពុងរក្សាទុក...';
-  btn.disabled = true;
-
-  try {
-    const canvas = await renderCardCanvas();
-    const isIOS  = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-    if (isIOS) {
-      const ov  = document.getElementById('iosOverlay');
-      const img = document.getElementById('iosPreviewImg');
-      img.src = canvas.toDataURL('image/png');
-      ov.style.display = 'flex';
-    } else {
-      // Fix: use Blob + object URL so browser always recognises PNG
-      canvas.toBlob(function(blob) {
-        const url  = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'agency-card.png';
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      }, 'image/png');
-    }
-  } catch(err) {
-    alert('មានបញ្ហា: ' + err.message);
-  }
-
-  btn.innerHTML = originalText;
-  btn.disabled  = false;
+/* bank */
+$('qOn').onchange=e=>{S.qrOn=e.target.checked;save()};
+$('bQ').onclick=()=>$('fQ').click();
+$('fQ').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const img=new Image();
+  img.onload=()=>{const s=Math.min(1,1400/Math.max(img.width,img.height));cv.width=img.width*s;cv.height=img.height*s;cx.drawImage(img,0,0,cv.width,cv.height);
+    const rr=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);S.emv=rr&&/^0002/.test(rr.data)?rr.data:null;
+    S.qr=cv.toDataURL('image/png');S.qrOn=true;save();render();makeQrFile();toast(S.emv?'បានរក្សាទុក QR ✓ អានបាន':'រក្សាទុកហើយ ប៉ុន្តែអាន QR មិនបាន')};
+  img.src=URL.createObjectURL(f);e.target.value='';
+};
+$('bQd').onclick=()=>{if(S.qr)ask('លុប QR ABA?',()=>{S.qr=null;S.emv=null;S.qrOn=false;qrFile=null;save();render()})};
+let askCb=null,qrFile=null,samp,editId=null,pend=new Set(),shUrl={},shFile={};
+async function copyNum(c){const tot=sum(c);if(!(tot>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
+  const s=c==='USD'?tot.toFixed(2):String(Math.round(tot));
+  try{await navigator.clipboard.writeText(s)}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.focus();t.select();t.setSelectionRange(0,99);document.execCommand('copy');t.remove()}
+  toast('បានចម្លង '+s)}
+function crc16(s){let c=0xFFFF;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let k=0;k<8;k++)c=c&0x8000?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,'0')}
+function buildEMV(emv,amt,cur){const m=new Map();let i=0;while(i+4<=emv.length){const t=emv.substr(i,2),l=+emv.substr(i+2,2);if(isNaN(l))return null;m.set(t,emv.substr(i+4,l));i+=4+l}
+  m.delete('63');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
+  const s=[...m.keys()].sort().map(t=>{const v=m.get(t);return t+String(v.length).padStart(2,'0')+v}).join('')+'6304';return s+crc16(s)}
+function qrCanvas(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),z=8,b=4,c=document.createElement('canvas');c.width=c.height=(n+2*b)*z;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#000';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+b)*z,(r+b)*z,z,z);return c}
+function drawQR(){return;for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
+  if(!S.emv||!(tot>0)||!window.qrcode){el.innerHTML='';continue}
+  try{const k=qrCanvas(buildEMV(S.emv,tot,c)),u=k.toDataURL('image/png');shUrl[c]=u;el.innerHTML='<img alt="QR" src="'+u+'">';k.toBlob(b=>{if(b)shFile[c]=new File([b],'pay-'+c+'.png',{type:'image/png'})},'image/png')}catch(x){el.innerHTML=''}}}
+function ask(m,cb){$('cmsg').textContent=m;askCb=cb;$('cdlg').showModal()}
+$('cNo').onclick=()=>$('cdlg').close();
+$('cYes').onclick=()=>{$('cdlg').close();if(askCb)askCb()};
+$('bSave').onclick=()=>{save();toast('បានរក្សាទុករួចរាល់ ✓')};
+async function makeQrFile(){qrFile=null;if(S.qr){try{qrFile=dataFile(S.qr,'aba-qr.png')}catch(e){}}}
+function dataFile(u,name){const p=u.split(','),mime=p[0].match(/:(.*?);/)[1],bin=atob(p[1]),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new File([a],name,{type:mime})}
+function showShare(c){const u=shUrl[c]||(S.qrOn?S.qr:null),im=$('simg');im.hidden=!u;if(u)im.src=u;$('stxt').value=(c==='USD'?'ដុល្លារ ':'រៀល ')+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+S.accs.filter(a=>a.on).map(a=>'\n'+a.name+': '+a.no).join('');$('sdlg').showModal()}
+$('sClose').onclick=()=>$('sdlg').close();
+$('sCopy').onclick=async()=>{const el=$('stxt');try{await navigator.clipboard.writeText(el.value)}catch(e){el.select();document.execCommand('copy')}toast('បានចម្លង')};
+$('eNo').onclick=()=>$('adlg').close();
+$('eOk').onclick=()=>{const a=S.accs.find(x=>x.id===editId);if(a){a.name=$('en').value.trim()||a.name;a.no=$('eno').value.trim()||a.no;save();render()}$('adlg').close()};
+async function scanFrame(c,code,loc){
+  if(code){if(pend.has(code))return;if(S.items.some(i=>i.code===code)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return}if(S.skip.includes(code)){toast('គ្មាន COD (រំលង)');return}}
+  beep();
+  if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
+  if(!samp){openAmt(code);return}
+  if(code)pend.add(code);toast('កំពុងអាន COD...');
+  try{
+    let sx=0,sy=0,sw=c.width,sh=c.height;
+    if(loc&&loc.length){const X=loc.map(p=>p.x),Y=loc.map(p=>p.y),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),q=Math.max(x1-x0,y1-y0);sx=Math.max(0,x0-2*q);sy=Math.max(0,y0-.4*q);sw=Math.min(c.width,x1+.15*q)-sx;sh=Math.min(c.height,y1+.4*q)-sy}
+    const sc=Math.min(1,640/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);
+    const blob=await new Promise(r=>o.toBlob(r,'image/jpeg',.8));
+    const j=await samp.json('This is a Cambodian parcel shipping label. Find the COD amount printed next to the word COD (left of the QR code), such as (7.00 $) or (20,000 ៛). Never use the delivery fee (ថ្លៃដឹក, marked PAID). If the word COD is not on the label, cod is false. Reply ONLY with JSON: {"cod":true or false,"amount":number,"currency":"USD" or "KHR"}',{images:[blob],modelTier:'quick',cache:false});
+    if(j&&j.cod&&+j.amount>0){const cur=j.currency==='USD'?'USD':'KHR',amt=cur==='USD'?Math.round(j.amount*100)/100:Math.round(j.amount);S.items.push({id:uid(),code:code||'',cur,amt,ai:true});S.last=cur;save();render();toast('បានបន្ថែម '+fmt(amt,cur)+(cur==='USD'?' $':' ៛'))}
+    else{if(code)pend.delete(code);toast('គ្មាន COD រំលង')}
+  }catch(e){if(code)pend.delete(code);toast('អានមិនបាន សូមបញ្ចូលដោយដៃ');openAmt(code)}
 }
+$('aAdd').onclick=()=>{
+  const n=$('an').value.trim(),o=$('ano').value.trim();if(!o){toast('សូមបញ្ចូលលេខគណនី');return}
+  S.accs.push({id:uid(),name:n||'គណនី',no:o,on:false});$('an').value='';$('ano').value='';save();render();
+};
+function tickAcc(id,v){const a=S.accs.find(x=>x.id===id);if(a){a.on=v;save()}}
+function editAcc(id){const a=S.accs.find(x=>x.id===id);if(!a)return;editId=id;$('en').value=a.name;$('eno').value=a.no;$('adlg').showModal()}
+function delAcc(id){ask('លុបគណនីនេះ?',()=>{S.accs=S.accs.filter(a=>a.id!==id);save();render()})}
+$('bClr').onclick=()=>{if(S.items.length||S.skip.length)ask('លុបបញ្ជីកញ្ចប់ទាំងអស់? (QR និងលេខគណនីមិនត្រូវលុបទេ)',()=>{S.items=[];S.skip=[];save();render()})};
 
-// ── Share to Telegram ──
-async function shareToTelegram() {
-  const btn = document.getElementById('shareBtn');
-  const originalHTML = btn.innerHTML;
-  btn.innerHTML = 'កំពុងត្រៀម...';
-  btn.disabled = true;
-
-  try {
-    const canvas = await renderCardCanvas();
-
-    // Try Web Share API (Android Chrome, iOS Safari, Telegram in-app browser)
-    if (navigator.canShare) {
-      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-      const file = new File([blob], 'agency-card.png', { type: 'image/png' });
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-    }
-
-    // Fallback
-    const dataURL = canvas.toDataURL('image/png');
-    const isIOS   = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-    if (isIOS) {
-      const ov  = document.getElementById('iosOverlay');
-      const img = document.getElementById('iosPreviewImg');
-      ov.querySelector('p').textContent = 'សូមចុចឱ្យជាប់លើរូបភាព រួចជ្រើស "Save Image" ហើយបញ្ជូនទៅ Telegram';
-      img.src = dataURL;
-      ov.style.display = 'flex';
-    } else {
-      canvas.toBlob(function(blob) {
-        const url  = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'agency-card.png';
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      }, 'image/png');
-      setTimeout(() => { window.open('https://t.me', '_blank'); }, 800);
-    }
-
-  } catch(err) {
-    // AbortError = user cancelled share sheet — not a real error
-    if (err.name !== 'AbortError') {
-      alert('មានបញ្ហា: ' + err.message);
-    }
-  } finally {
-    // ALWAYS restore button regardless of success / cancel / error
-    btn.innerHTML = originalHTML;
-    btn.disabled  = false;
-  }
+/* share */
+async function share(c){
+  if(!(sum(c)>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
+  const f=S.qrOn&&S.qr?(qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
+  try{if(f){try{await navigator.share({files:[f]})}catch(e1){if(e1.name==='AbortError')return;await navigator.share({files:[f],title:'ABA QR',text:'ABA QR'})}}else await navigator.share({text:tx})}catch(e){if(e.name==='AbortError')return;if(S.qr)showShare(c);else toast('ចែករំលែកមិនបាន')}
 }
+async function shareOld(c){
+  const list=S.items.filter(i=>i.cur===c);if(!list.length){toast('មិនទាន់មានទឹកប្រាក់');return}
+  let t='COD '+(c==='USD'?'ដុល្លារ':'ប្រាក់រៀល')+'\n'+list.map((i,k)=>(k+1)+'. '+fmt(i.amt,c)).join('\n')+'\nសរុប: '+fmt(sum(c),c)+(c==='USD'?' $':' ៛');
+  const ac=S.accs.filter(a=>a.on);if(ac.length)t+='\n\nគណនី:\n'+ac.map(a=>a.name+': '+a.no).join('\n');
+  const data={text:t,title:'COD'};
+  if(S.qrOn&&qrFile&&navigator.canShare&&navigator.canShare({files:[qrFile]}))data.files=[qrFile];
+  try{if(navigator.share){await navigator.share(data);return}}catch(e){if(e.name==='AbortError')return}
+  showShare(t);
+}
+$('sU').onclick=()=>share('USD');$('sK').onclick=()=>share('KHR');makeQrFile();
+render();
 </script>
 </body>
 </html>
