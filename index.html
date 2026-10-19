@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <style>
 :root{--bg:#f6f1e9;--card:#fff;--ink:#231a12;--mute:#7a6d60;--line:#e2d8ca;--or:#e8660c;--or2:#fff0e4;--usd:#1b7a4b;--khr:#2b5fa8;--danger:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120d;--card:#241d16;--ink:#f4ece1;--mute:#a89a8a;--line:#3a3025;--or:#ff8a3d;--or2:#33231a;--usd:#5fd39a;--khr:#7fb0f0;--danger:#ff8a80;color-scheme:dark}}
@@ -38,7 +38,7 @@ input:disabled{opacity:.45}
 .item .e{display:flex;gap:4px;margin-top:4px}
 .item .e select{flex:0 0 46%;font-size:12px;padding:4px}
 .item .e input{flex:1;width:0;font-size:13px;padding:4px}
-.tot{margin-top:8px;font-size:17px;font-weight:700}
+.tot{margin-top:8px;font-size:28px;font-weight:700;line-height:1.2}
 .u .tot{color:var(--usd)}.k .tot{color:var(--khr)}
 .empty{color:var(--mute);font-size:13px;padding:8px 0}
 .share{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
@@ -128,7 +128,7 @@ function render(){
       <div class="e"><select onchange="selEdit('${i.id}',this)" aria-label="កែទឹកប្រាក់"><option value="">កែទឹកប្រាក់</option><option value="USD">កែជា $</option><option value="KHR">កែជា ៛</option></select>
       <input id="in${i.id}" disabled inputmode="decimal" placeholder="..." onkeydown="if(event.key==='Enter')applyEdit('${i.id}')" onchange="applyEdit('${i.id}')"></div></div>`).join(''):'<div class="empty">មិនទាន់មាន</div>';
     $(n).textContent=list.length+' កញ្ចប់';
-    $(t).innerHTML='សរុប: '+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+' <button class="g" style="padding:4px 10px;font-size:13px" onclick="copyNum(\''+c+'\')">ចម្លង</button>';
+    $(t).innerHTML='<div style="font-size:12px;color:var(--mute);font-weight:400">សរុប</div>'+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+' <button class="g" style="padding:4px 10px;font-size:13px" onclick="copyNum(\''+c+'\')">ចម្លង</button>';
   }
   drawQR();$('qOn').checked=!!S.qrOn;{const a=S.accs[0],ae=document.activeElement;if(ae!==$('an')&&ae!==$('ano')){$('an').value=a?a.name:'';$('ano').value=a?a.no:''}}
   $('bq').hidden=!S.qr;if(S.qr)$('bq').src=S.qr;
@@ -229,6 +229,14 @@ $('fQ').onchange=e=>{
 };
 $('bQd').onclick=()=>{if(S.qr)ask('លុប QR ABA?',()=>{S.qr=null;S.emv=null;S.qrOn=false;qrFile=null;save();render()})};
 let askCb=null,qrFile=null,samp,editId=null,pend=new Set(),shUrl={},shFile={},ocrW=null;
+function cropC(c,loc){let sx=0,sy=0,sw=c.width,sh=c.height;
+  if(loc&&loc.length){const X=loc.map(p=>p.x),Y=loc.map(p=>p.y),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),q=Math.max(x1-x0,y1-y0);sx=Math.max(0,x0-2*q);sy=Math.max(0,y0-.4*q);sw=Math.min(c.width,x1+.15*q)-sx;sh=Math.min(c.height,y1+.4*q)-sy}
+  const sc=Math.min(2,1000/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);return o}
+async function bgOcr(c,code,loc){
+  const o=cropC(c,loc);
+  try{const j=await Promise.race([ocrParse(o),new Promise((_,r)=>setTimeout(r,25000))]);
+    if(j&&j.cod&&dCode===code&&$('dlg').open&&!$('amt').value){$('amt').value=j.currency==='USD'?(+j.amount).toFixed(2):String(Math.round(j.amount));setCur(j.currency);toast('OCR: '+$('amt').value+' — សូមពិនិត្យ')}}catch(e){}
+}
 async function ocrParse(cvs){
   if(!window.Tesseract)throw 1;
   if(!ocrW){toast('កំពុងរៀបចំ OCR ដំបូង...');ocrW=await Tesseract.createWorker('eng')}
@@ -261,7 +269,7 @@ function buildEMVold(emv,amt,cur){const m=new Map();let i=0;while(i+4<=emv.lengt
   m.delete('63');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
   const s=[...m.keys()].sort().map(t=>{const v=m.get(t);return t+String(v.length).padStart(2,'0')+v}).join('')+'6304';return s+crc16(s)}
 function qrCanvas(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),z=8,b=4,c=document.createElement('canvas');c.width=c.height=(n+2*b)*z;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#000';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+b)*z,(r+b)*z,z,z);return c}
-function drawQR(){for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
+function drawQR(){return;for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
   if(!S.emv||!(tot>0)||!window.qrcode){el.innerHTML='';continue}
   try{const k=qrCanvas(buildEMV(S.emv,tot,c)),u=k.toDataURL('image/png');shUrl[c]=u;el.innerHTML='<img alt="QR" src="'+u+'">';k.toBlob(b=>{if(b)shFile[c]=new File([b],'pay-'+c+'.png',{type:'image/png'})},'image/png')}catch(x){el.innerHTML=''}}}
 function ask(m,cb){$('cmsg').textContent=m;askCb=cb;$('cdlg').showModal()}
@@ -279,7 +287,7 @@ async function scanFrame(c,code,loc){
   if(code){if(pend.has(code))return;if(S.items.some(i=>i.code===code)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return}if(S.skip.includes(code)){toast('គ្មាន COD (រំលង)');return}}
   beep();
   if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
-  if(!samp&&!window.Tesseract){openAmt(code);return}
+  if(!samp){openAmt(code);if(window.Tesseract)bgOcr(c,code,loc);return}
   if(code)pend.add(code);toast('កំពុងអាន COD...');
   try{
     let sx=0,sy=0,sw=c.width,sh=c.height;
