@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <style>
 :root{--bg:#f6f1e9;--card:#fff;--ink:#231a12;--mute:#7a6d60;--line:#e2d8ca;--or:#e8660c;--or2:#fff0e4;--usd:#1b7a4b;--khr:#2b5fa8;--danger:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120d;--card:#241d16;--ink:#f4ece1;--mute:#a89a8a;--line:#3a3025;--or:#ff8a3d;--or2:#33231a;--usd:#5fd39a;--khr:#7fb0f0;--danger:#ff8a80;color-scheme:dark}}
@@ -47,6 +48,7 @@ input:disabled{opacity:.45}
 .acc div{flex:1;min-width:0;word-break:break-all}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--or)}
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(92vw,360px);padding:14px}
+#accs{display:none}
 .qb img{width:100%;max-width:200px;display:block;margin:8px auto 0;border-radius:6px;background:#fff;padding:6px}
 dialog::backdrop{background:rgba(0,0,0,.55)}
 .seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1;background:var(--or2);color:var(--or);border:1px solid var(--line)}
@@ -75,7 +77,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 
 <div class="card" style="margin-top:10px">
   <h2>ធនាគារ</h2>
-  <div class="row"><input type="checkbox" id="qOn" aria-label="ជ្រើស QR"><b>QR ABA</b>
+  <div class="row"><input type="checkbox" id="qOn" aria-label="ជ្រើស QR"><b>QR ABA + គណនី</b>
     <button class="g" id="bQ">ដាក់/ប្តូររូប QR</button><button class="x" id="bQd" aria-label="លុប QR">✕</button>
     <input type="file" id="fQ" accept="image/*" hidden></div>
   <img id="bq" alt="QR ABA" hidden>
@@ -93,7 +95,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 </div>
 <div class="row" style="margin-top:10px;justify-content:space-between">
   <span style="color:var(--mute);font-size:12px">ទិន្នន័យរក្សាទុកក្នុងទូរស័ព្ទនេះ</span>
-  <button id="bSave">រក្សាទុក</button><button class="g" id="bClr">លុបទាំងអស់</button>
+  <button id="bSave">រក្សាទុកទាំងអស់</button><button class="g" id="bClr">លុបទាំងអស់</button>
 </div>
 
 <dialog id="dlg">
@@ -128,7 +130,7 @@ function render(){
     $(n).textContent=list.length+' កញ្ចប់';
     $(t).innerHTML='សរុប: '+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+' <button class="g" style="padding:4px 10px;font-size:13px" onclick="copyNum(\''+c+'\')">ចម្លង</button>';
   }
-  drawQR();$('qOn').checked=!!S.qrOn;
+  drawQR();$('qOn').checked=!!S.qrOn;{const a=S.accs[0],ae=document.activeElement;if(ae!==$('an')&&ae!==$('ano')){$('an').value=a?a.name:'';$('ano').value=a?a.no:''}}
   $('bq').hidden=!S.qr;if(S.qr)$('bq').src=S.qr;
   $('accs').innerHTML=S.accs.length?S.accs.map(a=>`<div class="acc"><input type="checkbox" ${a.on?'checked':''} onchange="tickAcc('${a.id}',this.checked)" aria-label="ជ្រើស"><div><b>${esc(a.name)}</b><br>${esc(a.no)}</div><button class="g" onclick="editAcc('${a.id}')">កែ</button><button class="x" onclick="delAcc('${a.id}')" aria-label="លុប">✕</button></div>`).join(''):'<div class="empty">មិនទាន់មានលេខគណនី</div>';
 }
@@ -226,7 +228,16 @@ $('fQ').onchange=e=>{
   img.src=URL.createObjectURL(f);e.target.value='';
 };
 $('bQd').onclick=()=>{if(S.qr)ask('លុប QR ABA?',()=>{S.qr=null;S.emv=null;S.qrOn=false;qrFile=null;save();render()})};
-let askCb=null,qrFile=null,samp,editId=null,pend=new Set(),shUrl={},shFile={};
+let askCb=null,qrFile=null,samp,editId=null,pend=new Set(),shUrl={},shFile={},ocrW=null;
+async function ocrParse(cvs){
+  if(!window.Tesseract)throw 1;
+  if(!ocrW){toast('កំពុងរៀបចំ OCR ដំបូង...');ocrW=await Tesseract.createWorker('eng')}
+  const t=(await ocrW.recognize(cvs)).data.text;
+  const m=t.match(/C[O0Q]D[^0-9]{0,6}(\d[\d,.]*)\s*(\$|[^\d\s)]?)/i);
+  if(!m){if(/C[O0Q]D/i.test(t))throw 2;return{cod:false}}
+  const n=m[1].replace(/,/g,''),usd=m[2]==='$'||/\.\d{1,2}$/.test(n);
+  return{cod:true,amount:parseFloat(n),currency:usd?'USD':'KHR'}
+}
 async function copyNum(c){const tot=sum(c);if(!(tot>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
   const s=c==='USD'?tot.toFixed(2):String(Math.round(tot));
   try{await navigator.clipboard.writeText(s)}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.focus();t.select();t.setSelectionRange(0,99);document.execCommand('copy');t.remove()}
@@ -254,21 +265,21 @@ async function scanFrame(c,code,loc){
   if(code){if(pend.has(code))return;if(S.items.some(i=>i.code===code)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return}if(S.skip.includes(code)){toast('គ្មាន COD (រំលង)');return}}
   beep();
   if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
-  if(!samp){openAmt(code);return}
+  if(!samp&&!window.Tesseract){openAmt(code);return}
   if(code)pend.add(code);toast('កំពុងអាន COD...');
   try{
     let sx=0,sy=0,sw=c.width,sh=c.height;
     if(loc&&loc.length){const X=loc.map(p=>p.x),Y=loc.map(p=>p.y),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),q=Math.max(x1-x0,y1-y0);sx=Math.max(0,x0-2*q);sy=Math.max(0,y0-.4*q);sw=Math.min(c.width,x1+.15*q)-sx;sh=Math.min(c.height,y1+.4*q)-sy}
-    const sc=Math.min(1,640/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);
-    const blob=await new Promise(r=>o.toBlob(r,'image/jpeg',.8));
-    const j=await samp.json('This is a Cambodian parcel shipping label. Find the COD amount printed next to the word COD (left of the QR code), such as (7.00 $) or (20,000 ៛). Never use the delivery fee (ថ្លៃដឹក, marked PAID). If the word COD is not on the label, cod is false. Reply ONLY with JSON: {"cod":true or false,"amount":number,"currency":"USD" or "KHR"}',{images:[blob],modelTier:'quick',cache:false});
+    const sc=Math.min(samp?1:2,(samp?640:1000)/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);
+    const blob=samp?await new Promise(r=>o.toBlob(r,'image/jpeg',.8)):null;
+    const j=!samp?await ocrParse(o):await samp.json('This is a Cambodian parcel shipping label. Find the COD amount printed next to the word COD (left of the QR code), such as (7.00 $) or (20,000 ៛). Never use the delivery fee (ថ្លៃដឹក, marked PAID). If the word COD is not on the label, cod is false. Reply ONLY with JSON: {"cod":true or false,"amount":number,"currency":"USD" or "KHR"}',{images:[blob],modelTier:'quick',cache:false});
     if(j&&j.cod&&+j.amount>0){const cur=j.currency==='USD'?'USD':'KHR',amt=cur==='USD'?Math.round(j.amount*100)/100:Math.round(j.amount);S.items.push({id:uid(),code:code||'',cur,amt,ai:true});S.last=cur;save();render();toast('បានបន្ថែម '+fmt(amt,cur)+(cur==='USD'?' $':' ៛'))}
     else{if(code)pend.delete(code);toast('គ្មាន COD រំលង')}
   }catch(e){if(code)pend.delete(code);toast('អានមិនបាន សូមបញ្ចូលដោយដៃ');openAmt(code)}
 }
 $('aAdd').onclick=()=>{
-  const n=$('an').value.trim(),o=$('ano').value.trim();if(!o){toast('សូមបញ្ចូលលេខគណនី');return}
-  S.accs.push({id:uid(),name:n||'គណនី',no:o,on:false});$('an').value='';$('ano').value='';save();render();
+  const n=$('an').value.trim(),o=$('ano').value.trim();
+  S.accs=(n||o)?[{id:'acc',name:n,no:o,on:true}]:[];save();render();toast('បានរក្សាទុក');
 };
 function tickAcc(id,v){const a=S.accs.find(x=>x.id===id);if(a){a.on=v;save()}}
 function editAcc(id){const a=S.accs.find(x=>x.id===id);if(!a)return;editId=id;$('en').value=a.name;$('eno').value=a.no;$('adlg').showModal()}
@@ -278,8 +289,8 @@ $('bClr').onclick=()=>{if(S.items.length||S.skip.length)ask('លុបបញ្�
 /* share */
 async function share(c){
   if(!(sum(c)>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
-  const f=S.qrOn&&S.qr?(qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
-  try{if(f){try{await navigator.share({files:[f]})}catch(e1){if(e1.name==='AbortError')return;await navigator.share({files:[f],title:'ABA QR',text:'ABA QR'})}}else await navigator.share({text:tx})}catch(e){if(e.name==='AbortError')return;if(S.qr)showShare(c);else toast('ចែករំលែកមិនបាន')}
+  const f=S.qrOn&&S.qr?(qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=!S.qrOn?'':S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
+  try{if(f){try{await navigator.share(tx?{files:[f],text:tx}:{files:[f]})}catch(e1){if(e1.name==='AbortError')return;await navigator.share({files:[f],title:'ABA QR',text:'ABA QR'})}}else await navigator.share({text:tx})}catch(e){if(e.name==='AbortError')return;if(S.qr)showShare(c);else toast('ចែករំលែកមិនបាន')}
 }
 async function shareOld(c){
   const list=S.items.filter(i=>i.cur===c);if(!list.length){toast('មិនទាន់មានទឹកប្រាក់');return}
