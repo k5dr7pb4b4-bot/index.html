@@ -243,11 +243,25 @@ async function copyNum(c){const tot=sum(c);if(!(tot>0)){toast('មិនទា�
   try{await navigator.clipboard.writeText(s)}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.focus();t.select();t.setSelectionRange(0,99);document.execCommand('copy');t.remove()}
   toast('បានចម្លង '+s)}
 function crc16(s){let c=0xFFFF;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let k=0;k<8;k++)c=c&0x8000?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,'0')}
-function buildEMV(emv,amt,cur){const m=new Map();let i=0;while(i+4<=emv.length){const t=emv.substr(i,2),l=+emv.substr(i+2,2);if(isNaN(l))return null;m.set(t,emv.substr(i+4,l));i+=4+l}
+function buildEMV(emv,amt,cur){return buildKH(emv,amt,cur)}
+function tlv(s){const o=[];let i=0;while(i+4<=s.length){const l=+s.substr(i+2,2);if(isNaN(l))return null;o.push([s.substr(i,2),s.substr(i+4,l)]);i+=4+l}return o}
+function mk(a){return a.map(p=>p[0]+String(p[1].length).padStart(2,'0')+p[1]).join('')}
+function buildKH(emv,amt,cur){
+  const a=tlv(emv);if(!a)return null;const m=new Map(a);
+  const t29=tlv(m.get('29')||'')||[],t40=tlv(m.get('40')||'')||[];
+  const g=(r,t)=>{const x=r.find(p=>p[0]===t);return x?x[1]:''};
+  const acc=cur==='USD'?(g(t40,'03')||g(t40,'02')):(g(t40,'02')||g(t29,'01'));
+  m.set('29',mk(t29.map(p=>p[0]==='01'&&acc?['01',acc]:p)));
+  m.set('40',mk([['00',g(t40,'00')],['01',g(t40,'01')],['02',acc]].filter(p=>p[1])));
+  m.set('01','12');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
+  const n=Date.now();m.set('99',mk([['00',String(n)],['01',String(n+365*86400000)]]));
+  m.delete('63');
+  const s=[...m.keys()].sort().map(t=>t+String(m.get(t).length).padStart(2,'0')+m.get(t)).join('')+'6304';return s+crc16(s)}
+function buildEMVold(emv,amt,cur){const m=new Map();let i=0;while(i+4<=emv.length){const t=emv.substr(i,2),l=+emv.substr(i+2,2);if(isNaN(l))return null;m.set(t,emv.substr(i+4,l));i+=4+l}
   m.delete('63');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
   const s=[...m.keys()].sort().map(t=>{const v=m.get(t);return t+String(v.length).padStart(2,'0')+v}).join('')+'6304';return s+crc16(s)}
 function qrCanvas(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),z=8,b=4,c=document.createElement('canvas');c.width=c.height=(n+2*b)*z;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#000';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+b)*z,(r+b)*z,z,z);return c}
-function drawQR(){return;for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
+function drawQR(){for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
   if(!S.emv||!(tot>0)||!window.qrcode){el.innerHTML='';continue}
   try{const k=qrCanvas(buildEMV(S.emv,tot,c)),u=k.toDataURL('image/png');shUrl[c]=u;el.innerHTML='<img alt="QR" src="'+u+'">';k.toBlob(b=>{if(b)shFile[c]=new File([b],'pay-'+c+'.png',{type:'image/png'})},'image/png')}catch(x){el.innerHTML=''}}}
 function ask(m,cb){$('cmsg').textContent=m;askCb=cb;$('cdlg').showModal()}
@@ -289,7 +303,7 @@ $('bClr').onclick=()=>{if(S.items.length||S.skip.length)ask('លុបបញ្�
 /* share */
 async function share(c){
   if(!(sum(c)>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
-  const f=S.qrOn&&S.qr?(qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=!S.qrOn?'':S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
+  const f=S.qrOn&&S.qr?(shFile[c]||qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=!S.qrOn?'':S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
   try{if(f){try{await navigator.share(tx?{files:[f],text:tx}:{files:[f]})}catch(e1){if(e1.name==='AbortError')return;await navigator.share({files:[f],title:'ABA QR',text:'ABA QR'})}}else await navigator.share({text:tx})}catch(e){if(e.name==='AbortError')return;if(S.qr)showShare(c);else toast('ចែករំលែកមិនបាន')}
 }
 async function shareOld(c){
@@ -302,6 +316,7 @@ async function shareOld(c){
   showShare(t);
 }
 $('sU').onclick=()=>share('USD');$('sK').onclick=()=>share('KHR');makeQrFile();
+if(S.qr&&!S.emv){const im=new Image();im.onload=()=>{cv.width=im.width;cv.height=im.height;cx.drawImage(im,0,0);const r=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);if(r&&/^0002/.test(r.data)){S.emv=r.data;save();render()}};im.src=S.qr}
 render();
 </script>
 </body>
