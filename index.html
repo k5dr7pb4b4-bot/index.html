@@ -2,330 +2,158 @@
 <html lang="km">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ទូទាត់ COD</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script async src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ចំរៀង និង រឿង</title>
 <style>
-:root{--bg:#f6f1e9;--card:#fff;--ink:#231a12;--mute:#7a6d60;--line:#e2d8ca;--or:#e8660c;--or2:#fff0e4;--usd:#1b7a4b;--khr:#2b5fa8;--danger:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120d;--card:#241d16;--ink:#f4ece1;--mute:#a89a8a;--line:#3a3025;--or:#ff8a3d;--or2:#33231a;--usd:#5fd39a;--khr:#7fb0f0;--danger:#ff8a80;color-scheme:dark}}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Khmer","Khmer OS",system-ui,sans-serif;font-size:15px}
-body{padding:10px 10px 40px;max-width:760px;margin:0 auto}
-h1{font-size:18px;margin:6px 2px 10px}
-h2{font-size:15px;margin:0 0 8px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
-button{font:inherit;border:0;border-radius:8px;padding:9px 12px;background:var(--or);color:#fff;font-weight:600;cursor:pointer}
-button.g{background:var(--or2);color:var(--or);border:1px solid var(--or)}
-button.x{background:transparent;color:var(--danger);padding:4px 8px;font-size:18px}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--or);outline-offset:1px}
-input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px;min-width:0}
-input:disabled{opacity:.45}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#cam{display:none;position:relative;margin-top:8px}
-#cam video{width:100%;border-radius:8px;max-height:300px;object-fit:cover;background:#000}
-#cam .box{position:absolute;inset:20% 20%;border:3px solid var(--or);border-radius:10px;pointer-events:none}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.col{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}
-.col.u{border-top:4px solid var(--usd)}.col.k{border-top:4px solid var(--khr)}
-.col h2{display:flex;justify-content:space-between}
-.item{border-bottom:1px dashed var(--line);padding:6px 0}
-.item .t{display:flex;align-items:center;gap:4px;font-weight:600;font-size:16px}
-.item .t span{flex:1;word-break:break-all}
-.item small{color:var(--mute);display:block;font-size:11px;word-break:break-all}
-.item .e{display:flex;gap:4px;margin-top:4px}
-.item .e select{flex:0 0 46%;font-size:12px;padding:4px}
-.item .e input{flex:1;width:0;font-size:13px;padding:4px}
-.tot{margin-top:8px;font-size:28px;font-weight:700;line-height:1.2}
-.u .tot{color:var(--usd)}.k .tot{color:var(--khr)}
-.empty{color:var(--mute);font-size:13px;padding:8px 0}
-.share{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.share button{padding:12px 6px}
-#bq{max-width:150px;border-radius:8px;border:1px solid var(--line);display:block;margin:8px 0}
-.acc{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
-.acc div{flex:1;min-width:0;word-break:break-all}
-input[type=checkbox]{width:22px;height:22px;accent-color:var(--or)}
-dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(92vw,360px);padding:14px}
-#accs{display:none}
-.qb img{width:100%;max-width:200px;display:block;margin:8px auto 0;border-radius:6px;background:#fff;padding:6px}
-dialog::backdrop{background:rgba(0,0,0,.55)}
-.seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1;background:var(--or2);color:var(--or);border:1px solid var(--line)}
-.seg button.on{background:var(--or);color:#fff}
-#amt{width:100%;font-size:26px;text-align:center}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;display:none;z-index:99;max-width:90vw}
+:root{--bg:#0f1218;--card:#1a1f29;--tx:#eef2f8;--mut:#8b96a8;--pri:#ff7a1a;--bd:#2a3140;--red:#f87171}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:"Noto Sans Khmer","Khmer OS",system-ui,sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+main{flex:1;overflow:auto;padding:12px}
+nav{display:flex;background:var(--card);border-top:1px solid var(--bd)}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:10px 4px;font:inherit;font-size:13px}
+nav button.on{color:var(--pri);font-weight:700}nav b{display:block;font-size:20px}
+.sec{display:none}.sec.on{display:block}
+.b{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-size:14px;cursor:pointer;display:inline-block}
+.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+input[type=url],select{width:100%;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:10px;font:inherit;font-size:15px;margin-bottom:8px}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px}
+.row.cur{border-color:var(--pri)}
+.ic{font-size:24px}.nm{flex:1;min-width:0;cursor:pointer}
+.nm div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+small{color:var(--mut)}
+.x{border:0;background:none;font-size:17px;padding:6px;color:var(--red)}
+.pg{height:4px;background:var(--bd);border-radius:2px;margin-top:5px}.pg i{display:block;height:100%;background:var(--pri);border-radius:2px}
+.empty{text-align:center;color:var(--mut);padding:36px 0}
+.note{font-size:12px;color:var(--mut);margin:8px 0}
+#msg{font-size:13px;white-space:pre-wrap;margin-top:8px}
+#mp{background:var(--card);border-top:1px solid var(--bd);padding:8px 12px;display:none}
+#mp.on{display:block}
+#mp .t{display:flex;align-items:center;gap:6px}
+#mp .t span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+#mp button{border:0;background:none;color:var(--tx);font-size:22px;padding:4px 8px}
+#mp button.on{color:var(--pri)}
+#sk{width:100%;accent-color:var(--pri)}
+#vw{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:9;padding-top:env(safe-area-inset-top)}
+#vw.on{display:flex}
+#vt{display:flex;gap:8px;padding:8px;align-items:center}
+#vt span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#vv{flex:1;width:100%;min-height:0;background:#000}
 </style>
 </head>
 <body>
-<h1>ទូទាត់ COD ទៅក្រុមហ៊ុន</h1>
-
-<div class="card">
-  <div class="row">
-    <button id="bScan">ស្កេន QR កញ្ចប់</button>
-    <button class="g" id="bMan">+ បញ្ចូលដោយដៃ</button>
-    <button class="g" id="bImg">ថតរូបអាន COD</button>
-    <input type="file" id="fImg" accept="image/*" capture="environment" hidden>
-  </div>
-  <div id="cam"><video id="v" playsinline muted></video><div class="box"></div></div>
+<main>
+ <section class="sec on" id="s0"><div id="ml"></div></section>
+ <section class="sec" id="s1"><div id="vl"></div></section>
+ <section class="sec" id="s2">
+  <label class="b" style="width:100%;text-align:center;margin-bottom:12px">📲 ជ្រើសឯកសារពីទូរស័ព្ទ (ចំរៀង/រឿង)<input type="file" id="up" accept="audio/*,video/*,.mp3,.m4a,.mp4,.mkv,.webm" multiple hidden></label>
+  <input type="url" id="du" placeholder="ឬ ដាក់ link ផ្ទាល់នៃឯកសារ (.mp4 / .mp3 ...)" inputmode="url">
+  <select id="dk"><option value="auto">ដាក់ដោយស្វ័យប្រវត្តិ</option><option value="music">ចំរៀង</option><option value="movie">រឿង</option></select>
+  <button class="b" id="dg" style="width:100%">⬇ ទាញយកពី link</button>
+  <div class="pg" id="dp" style="display:none"><i style="width:0"></i></div>
+  <div id="msg"></div>
+  <div class="note">link ត្រូវជា link ឯកសារផ្ទាល់ ហើយ server ត្រូវអនុញ្ញាត។ បើទាញយកមិនបាន សូម download ឯកសារចូលទូរស័ព្ទជាមុន (Safari/Files) រួចចុច «ជ្រើសឯកសារ» ខាងលើ។</div>
+  <div class="note" id="st"></div>
+ </section>
+</main>
+<div id="mp">
+ <div class="t"><span id="mt"></span><button id="sh">🔀</button><button id="pv">⏮</button><button id="pl">▶</button><button id="nx">⏭</button><button id="rp">🔁</button></div>
+ <input type="range" id="sk" min="0" max="1000" value="0">
 </div>
-
-<div class="cols">
-  <div class="col u"><h2><span>ដុល្លារ $</span><span id="nU">0</span></h2><div id="lU"></div><div class="tot" id="tU"></div><div id="qU" class="qb"></div></div>
-  <div class="col k"><h2><span>ប្រាក់រៀល ៛</span><span id="nK">0</span></h2><div id="lK"></div><div class="tot" id="tK"></div><div id="qK" class="qb"></div></div>
-</div>
-
-<div class="card" style="margin-top:10px">
-  <h2>ធនាគារ</h2>
-  <div class="row"><input type="checkbox" id="qOn" aria-label="ជ្រើស QR"><b>QR ABA + គណនី</b>
-    <button class="g" id="bQ">ដាក់/ប្តូររូប QR</button><button class="x" id="bQd" aria-label="លុប QR">✕</button>
-    <input type="file" id="fQ" accept="image/*" hidden></div>
-  <img id="bq" alt="QR ABA" hidden>
-  <b style="display:block;margin-top:10px">លេខគណនី</b>
-  <div id="accs"></div>
-  <div class="row" style="margin-top:8px">
-    <input id="an" placeholder="ឈ្មោះ/ធនាគារ" style="flex:1 1 40%"><input id="ano" placeholder="លេខគណនី" inputmode="numeric" style="flex:1 1 40%">
-    <button id="aAdd">រក្សាទុក</button>
-  </div>
-</div>
-
-<div class="share">
-  <button id="sU" style="background:var(--usd)">ចែករំលែក ដុល្លារ</button>
-  <button id="sK" style="background:var(--khr)">ចែករំលែក ប្រាក់រៀល</button>
-</div>
-<div class="row" style="margin-top:10px;justify-content:space-between">
-  <span style="color:var(--mute);font-size:12px">ទិន្នន័យរក្សាទុកក្នុងទូរស័ព្ទនេះ</span>
-  <button id="bSave">រក្សាទុកទាំងអស់</button><button class="g" id="bClr">លុបទាំងអស់</button>
-</div>
-
-<dialog id="dlg">
-  <b>បន្ថែមទឹកប្រាក់ COD</b>
-  <small id="dcode" style="display:block;color:var(--mute);word-break:break-all"></small>
-  <div class="seg"><button id="cU" class="on">$ ដុល្លារ</button><button id="cK">៛ រៀល</button></div>
-  <input id="amt" inputmode="decimal" placeholder="0">
-  <div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="dNone">គ្មាន COD</button><button class="g" id="dNo">បោះបង់</button><button id="dOk">បន្ថែម</button></div>
-</dialog>
-<dialog id="cdlg"><div id="cmsg" style="margin-bottom:12px"></div><div class="row" style="justify-content:flex-end"><button class="g" id="cNo">បោះបង់</button><button id="cYes" style="background:var(--danger)">យល់ព្រម</button></div></dialog>
-<dialog id="adlg"><b>កែគណនី</b><input id="en" placeholder="ឈ្មោះ/ធនាគារ" style="width:100%;margin:8px 0"><input id="eno" placeholder="លេខគណនី" inputmode="numeric" style="width:100%"><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="eNo">បោះបង់</button><button id="eOk">រក្សាទុក</button></div></dialog>
-<dialog id="sdlg"><b>ចែករំលែក</b><textarea id="stxt" hidden rows="8" readonly style="width:100%;margin:8px 0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px"></textarea><img id="simg" alt="QR" hidden style="max-width:240px;width:100%;background:#fff;display:block;margin:0 auto 8px"><small style="color:var(--mute)">ចុចយូរលើរូប QR រួចជ្រើសរើស «Share»</small><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="g" id="sClose">បិទ</button><button id="sCopy" hidden>ចម្លងអត្ថបទ</button></div></dialog>
-<div id="toast"></div>
+<nav>
+ <button class="on" data-t="0"><b>🎵</b>ចំរៀង</button>
+ <button data-t="1"><b>🎬</b>រឿង</button>
+ <button data-t="2"><b>➕</b>បន្ថែម</button>
+</nav>
+<div id="vw"><div id="vt"><span id="vn"></span><a id="vd" class="b g" style="text-decoration:none">រក្សាទុក</a><button class="b g" id="vc">✕</button></div><video id="vv" controls playsinline></video></div>
+<audio id="au"></audio>
 
 <script>
-const $=id=>document.getElementById(id);
-let S={items:[],skip:[],emv:null,qr:null,qrOn:false,accs:[],last:'USD'};
-const KEY='codpay.v1';
-try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-const fmt=(n,c)=>c==='USD'?Number(n).toFixed(2):Math.round(n).toLocaleString('en-US');
-const sum=c=>S.items.filter(i=>i.cur===c).reduce((a,i)=>a+i.amt,0);
-function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2200)}
-function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.frequency.value=880;o.connect(a.destination);o.start();setTimeout(()=>o.stop(),90)}catch(e){}}
+const $=s=>document.querySelector(s),au=$("#au"),vv=$("#vv");
+let db,music=[],movies=[],qi=-1,shuf=false,rep=0,aurl=null,vid=null,lastSave=0;
+const open=()=>new Promise((ok,no)=>{const r=indexedDB.open("boltmedia",1);
+ r.onupgradeneeded=()=>{r.result.createObjectStore("meta",{keyPath:"id",autoIncrement:true});r.result.createObjectStore("blobs")};
+ r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+const rq=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),r=f(t.objectStore(st));t.oncomplete=()=>ok(r.result);t.onerror=()=>no(t.error)});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sz=n=>n<1048576?(n/1024).toFixed(0)+" KB":n<1073741824?(n/1048576).toFixed(1)+" MB":(n/1073741824).toFixed(2)+" GB";
+const tm=s=>isFinite(s)?Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"):"0:00";
+const EXT={mp3:"audio/mpeg",m4a:"audio/mp4",aac:"audio/aac",wav:"audio/wav",ogg:"audio/ogg",flac:"audio/flac",mp4:"video/mp4",m4v:"video/mp4",webm:"video/webm",mov:"video/quicktime",mkv:"video/x-matroska"};
+const typeOf=(b,n)=>b.type||EXT[(n.split(".").pop()||"").toLowerCase()]||"";
+const kindOf=t=>t.startsWith("audio/")?"music":"movie";
 
-function render(){
-  for(const [c,l,n,t] of [['USD','lU','nU','tU'],['KHR','lK','nK','tK']]){
-    const list=S.items.filter(i=>i.cur===c);
-    $(l).innerHTML=list.length?list.map((i,k)=>`<div class="item"><div class="t"><span>${k+1}. ${fmt(i.amt,c)}</span><button class="x" onclick="del('${i.id}')" aria-label="លុប">✕</button></div>${i.code||i.ai?`<small>${esc(i.code)}${i.ai?' · AI':''}</small>`:''}
-      <div class="e"><select onchange="selEdit('${i.id}',this)" aria-label="កែទឹកប្រាក់"><option value="">កែទឹកប្រាក់</option><option value="USD">កែជា $</option><option value="KHR">កែជា ៛</option></select>
-      <input id="in${i.id}" disabled inputmode="decimal" placeholder="..." onkeydown="if(event.key==='Enter')applyEdit('${i.id}')" onchange="applyEdit('${i.id}')"></div></div>`).join(''):'<div class="empty">មិនទាន់មាន</div>';
-    $(n).textContent=list.length+' កញ្ចប់';
-    $(t).innerHTML='<div style="font-size:12px;color:var(--mute);font-weight:400">សរុប</div>'+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+' <button class="g" style="padding:4px 10px;font-size:13px" onclick="copyNum(\''+c+'\')">ចម្លង</button>';
-  }
-  drawQR();$('qOn').checked=!!S.qrOn;{const a=S.accs[0],ae=document.activeElement;if(ae!==$('an')&&ae!==$('ano')){$('an').value=a?a.name:'';$('ano').value=a?a.no:''}}
-  $('bq').hidden=!S.qr;if(S.qr)$('bq').src=S.qr;
-  $('accs').innerHTML=S.accs.length?S.accs.map(a=>`<div class="acc"><input type="checkbox" ${a.on?'checked':''} onchange="tickAcc('${a.id}',this.checked)" aria-label="ជ្រើស"><div><b>${esc(a.name)}</b><br>${esc(a.no)}</div><button class="g" onclick="editAcc('${a.id}')">កែ</button><button class="x" onclick="delAcc('${a.id}')" aria-label="លុប">✕</button></div>`).join(''):'<div class="empty">មិនទាន់មានលេខគណនី</div>';
-}
-function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+ document.querySelectorAll(".sec").forEach((s,i)=>s.classList.toggle("on",i==b.dataset.t))});
 
-function del(id){S.items=S.items.filter(i=>i.id!==id);save();render()}
-function selEdit(id,sel){const inp=$('in'+id);inp.dataset.cur=sel.value;inp.disabled=!sel.value;inp.value='';if(sel.value)inp.focus()}
-function applyEdit(id){
-  const inp=$('in'+id);if(!inp||inp.disabled)return;
-  const v=parseFloat(String(inp.value).replace(/,/g,''));const c=inp.dataset.cur;
-  if(!c||!(v>=0)||inp.value==='')return;
-  const it=S.items.find(i=>i.id===id);if(!it)return;
-  it.cur=c;it.amt=c==='USD'?Math.round(v*100)/100:Math.round(v);save();render();
-}
+async function load(){const a=await rq("meta","readonly",s=>s.getAll());
+ a.sort((x,y)=>x.name.localeCompare(y.name));
+ music=a.filter(m=>m.kind==="music");movies=a.filter(m=>m.kind==="movie").sort((x,y)=>y.date-x.date);draw();storage()}
+function draw(){
+ $("#ml").innerHTML=music.length?music.map((m,i)=>`<div class="row ${i===qi?"cur":""}"><span class="ic">${i===qi&&!au.paused?"🔊":"🎵"}</span><div class="nm" data-p="${i}"><div>${esc(m.name)}</div><small>${sz(m.size)}</small></div><button class="x" data-d="${m.id}">🗑</button></div>`).join(""):'<div class="empty">មិនទាន់មានចំរៀង<br>ចុច ➕ ដើម្បីបន្ថែម</div>';
+ $("#vl").innerHTML=movies.length?movies.map(m=>{const p=m.dur?Math.min(100,(m.pos||0)/m.dur*100):0;
+  return `<div class="row"><span class="ic">🎬</span><div class="nm" data-v="${m.id}"><div>${esc(m.name)}</div><small>${sz(m.size)}${p>1?" · មើលបាន "+Math.round(p)+"%":""}</small><div class="pg"><i style="width:${p}%"></i></div></div><button class="x" data-d="${m.id}">🗑</button></div>`}).join(""):'<div class="empty">មិនទាន់មានរឿង<br>ចុច ➕ ដើម្បីបន្ថែម</div>';
+ document.querySelectorAll("[data-p]").forEach(e=>e.onclick=()=>play(+e.dataset.p));
+ document.querySelectorAll("[data-v]").forEach(e=>e.onclick=()=>watch(+e.dataset.v));
+ document.querySelectorAll(".x").forEach(e=>e.onclick=()=>remove(+e.dataset.d))}
+async function storage(){try{if(navigator.storage){await navigator.storage.persist();const e=await navigator.storage.estimate();$("#st").textContent="ទំហំប្រើ៖ "+sz(e.usage)+" / "+sz(e.quota)}}catch(e){}}
+async function save(blob,name,kind){const t=typeOf(blob,name);if(!t){return false}
+ if(kind==="auto"||!kind)kind=kindOf(t);
+ const id=await rq("meta","readwrite",s=>s.add({name:name.replace(/\.[^.]+$/,""),file:name,type:t,kind,size:blob.size,date:Date.now(),pos:0,dur:0}));
+ await rq("blobs","readwrite",s=>s.put(new Blob([blob],{type:t}),id));return true}
+async function remove(id){if(!confirm("លុប?"))return;
+ if(qi>=0&&music[qi]&&music[qi].id===id){au.pause();au.removeAttribute("src");qi=-1;$("#mp").classList.remove("on")}
+ await rq("meta","readwrite",s=>s.delete(id));await rq("blobs","readwrite",s=>s.delete(id));load()}
 
-/* dialog */
-let dCur='USD',dCode='';
-function setCur(c){dCur=c;$('cU').classList.toggle('on',c==='USD');$('cK').classList.toggle('on',c==='KHR')}
-$('cU').onclick=()=>setCur('USD');$('cK').onclick=()=>setCur('KHR');
-function openAmt(code,cur,amt){
-  dCode=code||'';$('dcode').textContent=dCode;setCur(cur||S.last||'USD');$('amt').value=amt||'';
-  if(!$('dlg').open)$('dlg').showModal();setTimeout(()=>$('amt').focus(),50);
-}
-$('dNo').onclick=()=>$('dlg').close();
-$('dNone').onclick=()=>{if(dCode&&!S.skip.includes(dCode)){S.skip.push(dCode);save()}$('dlg').close();toast('គ្មាន COD រំលង')};
-$('dOk').onclick=()=>{
-  const v=parseFloat(String($('amt').value).replace(/,/g,''));
-  if(!(v>0)){toast('សូមបញ្ចូលចំនួនទឹកប្រាក់');return}
-  S.items.push({id:uid(),code:dCode,cur:dCur,amt:dCur==='USD'?Math.round(v*100)/100:Math.round(v)});
-  S.last=dCur;save();render();$('dlg').close();
-};
-$('amt').addEventListener('keydown',e=>{if(e.key==='Enter')$('dOk').click()});
-$('bMan').onclick=()=>openAmt('');
+// upload
+$("#up").onchange=async e=>{let n=0;for(const f of e.target.files){if(await save(f,f.name,$("#dk").value))n++}
+ e.target.value="";$("#msg").textContent="✅ បន្ថែមរួច "+n+" ឯកសារ";load()};
 
-/* scan */
-function parseQR(txt){
-  const m=txt.match(/(\d[\d,]*(?:\.\d+)?)\s*(\$|USD|៛|KHR|riel)/i)||txt.match(/(\$|USD|៛|KHR)\s*(\d[\d,]*(?:\.\d+)?)/i);
-  if(!m)return null;
-  const a=isNaN(m[1].replace(/,/g,''))?m[2]:m[1],u=isNaN(m[1].replace(/,/g,''))?m[1]:m[2];
-  return{amt:a.replace(/,/g,''),cur:/\$|usd/i.test(u)?'USD':'KHR'};
-}
-function onCode(txt){
-  txt=String(txt).trim();if(!txt)return false;
-  if(S.items.some(i=>i.code===txt)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return false}
-  if(S.skip.includes(txt)){toast('គ្មាន COD (រំលង)');return false}
-  beep();const p=parseQR(txt);
-  if(p){S.items.push({id:uid(),code:txt,cur:p.cur,amt:+p.amt});S.last=p.cur;save();render();toast('បានបន្ថែម '+fmt(p.amt,p.cur));return true}
-  openAmt(txt);return true;
-}
-let stream=null,det=null,running=false,cool=0,lastTxt='';
-const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
-async function startCam(){
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-    $('v').srcObject=stream;await $('v').play();$('cam').style.display='block';$('bScan').textContent='បិទកាមេរ៉ា';
-    if('BarcodeDetector' in window){try{det=new BarcodeDetector({formats:['qr_code']})}catch(e){det=null}}
-    if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
-    running=true;lastTxt='';loop();
-  }catch(e){toast('បើកកាមេរ៉ាមិនបាន សូមប្រើ «ស្កេនពីរូប» ឬបញ្ចូលដោយដៃ')}
-}
-function stopCam(){running=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('cam').style.display='none';$('bScan').textContent='ស្កេន QR កញ្ចប់'}
-$('bScan').onclick=()=>running?stopCam():startCam();
-async function loop(){
-  if(!running)return;
-  const v=$('v');
-  if(!$('dlg').open&&Date.now()>cool&&v.videoWidth){
-    let txt=null,loc=null;
-    try{
-      if(det){const r=await det.detect(v);if(r.length){txt=r[0].rawValue;loc=r[0].cornerPoints}}
-      else if(window.jsQR){cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);const d=cx.getImageData(0,0,cv.width,cv.height);const r=jsQR(d.data,d.width,d.height);if(r){txt=r.data;const L=r.location;loc=[L.topLeftCorner,L.topRightCorner,L.bottomRightCorner,L.bottomLeftCorner]}}
-    }catch(e){}
-    if(txt&&txt!==lastTxt){lastTxt=txt;cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);scanFrame(cv,txt,loc);cool=Date.now()+700}
-  }
-  setTimeout(loop,150);
-}
-$('bImg').onclick=()=>$('fImg').click();
-$('fImg').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;const img=new Image();
-  img.onload=()=>{
-    const s=Math.min(1,1600/Math.max(img.width,img.height));cv.width=img.width*s;cv.height=img.height*s;cx.drawImage(img,0,0,cv.width,cv.height);
-    const r=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);
-    scanFrame(cv,r?r.data:'',r?[r.location.topLeftCorner,r.location.topRightCorner,r.location.bottomRightCorner,r.location.bottomLeftCorner]:null);
-  };img.src=URL.createObjectURL(f);e.target.value='';
-};
+// download
+$("#dg").onclick=async()=>{const u=$("#du").value.trim(),m=$("#msg"),pg=$("#dp");if(!u)return;
+ m.textContent="កំពុងទាញយក...";pg.style.display="block";const bar=pg.firstChild;bar.style.width="0";
+ try{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);
+  const len=+r.headers.get("content-length")||0,rd=r.body.getReader(),parts=[];let got=0;
+  for(;;){const{done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;
+   bar.style.width=len?(got/len*100)+"%":"50%";m.textContent="កំពុងទាញយក "+sz(got)+(len?" / "+sz(len):"")}
+  const name=decodeURIComponent(new URL(u).pathname.split("/").pop())||"file";
+  const blob=new Blob(parts,{type:r.headers.get("content-type")||""});
+  if(!(await save(blob,name,$("#dk").value)))throw new Error("មិនស្គាល់ប្រភេទឯកសារ");
+  m.textContent="✅ រក្សាទុករួច៖ "+name;$("#du").value="";load()}
+ catch(e){m.textContent="❌ ទាញយកមិនបាន៖ "+e.message+"\nសូម download ចូលទូរស័ព្ទជាមុន រួចចុច «ជ្រើសឯកសារ»។"}
+ pg.style.display="none"};
 
-/* bank */
-$('qOn').onchange=e=>{S.qrOn=e.target.checked;save()};
-$('bQ').onclick=()=>$('fQ').click();
-$('fQ').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;const img=new Image();
-  img.onload=()=>{const s=Math.min(1,1400/Math.max(img.width,img.height));cv.width=img.width*s;cv.height=img.height*s;cx.drawImage(img,0,0,cv.width,cv.height);
-    const rr=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);S.emv=rr&&/^0002/.test(rr.data)?rr.data:null;
-    S.qr=cv.toDataURL('image/png');S.qrOn=true;save();render();makeQrFile();toast(S.emv?'បានរក្សាទុក QR ✓ អានបាន':'រក្សាទុកហើយ ប៉ុន្តែអាន QR មិនបាន')};
-  img.src=URL.createObjectURL(f);e.target.value='';
-};
-$('bQd').onclick=()=>{if(S.qr)ask('លុប QR ABA?',()=>{S.qr=null;S.emv=null;S.qrOn=false;qrFile=null;save();render()})};
-let askCb=null,qrFile=null,samp,editId=null,pend=new Set(),shUrl={},shFile={},ocrW=null;
-function cropC(c,loc){let sx=0,sy=0,sw=c.width,sh=c.height;
-  if(loc&&loc.length){const X=loc.map(p=>p.x),Y=loc.map(p=>p.y),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),q=Math.max(x1-x0,y1-y0);sx=Math.max(0,x0-2*q);sy=Math.max(0,y0-.4*q);sw=Math.min(c.width,x1+.15*q)-sx;sh=Math.min(c.height,y1+.4*q)-sy}
-  const sc=Math.min(2,1000/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);return o}
-async function bgOcr(c,code,loc){
-  const o=cropC(c,loc);
-  try{const j=await Promise.race([ocrParse(o),new Promise((_,r)=>setTimeout(r,25000))]);
-    if(j&&j.cod&&dCode===code&&$('dlg').open&&!$('amt').value){$('amt').value=j.currency==='USD'?(+j.amount).toFixed(2):String(Math.round(j.amount));setCur(j.currency);toast('OCR: '+$('amt').value+' — សូមពិនិត្យ')}}catch(e){}
-}
-async function ocrParse(cvs){
-  if(!window.Tesseract)throw 1;
-  if(!ocrW){toast('កំពុងរៀបចំ OCR ដំបូង...');ocrW=await Tesseract.createWorker('eng')}
-  const t=(await ocrW.recognize(cvs)).data.text;
-  const m=t.match(/C[O0Q]D[^0-9]{0,6}(\d[\d,.]*)\s*(\$|[^\d\s)]?)/i);
-  if(!m){if(/C[O0Q]D/i.test(t))throw 2;return{cod:false}}
-  const n=m[1].replace(/,/g,''),usd=m[2]==='$'||/\.\d{1,2}$/.test(n);
-  return{cod:true,amount:parseFloat(n),currency:usd?'USD':'KHR'}
-}
-async function copyNum(c){const tot=sum(c);if(!(tot>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
-  const s=c==='USD'?tot.toFixed(2):String(Math.round(tot));
-  try{await navigator.clipboard.writeText(s)}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.focus();t.select();t.setSelectionRange(0,99);document.execCommand('copy');t.remove()}
-  toast('បានចម្លង '+s)}
-function crc16(s){let c=0xFFFF;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let k=0;k<8;k++)c=c&0x8000?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,'0')}
-function buildEMV(emv,amt,cur){return buildKH(emv,amt,cur)}
-function tlv(s){const o=[];let i=0;while(i+4<=s.length){const l=+s.substr(i+2,2);if(isNaN(l))return null;o.push([s.substr(i,2),s.substr(i+4,l)]);i+=4+l}return o}
-function mk(a){return a.map(p=>p[0]+String(p[1].length).padStart(2,'0')+p[1]).join('')}
-function buildKH(emv,amt,cur){
-  const a=tlv(emv);if(!a)return null;const m=new Map(a);
-  const t29=tlv(m.get('29')||'')||[],t40=tlv(m.get('40')||'')||[];
-  const g=(r,t)=>{const x=r.find(p=>p[0]===t);return x?x[1]:''};
-  const acc=cur==='USD'?(g(t40,'03')||g(t40,'02')):(g(t40,'02')||g(t29,'01'));
-  m.set('29',mk(t29.map(p=>p[0]==='01'&&acc?['01',acc]:p)));
-  m.set('40',mk([['00',g(t40,'00')],['01',g(t40,'01')],['02',acc]].filter(p=>p[1])));
-  m.set('01','12');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
-  const n=Date.now();m.set('99',mk([['00',String(n)],['01',String(n+365*86400000)]]));
-  m.delete('63');
-  const s=[...m.keys()].sort().map(t=>t+String(m.get(t).length).padStart(2,'0')+m.get(t)).join('')+'6304';return s+crc16(s)}
-function buildEMVold(emv,amt,cur){const m=new Map();let i=0;while(i+4<=emv.length){const t=emv.substr(i,2),l=+emv.substr(i+2,2);if(isNaN(l))return null;m.set(t,emv.substr(i+4,l));i+=4+l}
-  m.delete('63');m.set('53',cur==='USD'?'840':'116');m.set('54',cur==='USD'?amt.toFixed(2):String(Math.round(amt)));
-  const s=[...m.keys()].sort().map(t=>{const v=m.get(t);return t+String(v.length).padStart(2,'0')+v}).join('')+'6304';return s+crc16(s)}
-function qrCanvas(text){const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),z=8,b=4,c=document.createElement('canvas');c.width=c.height=(n+2*b)*z;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#000';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+b)*z,(r+b)*z,z,z);return c}
-function drawQR(){return;for(const [c,id] of [['USD','qU'],['KHR','qK']]){const tot=sum(c),el=$(id);shUrl[c]=null;shFile[c]=null;
-  if(!S.emv||!(tot>0)||!window.qrcode){el.innerHTML='';continue}
-  try{const k=qrCanvas(buildEMV(S.emv,tot,c)),u=k.toDataURL('image/png');shUrl[c]=u;el.innerHTML='<img alt="QR" src="'+u+'">';k.toBlob(b=>{if(b)shFile[c]=new File([b],'pay-'+c+'.png',{type:'image/png'})},'image/png')}catch(x){el.innerHTML=''}}}
-function ask(m,cb){$('cmsg').textContent=m;askCb=cb;$('cdlg').showModal()}
-$('cNo').onclick=()=>$('cdlg').close();
-$('cYes').onclick=()=>{$('cdlg').close();if(askCb)askCb()};
-$('bSave').onclick=()=>{save();toast('បានរក្សាទុករួចរាល់ ✓')};
-async function makeQrFile(){qrFile=null;if(S.qr){try{qrFile=dataFile(S.qr,'aba-qr.png')}catch(e){}}}
-function dataFile(u,name){const p=u.split(','),mime=p[0].match(/:(.*?);/)[1],bin=atob(p[1]),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new File([a],name,{type:mime})}
-function showShare(c){const u=shUrl[c]||(S.qrOn?S.qr:null),im=$('simg');im.hidden=!u;if(u)im.src=u;$('stxt').value=(c==='USD'?'ដុល្លារ ':'រៀល ')+fmt(sum(c),c)+(c==='USD'?' $':' ៛')+S.accs.filter(a=>a.on).map(a=>'\n'+a.name+': '+a.no).join('');$('sdlg').showModal()}
-$('sClose').onclick=()=>$('sdlg').close();
-$('sCopy').onclick=async()=>{const el=$('stxt');try{await navigator.clipboard.writeText(el.value)}catch(e){el.select();document.execCommand('copy')}toast('បានចម្លង')};
-$('eNo').onclick=()=>$('adlg').close();
-$('eOk').onclick=()=>{const a=S.accs.find(x=>x.id===editId);if(a){a.name=$('en').value.trim()||a.name;a.no=$('eno').value.trim()||a.no;save();render()}$('adlg').close()};
-async function scanFrame(c,code,loc){
-  if(code){if(pend.has(code))return;if(S.items.some(i=>i.code===code)){toast('កញ្ចប់នេះស្កេនរួចហើយ');return}if(S.skip.includes(code)){toast('គ្មាន COD (រំលង)');return}}
-  beep();
-  if(samp===undefined){try{samp=window.claude?await claude.use('sample'):null}catch(e){samp=null}}
-  if(!samp){openAmt(code);if(window.Tesseract)bgOcr(c,code,loc);return}
-  if(code)pend.add(code);toast('កំពុងអាន COD...');
-  try{
-    let sx=0,sy=0,sw=c.width,sh=c.height;
-    if(loc&&loc.length){const X=loc.map(p=>p.x),Y=loc.map(p=>p.y),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),q=Math.max(x1-x0,y1-y0);sx=Math.max(0,x0-2*q);sy=Math.max(0,y0-.4*q);sw=Math.min(c.width,x1+.15*q)-sx;sh=Math.min(c.height,y1+.4*q)-sy}
-    const sc=Math.min(samp?1:2,(samp?640:1000)/Math.max(sw,sh)),o=document.createElement('canvas');o.width=sw*sc;o.height=sh*sc;o.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,o.width,o.height);
-    const blob=samp?await new Promise(r=>o.toBlob(r,'image/jpeg',.8)):null;
-    const j=!samp?await ocrParse(o):await samp.json('This is a Cambodian parcel shipping label. Find the COD amount printed next to the word COD (left of the QR code), such as (7.00 $) or (20,000 ៛). Never use the delivery fee (ថ្លៃដឹក, marked PAID). If the word COD is not on the label, cod is false. Reply ONLY with JSON: {"cod":true or false,"amount":number,"currency":"USD" or "KHR"}',{images:[blob],modelTier:'quick',cache:false});
-    if(j&&j.cod&&+j.amount>0){const cur=j.currency==='USD'?'USD':'KHR',amt=cur==='USD'?Math.round(j.amount*100)/100:Math.round(j.amount);S.items.push({id:uid(),code:code||'',cur,amt,ai:true});S.last=cur;save();render();toast('បានបន្ថែម '+fmt(amt,cur)+(cur==='USD'?' $':' ៛'))}
-    else{if(code)pend.delete(code);toast('គ្មាន COD រំលង')}
-  }catch(e){if(code)pend.delete(code);toast('អានមិនបាន សូមបញ្ចូលដោយដៃ');openAmt(code)}
-}
-$('aAdd').onclick=()=>{
-  const n=$('an').value.trim(),o=$('ano').value.trim();
-  S.accs=(n||o)?[{id:'acc',name:n,no:o,on:true}]:[];save();render();toast('បានរក្សាទុក');
-};
-function tickAcc(id,v){const a=S.accs.find(x=>x.id===id);if(a){a.on=v;save()}}
-function editAcc(id){const a=S.accs.find(x=>x.id===id);if(!a)return;editId=id;$('en').value=a.name;$('eno').value=a.no;$('adlg').showModal()}
-function delAcc(id){ask('លុបគណនីនេះ?',()=>{S.accs=S.accs.filter(a=>a.id!==id);save();render()})}
-$('bClr').onclick=()=>{if(S.items.length||S.skip.length)ask('លុបបញ្ជីកញ្ចប់ទាំងអស់? (QR និងលេខគណនីមិនត្រូវលុបទេ)',()=>{S.items=[];S.skip=[];save();render()})};
+// music
+async function play(i){qi=i;const m=music[i];const b=await rq("blobs","readonly",s=>s.get(m.id));
+ if(aurl)URL.revokeObjectURL(aurl);aurl=URL.createObjectURL(b);au.src=aurl;
+ try{await au.play()}catch(e){}
+ $("#mt").textContent=m.name;$("#mp").classList.add("on");draw();
+ if("mediaSession" in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:m.name,artist:"ចំរៀងរបស់ខ្ញុំ"});
+  navigator.mediaSession.setActionHandler("nexttrack",next);navigator.mediaSession.setActionHandler("previoustrack",prev)}}
+function next(){if(!music.length)return;play(shuf?Math.floor(Math.random()*music.length):(qi+1)%music.length)}
+function prev(){if(!music.length)return;if(au.currentTime>3)au.currentTime=0;else play((qi-1+music.length)%music.length)}
+$("#pl").onclick=()=>au.paused?au.play():au.pause();
+$("#nx").onclick=next;$("#pv").onclick=prev;
+$("#sh").onclick=e=>{shuf=!shuf;e.target.classList.toggle("on",shuf)};
+$("#rp").onclick=e=>{rep=(rep+1)%3;e.target.textContent=rep==2?"🔂":"🔁";e.target.classList.toggle("on",rep>0)};
+au.onplay=au.onpause=()=>{$("#pl").textContent=au.paused?"▶":"⏸";draw()};
+au.onended=()=>{if(rep==2)play(qi);else if(rep==1||qi<music.length-1||shuf)next();else draw()};
+au.ontimeupdate=()=>{if(au.duration)$("#sk").value=au.currentTime/au.duration*1000};
+$("#sk").oninput=e=>{if(au.duration)au.currentTime=e.target.value/1000*au.duration};
 
-/* share */
-async function share(c){
-  if(!(sum(c)>0)){toast('មិនទាន់មានទឹកប្រាក់');return}
-  const f=S.qrOn&&S.qr?(shFile[c]||qrFile||dataFile(S.qr,'aba-qr.png')):null,tx=!S.qrOn?'':S.accs.filter(a=>a.on).map(a=>a.name+': '+a.no).join('\n');if(!f&&!tx){toast('សូម tick QR ឬលេខគណនី');return}
-  try{if(f){try{await navigator.share(tx?{files:[f],text:tx}:{files:[f]})}catch(e1){if(e1.name==='AbortError')return;await navigator.share({files:[f],title:'ABA QR',text:'ABA QR'})}}else await navigator.share({text:tx})}catch(e){if(e.name==='AbortError')return;if(S.qr)showShare(c);else toast('ចែករំលែកមិនបាន')}
-}
-async function shareOld(c){
-  const list=S.items.filter(i=>i.cur===c);if(!list.length){toast('មិនទាន់មានទឹកប្រាក់');return}
-  let t='COD '+(c==='USD'?'ដុល្លារ':'ប្រាក់រៀល')+'\n'+list.map((i,k)=>(k+1)+'. '+fmt(i.amt,c)).join('\n')+'\nសរុប: '+fmt(sum(c),c)+(c==='USD'?' $':' ៛');
-  const ac=S.accs.filter(a=>a.on);if(ac.length)t+='\n\nគណនី:\n'+ac.map(a=>a.name+': '+a.no).join('\n');
-  const data={text:t,title:'COD'};
-  if(S.qrOn&&qrFile&&navigator.canShare&&navigator.canShare({files:[qrFile]}))data.files=[qrFile];
-  try{if(navigator.share){await navigator.share(data);return}}catch(e){if(e.name==='AbortError')return}
-  showShare(t);
-}
-$('sU').onclick=()=>share('USD');$('sK').onclick=()=>share('KHR');makeQrFile();
-if(S.qr&&!S.emv){const im=new Image();im.onload=()=>{cv.width=im.width;cv.height=im.height;cx.drawImage(im,0,0);const r=window.jsQR&&jsQR(cx.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height);if(r&&/^0002/.test(r.data)){S.emv=r.data;save();render()}};im.src=S.qr}
-render();
+// movies
+async function watch(id){au.pause();const m=movies.find(x=>x.id===id),b=await rq("blobs","readonly",s=>s.get(id));
+ vid=m;const u=URL.createObjectURL(b);vv.src=u;vv._u=u;$("#vn").textContent=m.name;$("#vd").href=u;$("#vd").download=m.file;
+ $("#vw").classList.add("on");
+ vv.onloadedmetadata=()=>{m.dur=vv.duration;if(m.pos>5&&m.pos<vv.duration-10)vv.currentTime=m.pos;vv.play().catch(()=>{})}}
+async function savePos(){if(!vid)return;vid.pos=vv.currentTime;vid.dur=vv.duration||vid.dur;
+ await rq("meta","readwrite",s=>s.put(vid))}
+vv.ontimeupdate=()=>{const n=Date.now();if(n-lastSave>5000){lastSave=n;savePos()}};
+vv.onpause=savePos;
+$("#vc").onclick=async()=>{vv.pause();await savePos();$("#vw").classList.remove("on");URL.revokeObjectURL(vv._u);vv.removeAttribute("src");vid=null;load()};
+
+open().then(d=>{db=d;load()}).catch(()=>{$("#ml").innerHTML='<div class="empty">មិនអាចប្រើ storage បាន</div>'});
 </script>
 </body>
 </html>
