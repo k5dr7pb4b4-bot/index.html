@@ -1,159 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="km">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>ចំរៀង និង រឿង</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>អក្សរគំរូ និងផ្លូវកាត់ក្តារចុច</title>
 <style>
-:root{--bg:#0f1218;--card:#1a1f29;--tx:#eef2f8;--mut:#8b96a8;--pri:#ff7a1a;--bd:#2a3140;--red:#f87171}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0}
-body{font-family:"Noto Sans Khmer","Khmer OS",system-ui,sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
-main{flex:1;overflow:auto;padding:12px}
-nav{display:flex;background:var(--card);border-top:1px solid var(--bd)}
-nav button{flex:1;border:0;background:none;color:var(--mut);padding:10px 4px;font:inherit;font-size:13px}
-nav button.on{color:var(--pri);font-weight:700}nav b{display:block;font-size:20px}
-.sec{display:none}.sec.on{display:block}
-.b{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-size:14px;cursor:pointer;display:inline-block}
-.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
-input[type=url],select{width:100%;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:10px;font:inherit;font-size:15px;margin-bottom:8px}
-.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px}
-.row.cur{border-color:var(--pri)}
-.ic{font-size:24px}.nm{flex:1;min-width:0;cursor:pointer}
-.nm div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-small{color:var(--mut)}
-.x{border:0;background:none;font-size:17px;padding:6px;color:var(--red)}
-.pg{height:4px;background:var(--bd);border-radius:2px;margin-top:5px}.pg i{display:block;height:100%;background:var(--pri);border-radius:2px}
-.empty{text-align:center;color:var(--mut);padding:36px 0}
-.note{font-size:12px;color:var(--mut);margin:8px 0}
-#msg{font-size:13px;white-space:pre-wrap;margin-top:8px}
-#mp{background:var(--card);border-top:1px solid var(--bd);padding:8px 12px;display:none}
-#mp.on{display:block}
-#mp .t{display:flex;align-items:center;gap:6px}
-#mp .t span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
-#mp button{border:0;background:none;color:var(--tx);font-size:22px;padding:4px 8px}
-#mp button.on{color:var(--pri)}
-#sk{width:100%;accent-color:var(--pri)}
-#vw{position:fixed;inset:0;background:#000;display:none;flex-direction:column;z-index:9;padding-top:env(safe-area-inset-top)}
-#vw.on{display:flex}
-#vt{display:flex;gap:8px;padding:8px;align-items:center}
-#vt span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#vv{flex:1;width:100%;min-height:0;background:#000}
+:root{--bg:#f4f6f9;--card:#fff;--tx:#1b1f24;--mut:#6b7280;--pri:#2563eb;--prit:#fff;--bd:#e3e7ec;--dan:#dc2626;--ok:#16a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1216;--card:#1a1f26;--tx:#e8eaed;--mut:#9aa3af;--pri:#5b8cff;--prit:#0b1020;--bd:#2b323b;--dan:#f87171;--ok:#4ade80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1216;--card:#1a1f26;--tx:#e8eaed;--mut:#9aa3af;--pri:#5b8cff;--prit:#0b1020;--bd:#2b323b;--dan:#f87171;--ok:#4ade80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Noto Sans Khmer","Khmer OS Battambang",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+h1{font-size:1.25rem;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+.card h2{font-size:1rem;margin:0 0 10px}
+label{display:block;font-size:.85rem;color:var(--mut);margin:8px 0 4px}
+input,textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px}
+textarea{min-height:90px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:0}
+.combo{cursor:pointer;font-weight:600;text-align:center}
+.combo.rec{outline:2px solid var(--pri);background:var(--card)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:9px 14px;cursor:pointer}
+button.pri{background:var(--pri);color:var(--prit);border-color:var(--pri);font-weight:600}
+button.dan{color:var(--dan)}
+.item{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--bg)}
+.item .top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.item b{font-size:1rem}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:2px 8px;color:var(--mut)}
+.prev{color:var(--mut);font-size:.9rem;white-space:pre-wrap;word-break:break-word;margin:6px 0;max-height:4.8em;overflow:hidden}
+.hint{font-size:.82rem;color:var(--mut);margin:6px 0 0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw}
+#toast.on{opacity:1}
+.empty{color:var(--mut);text-align:center;padding:14px}
 </style>
 </head>
 <body>
-<main>
- <section class="sec on" id="s0"><div id="ml"></div></section>
- <section class="sec" id="s1"><div id="vl"></div></section>
- <section class="sec" id="s2">
-  <label class="b" style="width:100%;text-align:center;margin-bottom:12px">📲 ជ្រើសឯកសារពីទូរស័ព្ទ (ចំរៀង/រឿង)<input type="file" id="up" accept="audio/*,video/*,.mp3,.m4a,.mp4,.mkv,.webm" multiple hidden></label>
-  <input type="url" id="du" placeholder="ឬ ដាក់ link ផ្ទាល់នៃឯកសារ (.mp4 / .mp3 ...)" inputmode="url">
-  <select id="dk"><option value="auto">ដាក់ដោយស្វ័យប្រវត្តិ</option><option value="music">ចំរៀង</option><option value="movie">រឿង</option></select>
-  <button class="b" id="dg" style="width:100%">⬇ ទាញយកពី link</button>
-  <div class="pg" id="dp" style="display:none"><i style="width:0"></i></div>
-  <div id="msg"></div>
-  <div class="note">link ត្រូវជា link ឯកសារផ្ទាល់ ហើយ server ត្រូវអនុញ្ញាត។ បើទាញយកមិនបាន សូម download ឯកសារចូលទូរស័ព្ទជាមុន (Safari/Files) រួចចុច «ជ្រើសឯកសារ» ខាងលើ។</div>
-  <div class="note" id="st"></div>
- </section>
-</main>
-<div id="mp">
- <div class="t"><span id="mt"></span><button id="sh">🔀</button><button id="pv">⏮</button><button id="pl">▶</button><button id="nx">⏭</button><button id="rp">🔁</button></div>
- <input type="range" id="sk" min="0" max="1000" value="0">
+<div class="wrap">
+<h1>⌨️ អក្សរគំរូ និងផ្លូវកាត់ក្តារចុច</h1>
+
+<div class="card">
+  <h2>ប្រអប់សាកល្បង (សរសេរ ហើយចុចផ្លូវកាត់)</h2>
+  <textarea id="test" class="target" placeholder="ចុចក្នុងប្រអប់នេះ រួចចុចផ្លូវកាត់ដែលបានកំណត់ ឬចុចប៊ូតុង «ដាក់ចូល» ខាងក្រោម…"></textarea>
+  <p class="hint">ផ្លូវកាត់ដំណើរការក្នុងទំព័រនេះ។ ប្រសិនបើមិនមានប្រអប់សរសេរកំពុងបើក អក្សរនឹងត្រូវ Copy ដោយស្វ័យប្រវត្តិ ហើយអ្នកអាច Paste (Ctrl+V) ទៅកម្មវិធីផ្សេងបាន។</p>
 </div>
-<nav>
- <button class="on" data-t="0"><b>🎵</b>ចំរៀង</button>
- <button data-t="1"><b>🎬</b>រឿង</button>
- <button data-t="2"><b>➕</b>បន្ថែម</button>
-</nav>
-<div id="vw"><div id="vt"><span id="vn"></span><a id="vd" class="b g" style="text-decoration:none">រក្សាទុក</a><button class="b g" id="vc">✕</button></div><video id="vv" controls playsinline></video></div>
-<audio id="au"></audio>
+
+<div class="card">
+  <h2 id="formTitle">បន្ថែមអក្សរគំរូថ្មី</h2>
+  <label>ឈ្មោះ</label>
+  <input id="fName" data-noinsert placeholder="ឧ. ជំរាបសួរ">
+  <label>អក្សរដែលត្រូវលោតចេញ</label>
+  <textarea id="fText" data-noinsert placeholder="ឧ. សួស្តី"></textarea>
+  <label>ផ្លូវកាត់ក្តារចុច (ចុចក្នុងប្រអប់ រួចចុចគ្រាប់ចុចដែលចង់បាន)</label>
+  <input id="fCombo" class="combo" data-noinsert readonly placeholder="ចុចទីនេះ រួចចុច ឧ. Ctrl+X">
+  <p class="hint">Backspace/Delete = លុបផ្លូវកាត់ · អាចប្រើ Ctrl, Alt, Shift រួមជាមួយអក្សរ លេខ F1–F12។ ផ្លូវកាត់របស់ browser មួយចំនួន (Ctrl+W, Ctrl+T, Ctrl+N) មិនអាចយកមកប្រើបានទេ។</p>
+  <div class="row">
+    <button class="pri" id="btnSave">រក្សាទុក</button>
+    <button id="btnCancel" style="display:none">បោះបង់</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>បញ្ជីអក្សរគំរូ</h2>
+  <div id="list"></div>
+  <div class="row">
+    <button id="btnExport">⬇ Backup</button>
+    <button id="btnImport">⬆ ស្តារ</button>
+    <input type="file" id="file" accept=".json,application/json" style="display:none">
+  </div>
+</div>
+</div>
+<div id="toast"></div>
 
 <script>
-const $=s=>document.querySelector(s),au=$("#au"),vv=$("#vv");
-let db,music=[],movies=[],qi=-1,shuf=false,rep=0,aurl=null,vid=null,lastSave=0;
-const open=()=>new Promise((ok,no)=>{const r=indexedDB.open("boltmedia",1);
- r.onupgradeneeded=()=>{r.result.createObjectStore("meta",{keyPath:"id",autoIncrement:true});r.result.createObjectStore("blobs")};
- r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
-const rq=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),r=f(t.objectStore(st));t.oncomplete=()=>ok(r.result);t.onerror=()=>no(t.error)});
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const sz=n=>n<1048576?(n/1024).toFixed(0)+" KB":n<1073741824?(n/1048576).toFixed(1)+" MB":(n/1073741824).toFixed(2)+" GB";
-const tm=s=>isFinite(s)?Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"):"0:00";
-const EXT={mp3:"audio/mpeg",m4a:"audio/mp4",aac:"audio/aac",wav:"audio/wav",ogg:"audio/ogg",flac:"audio/flac",mp4:"video/mp4",m4v:"video/mp4",webm:"video/webm",mov:"video/quicktime",mkv:"video/x-matroska"};
-const typeOf=(b,n)=>b.type||EXT[(n.split(".").pop()||"").toLowerCase()]||"";
-const kindOf=t=>t.startsWith("audio/")?"music":"movie";
+(function(){
+var KEY='qtp_shortcuts_v1', items=load(), editingId=null, lastTarget=null, capturing=false;
+var $=function(s){return document.querySelector(s)};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function load(){
+  try{var v=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(v))return v}catch(e){}
+  return [{id:uid(),name:'ជំរាបសួរ',text:'សួស្តី',combo:'Alt+1'}];
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on')},1800)}
 
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
- document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
- document.querySelectorAll(".sec").forEach((s,i)=>s.classList.toggle("on",i==b.dataset.t))});
+function comboFrom(e){
+  var c=e.code||'';
+  if(/^(Control|Shift|Alt|Meta|OS)/.test(c)||!c)return null;
+  var k=c.indexOf('Key')===0?c.slice(3):c.indexOf('Digit')===0?c.slice(5):c.indexOf('Numpad')===0?'Num'+c.slice(6):c;
+  var p=[];
+  if(e.ctrlKey)p.push('Ctrl');if(e.altKey)p.push('Alt');if(e.shiftKey)p.push('Shift');if(e.metaKey)p.push('Meta');
+  p.push(k);return p.join('+');
+}
 
-async function load(){const a=await rq("meta","readonly",s=>s.getAll());
- a.sort((x,y)=>x.name.localeCompare(y.name));
- music=a.filter(m=>m.kind==="music");movies=a.filter(m=>m.kind==="movie").sort((x,y)=>y.date-x.date);draw();storage()}
-function draw(){
- $("#ml").innerHTML=music.length?music.map((m,i)=>`<div class="row ${i===qi?"cur":""}"><span class="ic">${i===qi&&!au.paused?"🔊":"🎵"}</span><div class="nm" data-p="${i}"><div>${esc(m.name)}</div><small>${sz(m.size)}</small></div><button class="x" data-d="${m.id}">🗑</button></div>`).join(""):'<div class="empty">មិនទាន់មានចំរៀង<br>ចុច ➕ ដើម្បីបន្ថែម</div>';
- $("#vl").innerHTML=movies.length?movies.map(m=>{const p=m.dur?Math.min(100,(m.pos||0)/m.dur*100):0;
-  return `<div class="row"><span class="ic">🎬</span><div class="nm" data-v="${m.id}"><div>${esc(m.name)}</div><small>${sz(m.size)}${p>1?" · មើលបាន "+Math.round(p)+"%":""}</small><div class="pg"><i style="width:${p}%"></i></div></div><button class="x" data-d="${m.id}">🗑</button></div>`}).join(""):'<div class="empty">មិនទាន់មានរឿង<br>ចុច ➕ ដើម្បីបន្ថែម</div>';
- document.querySelectorAll("[data-p]").forEach(e=>e.onclick=()=>play(+e.dataset.p));
- document.querySelectorAll("[data-v]").forEach(e=>e.onclick=()=>watch(+e.dataset.v));
- document.querySelectorAll(".x").forEach(e=>e.onclick=()=>remove(+e.dataset.d))}
-async function storage(){try{if(navigator.storage){await navigator.storage.persist();const e=await navigator.storage.estimate();$("#st").textContent="ទំហំប្រើ៖ "+sz(e.usage)+" / "+sz(e.quota)}}catch(e){}}
-async function save(blob,name,kind){const t=typeOf(blob,name);if(!t){return false}
- if(kind==="auto"||!kind)kind=kindOf(t);
- const id=await rq("meta","readwrite",s=>s.add({name:name.replace(/\.[^.]+$/,""),file:name,type:t,kind,size:blob.size,date:Date.now(),pos:0,dur:0}));
- await rq("blobs","readwrite",s=>s.put(new Blob([blob],{type:t}),id));return true}
-async function remove(id){if(!confirm("លុប?"))return;
- if(qi>=0&&music[qi]&&music[qi].id===id){au.pause();au.removeAttribute("src");qi=-1;$("#mp").classList.remove("on")}
- await rq("meta","readwrite",s=>s.delete(id));await rq("blobs","readwrite",s=>s.delete(id));load()}
+function isTextField(el){
+  if(!el||el.readOnly||el.dataset&&el.dataset.noinsert!==undefined)return false;
+  if(el.tagName==='TEXTAREA')return true;
+  if(el.tagName==='INPUT')return /^(text|search|tel|url|email|)$/.test(el.type);
+  return false;
+}
 
-// upload
-$("#up").onchange=async e=>{let n=0;for(const f of e.target.files){if(await save(f,f.name,$("#dk").value))n++}
- e.target.value="";$("#msg").textContent="✅ បន្ថែមរួច "+n+" ឯកសារ";load()};
+function copy(t){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).catch(function(){fallback(t)});return}
+  }catch(e){}
+  fallback(t);
+}
+function fallback(t){
+  try{var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}catch(e){}
+}
 
-// download
-$("#dg").onclick=async()=>{const u=$("#du").value.trim(),m=$("#msg"),pg=$("#dp");if(!u)return;
- m.textContent="កំពុងទាញយក...";pg.style.display="block";const bar=pg.firstChild;bar.style.width="0";
- try{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);
-  const len=+r.headers.get("content-length")||0,rd=r.body.getReader(),parts=[];let got=0;
-  for(;;){const{done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;
-   bar.style.width=len?(got/len*100)+"%":"50%";m.textContent="កំពុងទាញយក "+sz(got)+(len?" / "+sz(len):"")}
-  const name=decodeURIComponent(new URL(u).pathname.split("/").pop())||"file";
-  const blob=new Blob(parts,{type:r.headers.get("content-type")||""});
-  if(!(await save(blob,name,$("#dk").value)))throw new Error("មិនស្គាល់ប្រភេទឯកសារ");
-  m.textContent="✅ រក្សាទុករួច៖ "+name;$("#du").value="";load()}
- catch(e){m.textContent="❌ ទាញយកមិនបាន៖ "+e.message+"\nសូម download ចូលទូរស័ព្ទជាមុន រួចចុច «ជ្រើសឯកសារ»។"}
- pg.style.display="none"};
+function use(text){
+  var el=document.activeElement;
+  if(!isTextField(el))el=(lastTarget&&document.contains(lastTarget))?lastTarget:null;
+  copy(text);
+  if(el){
+    el.focus();
+    var s=el.selectionStart,n=el.selectionEnd;
+    if(typeof s==='number'){el.setRangeText(text,s,n,'end')}else{el.value+=text}
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+    toast('✓ បានដាក់ចូល និង Copy');
+  }else{
+    toast('✓ បាន Copy — ចុច Ctrl+V ដើម្បី Paste');
+  }
+}
 
-// music
-async function play(i){qi=i;const m=music[i];const b=await rq("blobs","readonly",s=>s.get(m.id));
- if(aurl)URL.revokeObjectURL(aurl);aurl=URL.createObjectURL(b);au.src=aurl;
- try{await au.play()}catch(e){}
- $("#mt").textContent=m.name;$("#mp").classList.add("on");draw();
- if("mediaSession" in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:m.name,artist:"ចំរៀងរបស់ខ្ញុំ"});
-  navigator.mediaSession.setActionHandler("nexttrack",next);navigator.mediaSession.setActionHandler("previoustrack",prev)}}
-function next(){if(!music.length)return;play(shuf?Math.floor(Math.random()*music.length):(qi+1)%music.length)}
-function prev(){if(!music.length)return;if(au.currentTime>3)au.currentTime=0;else play((qi-1+music.length)%music.length)}
-$("#pl").onclick=()=>au.paused?au.play():au.pause();
-$("#nx").onclick=next;$("#pv").onclick=prev;
-$("#sh").onclick=e=>{shuf=!shuf;e.target.classList.toggle("on",shuf)};
-$("#rp").onclick=e=>{rep=(rep+1)%3;e.target.textContent=rep==2?"🔂":"🔁";e.target.classList.toggle("on",rep>0)};
-au.onplay=au.onpause=()=>{$("#pl").textContent=au.paused?"▶":"⏸";draw()};
-au.onended=()=>{if(rep==2)play(qi);else if(rep==1||qi<music.length-1||shuf)next();else draw()};
-au.ontimeupdate=()=>{if(au.duration)$("#sk").value=au.currentTime/au.duration*1000};
-$("#sk").oninput=e=>{if(au.duration)au.currentTime=e.target.value/1000*au.duration};
+document.addEventListener('focusin',function(e){if(isTextField(e.target))lastTarget=e.target});
 
-// movies
-async function watch(id){au.pause();const m=movies.find(x=>x.id===id),b=await rq("blobs","readonly",s=>s.get(id));
- vid=m;const u=URL.createObjectURL(b);vv.src=u;vv._u=u;$("#vn").textContent=m.name;$("#vd").href=u;$("#vd").download=m.file;
- $("#vw").classList.add("on");
- vv.onloadedmetadata=()=>{m.dur=vv.duration;if(m.pos>5&&m.pos<vv.duration-10)vv.currentTime=m.pos;vv.play().catch(()=>{})}}
-async function savePos(){if(!vid)return;vid.pos=vv.currentTime;vid.dur=vv.duration||vid.dur;
- await rq("meta","readwrite",s=>s.put(vid))}
-vv.ontimeupdate=()=>{const n=Date.now();if(n-lastSave>5000){lastSave=n;savePos()}};
-vv.onpause=savePos;
-$("#vc").onclick=async()=>{vv.pause();await savePos();$("#vw").classList.remove("on");URL.revokeObjectURL(vv._u);vv.removeAttribute("src");vid=null;load()};
+document.addEventListener('keydown',function(e){
+  if(capturing)return;
+  var c=comboFrom(e);if(!c)return;
+  for(var i=0;i<items.length;i++){
+    if(items[i].combo&&items[i].combo===c){
+      e.preventDefault();e.stopPropagation();
+      use(items[i].text);return;
+    }
+  }
+},true);
 
-open().then(d=>{db=d;load()}).catch(()=>{$("#ml").innerHTML='<div class="empty">មិនអាចប្រើ storage បាន</div>'});
+/* combo recorder */
+var fc=$('#fCombo');
+fc.addEventListener('focus',function(){capturing=true;fc.classList.add('rec');if(!fc.value)fc.placeholder='កំពុងស្តាប់… ចុចគ្រាប់ចុច'});
+fc.addEventListener('blur',function(){capturing=false;fc.classList.remove('rec')});
+fc.addEventListener('keydown',function(e){
+  e.preventDefault();e.stopPropagation();
+  if(e.key==='Backspace'||e.key==='Delete'){fc.value='';return}
+  var c=comboFrom(e);if(!c)return;
+  fc.value=c;
+  var dup=items.filter(function(x){return x.combo===c&&x.id!==editingId})[0];
+  if(dup)toast('⚠ ផ្លូវកាត់នេះត្រូវបានប្រើរួចហើយ ("'+dup.name+'")');
+});
+
+/* CRUD */
+function reset(){editingId=null;$('#fName').value='';$('#fText').value='';fc.value='';$('#formTitle').textContent='បន្ថែមអក្សរគំរូថ្មី';$('#btnCancel').style.display='none'}
+$('#btnSave').onclick=function(){
+  var name=$('#fName').value.trim(),text=$('#fText').value,combo=fc.value.trim();
+  if(!text){toast('សូមបញ្ចូលអក្សរ');return}
+  if(!name)name=text.slice(0,20);
+  var dup=combo&&items.filter(function(x){return x.combo===combo&&x.id!==editingId})[0];
+  if(dup){toast('ផ្លូវកាត់ជាន់គ្នា ជាមួយ "'+dup.name+'"');return}
+  if(editingId){
+    items=items.map(function(x){return x.id===editingId?{id:x.id,name:name,text:text,combo:combo}:x});
+  }else{items.push({id:uid(),name:name,text:text,combo:combo})}
+  save();reset();render();toast('✓ បានរក្សាទុក');
+};
+$('#btnCancel').onclick=reset;
+
+function render(){
+  var L=$('#list');
+  if(!items.length){L.innerHTML='<div class="empty">មិនទាន់មានអក្សរគំរូ</div>';return}
+  L.innerHTML=items.map(function(x){
+    return '<div class="item" data-id="'+x.id+'"><div class="top"><b>'+esc(x.name)+'</b>'+
+      (x.combo?'<span class="kbd">'+esc(x.combo)+'</span>':'<span class="kbd">គ្មានផ្លូវកាត់</span>')+'</div>'+
+      '<div class="prev">'+esc(x.text)+'</div>'+
+      '<div class="row" style="margin-top:6px"><button class="pri" data-a="use">ដាក់ចូល</button><button data-a="edit">កែ</button><button class="dan" data-a="del">លុប</button></div></div>';
+  }).join('');
+}
+$('#list').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  var id=b.closest('.item').dataset.id,it=items.filter(function(x){return x.id===id})[0];if(!it)return;
+  var a=b.dataset.a;
+  if(a==='use')use(it.text);
+  if(a==='edit'){editingId=id;$('#fName').value=it.name;$('#fText').value=it.text;fc.value=it.combo||'';$('#formTitle').textContent='កែអក្សរគំរូ';$('#btnCancel').style.display='';window.scrollTo({top:$('#formTitle').offsetTop-10,behavior:'smooth'})}
+  if(a==='del'&&confirm('លុប "'+it.name+'" មែនទេ?')){items=items.filter(function(x){return x.id!==id});save();render();if(editingId===id)reset()}
+});
+/* keep focus in test area when tapping "use" on phone */
+$('#list').addEventListener('mousedown',function(e){if(e.target.closest('button'))e.preventDefault()});
+
+/* backup */
+$('#btnExport').onclick=function(){
+  var b=new Blob([JSON.stringify(items,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='text-shortcuts-backup.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){toast('ប្រសិនបើមិនទាញយក សូមបើកទំព័រនេះក្នុង browser ផ្ទាល់')},600);
+};
+$('#btnImport').onclick=function(){$('#file').click()};
+$('#file').onchange=function(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{var v=JSON.parse(r.result);if(!Array.isArray(v))throw 0;
+      items=v.filter(function(x){return x&&x.text}).map(function(x){return {id:x.id||uid(),name:x.name||'',text:x.text,combo:x.combo||''}});
+      save();render();toast('✓ បានស្តារ')}catch(err){toast('ឯកសារមិនត្រឹមត្រូវ')}
+  };
+  r.readAsText(f);e.target.value='';
+};
+render();
+})();
 </script>
 </body>
 </html>
