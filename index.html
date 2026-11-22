@@ -1,214 +1,164 @@
-<!doctype html>
-<html lang="km">
-<head>
-<meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="km"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>អក្សរគំរូ និងផ្លូវកាត់ក្តារចុច</title>
+<title>ដឹកដល់ផ្ទះ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--bg:#f4f6f9;--card:#fff;--tx:#1b1f24;--mut:#6b7280;--pri:#2563eb;--prit:#fff;--bd:#e3e7ec;--dan:#dc2626;--ok:#16a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1216;--card:#1a1f26;--tx:#e8eaed;--mut:#9aa3af;--pri:#5b8cff;--prit:#0b1020;--bd:#2b323b;--dan:#f87171;--ok:#4ade80;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1216;--card:#1a1f26;--tx:#e8eaed;--mut:#9aa3af;--pri:#5b8cff;--prit:#0b1020;--bd:#2b323b;--dan:#f87171;--ok:#4ade80;color-scheme:dark}
-*{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:"Noto Sans Khmer","Khmer OS Battambang",system-ui,sans-serif;line-height:1.6}
-.wrap{max-width:820px;margin:0 auto;padding:14px}
-h1{font-size:1.25rem;margin:4px 0 12px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
-.card h2{font-size:1rem;margin:0 0 10px}
-label{display:block;font-size:.85rem;color:var(--mut);margin:8px 0 4px}
-input,textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px}
-textarea{min-height:90px;resize:vertical}
-input:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:0}
-.combo{cursor:pointer;font-weight:600;text-align:center}
-.combo.rec{outline:2px solid var(--pri);background:var(--card)}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:9px 14px;cursor:pointer}
-button.pri{background:var(--pri);color:var(--prit);border-color:var(--pri);font-weight:600}
-button.dan{color:var(--dan)}
-.item{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--bg)}
-.item .top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
-.item b{font-size:1rem}
-.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:2px 8px;color:var(--mut)}
-.prev{color:var(--mut);font-size:.9rem;white-space:pre-wrap;word-break:break-word;margin:6px 0;max-height:4.8em;overflow:hidden}
-.hint{font-size:.82rem;color:var(--mut);margin:6px 0 0}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw}
-#toast.on{opacity:1}
-.empty{color:var(--mut);text-align:center;padding:14px}
-</style>
-</head>
-<body>
-<div class="wrap">
-<h1>⌨️ អក្សរគំរូ និងផ្លូវកាត់ក្តារចុច</h1>
+:root{--bg:#f3f7fb;--card:#fff;--tx:#17324d;--mut:#6b7f94;--pri:#0b7a75;--pri2:#14b8a6;--bd:#d9e4ee;--red:#e5484d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a26;--card:#182636;--tx:#e8f1f9;--mut:#93a8bc;--bd:#2a3d50;--pri:#14b8a6;--pri2:#0b7a75}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:'Noto Sans Khmer',system-ui,sans-serif;font-size:15px}
+header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:14px;text-align:center;position:relative}
+#logo{font-weight:700;line-height:1.4;word-break:break-word}
+#logoBtn{position:absolute;right:8px;top:8px;background:#ffffff33;border:0;color:#fff;border-radius:8px;padding:4px 8px}
+#logoSet{display:none;background:var(--card);color:var(--tx);margin:10px;padding:10px;border-radius:12px;text-align:left}
+#logoSet.on{display:block}
+nav{display:flex;gap:4px;padding:8px;overflow-x:auto;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav button{flex:1;white-space:nowrap;padding:9px 10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit}
+nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+main{max-width:640px;margin:auto;padding:8px 10px 40px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
+input,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+button.b{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700}
+button.r{background:var(--red)}button.g{background:var(--mut)}
+.row{display:flex;gap:6px;align-items:center;margin-top:6px}.row input{flex:1}
+.item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.item .i{flex:1;min-width:0}.item small{color:var(--mut);display:block}
+.sug{border:1px solid var(--bd);border-radius:10px;margin-top:4px;overflow:hidden}
+.sug div{padding:9px 10px;border-bottom:1px solid var(--bd);background:var(--card)}
+table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left}
+.tot{font-size:20px;font-weight:700;color:var(--pri);text-align:right;margin-top:8px}
+.pg{display:none}.pg.on{display:block}
+#pa{display:none}
+@media print{body>*:not(#pa){display:none!important}#pa{display:block;width:72mm;font-size:14px;color:#000;background:#fff}#pa h3{margin:0 0 4px}}
+</style></head><body>
+<header><div id="logo"></div><div id="st" style="font-size:11px;opacity:.85;margin-top:4px"></div><button id="logoBtn" onclick="logoSet.classList.toggle('on')">⚙️ Logo</button></header>
+<div id="logoSet">
+<label>អក្សរ Logo</label><input id="lt" oninput="saveLogo()">
+<div class="row"><span>ទំហំ</span><input id="ls" type="range" min="14" max="40" oninput="saveLogo()"><input id="lc" type="color" style="width:56px;padding:2px" oninput="saveLogo()"></div>
+<div class="row"><button class="b r" onclick="lt.value='';saveLogo()">🗑️ លុបអក្សរ</button></div><label>សារផ្ញើអតិថិជន ({ឈ្មោះ} {ថ្លៃ} ជំនួសស្វ័យប្រវត្តិ)</label><textarea id="mt" rows="3" oninput="db.msg=this.value;save()"></textarea></div>
+<nav id="nav"></nav>
+<main>
+<section class="pg" id="p0"><div class="card">
+<b id="formTitle">ព័ត៌មានអតិថិជនថ្មី</b>
+<label>លេខទូរស័ព្ទ (ច្រើនបំផុត ៥)</label><div id="phones"></div>
+<button class="b g" style="margin-top:6px" onclick="addPhone('')">＋ បន្ថែមលេខ</button>
+<label>ឈ្មោះ</label><input id="fn">
+<label>ទីតាំង / អាស័យដ្ឋាន</label><input id="fa">
+<label>Link ទីតាំង (ពី Telegram)</label><input id="fl" oninput="prevQR()" placeholder="https://...">
+<div id="fqr" style="margin:8px 0"></div>
+<label>ថ្លៃសេវា (៛)</label><input id="ff" type="number" inputmode="numeric" placeholder="2000">
+<label>កំណត់ចំណាំ</label><textarea id="fnote" rows="2"></textarea>
+<div class="row"><button class="b" style="flex:1" onclick="saveCust()">💾 រក្សាទុក</button><button class="b g" onclick="clearForm()">សម្អាត</button></div>
+</div></section>
 
-<div class="card">
-  <h2>ប្រអប់សាកល្បង (សរសេរ ហើយចុចផ្លូវកាត់)</h2>
-  <textarea id="test" class="target" placeholder="ចុចក្នុងប្រអប់នេះ រួចចុចផ្លូវកាត់ដែលបានកំណត់ ឬចុចប៊ូតុង «ដាក់ចូល» ខាងក្រោម…"></textarea>
-  <p class="hint">ផ្លូវកាត់ដំណើរការក្នុងទំព័រនេះ។ ប្រសិនបើមិនមានប្រអប់សរសេរកំពុងបើក អក្សរនឹងត្រូវ Copy ដោយស្វ័យប្រវត្តិ ហើយអ្នកអាច Paste (Ctrl+V) ទៅកម្មវិធីផ្សេងបាន។</p>
-</div>
+<section class="pg" id="p1"><input id="lq" placeholder="ស្វែងរកក្នុងផ្ទាំងផ្ទុក..." oninput="renderList()" style="margin-bottom:8px"><div class="card" id="list"></div></section>
 
-<div class="card">
-  <h2 id="formTitle">បន្ថែមអក្សរគំរូថ្មី</h2>
-  <label>ឈ្មោះ</label>
-  <input id="fName" data-noinsert placeholder="ឧ. ជំរាបសួរ">
-  <label>អក្សរដែលត្រូវលោតចេញ</label>
-  <textarea id="fText" data-noinsert placeholder="ឧ. សួស្តី"></textarea>
-  <label>ផ្លូវកាត់ក្តារចុច (ចុចក្នុងប្រអប់ រួចចុចគ្រាប់ចុចដែលចង់បាន)</label>
-  <input id="fCombo" class="combo" data-noinsert readonly placeholder="ចុចទីនេះ រួចចុច ឧ. Ctrl+X">
-  <p class="hint">Backspace/Delete = លុបផ្លូវកាត់ · អាចប្រើ Ctrl, Alt, Shift រួមជាមួយអក្សរ លេខ F1–F12។ ផ្លូវកាត់របស់ browser មួយចំនួន (Ctrl+W, Ctrl+T, Ctrl+N) មិនអាចយកមកប្រើបានទេ។</p>
-  <div class="row">
-    <button class="pri" id="btnSave">រក្សាទុក</button>
-    <button id="btnCancel" style="display:none">បោះបង់</button>
-  </div>
-</div>
+<section class="pg" id="p2"><div class="card">
+<b>ស្វែងរកលេខទូរស័ព្ទ</b>
+<div class="row"><input id="sq" inputmode="numeric" placeholder="វាយ ឬ scan លេខ..." oninput="sugg()" onkeydown="if(event.key==='Enter')doSearch()"><button class="b" onclick="doSearch()">ស្វែងរក</button></div>
+<label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input id="auto" type="checkbox" style="width:auto" checked onchange="db.auto=this.checked;save()">🖨️ ព្រីនភ្លាមៗពេល scan / Enter</label><div id="sug"></div></div>
+<div class="card"><div class="row" style="justify-content:space-between;margin:0"><b>លទ្ធផល</b><button class="b r" onclick="if(confirm('Reset?')){db.q=[];save();renderQ()}">Reset</button></div><div id="queue"></div></div></section>
 
-<div class="card">
-  <h2>បញ្ជីអក្សរគំរូ</h2>
-  <div id="list"></div>
-  <div class="row">
-    <button id="btnExport">⬇ Backup</button>
-    <button id="btnImport">⬆ ស្តារ</button>
-    <input type="file" id="file" accept=".json,application/json" style="display:none">
-  </div>
-</div>
-</div>
-<div id="toast"></div>
+<section class="pg" id="p3"><div class="card"><div class="row" style="justify-content:space-between;margin:0"><b>ប្រវត្តិព្រីន</b><button class="b r" onclick="if(confirm('លុបទាំងអស់?')){db.h=[];save();renderHist()}">🗑️</button></div><div id="hist"></div></div></section>
 
+<section class="pg" id="p4"><div class="card">
+<label>ជ្រើសថ្ងៃ (រក្សាទុក ៣៣ ថ្ងៃ)</label><input id="dd" type="date" onchange="renderDaily()">
+<table style="margin-top:8px"><thead><tr><th>ល.រ</th><th>លេខទូរស័ព្ទ</th><th>ថ្លៃ</th></tr></thead><tbody id="dt"></tbody></table>
+<div class="tot" id="dtot"></div>
+<button class="b" style="width:100%;margin-top:10px" onclick="tg()">✈️ ផ្ញើចូល Telegram</button>
+</div></section>
+</main>
+<div id="dm" style="display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:320px;width:100%;text-align:center;margin:0"><div style="font-size:17px;font-weight:700;margin-bottom:6px">លេខនេះធ្លាប់ស្គេនម្តងរួចហើយ</div><div style="color:var(--mut);margin-bottom:14px">បើចុចយល់ព្រម គឺត្រូវគិតថ្លៃសេវាដឹកម្តងទៀត</div><div class="row" style="justify-content:space-between"><button class="b" id="dok" style="background:#6ee7b7;color:#064e3b">យល់ព្រម</button><button class="b r" id="dno">បោះបង់</button></div></div></div>
+<div id="pa"></div>
+<div id="qtmp" style="display:none"></div>
 <script>
-(function(){
-var KEY='qtp_shortcuts_v1', items=load(), editingId=null, lastTarget=null, capturing=false;
-var $=function(s){return document.querySelector(s)};
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
-function load(){
-  try{var v=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(v))return v}catch(e){}
-  return [{id:uid(),name:'ជំរាបសួរ',text:'សួស្តី',combo:'Alt+1'}];
-}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}}
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on')},1800)}
-
-function comboFrom(e){
-  var c=e.code||'';
-  if(/^(Control|Shift|Alt|Meta|OS)/.test(c)||!c)return null;
-  var k=c.indexOf('Key')===0?c.slice(3):c.indexOf('Digit')===0?c.slice(5):c.indexOf('Numpad')===0?'Num'+c.slice(6):c;
-  var p=[];
-  if(e.ctrlKey)p.push('Ctrl');if(e.altKey)p.push('Alt');if(e.shiftKey)p.push('Shift');if(e.metaKey)p.push('Meta');
-  p.push(k);return p.join('+');
-}
-
-function isTextField(el){
-  if(!el||el.readOnly||el.dataset&&el.dataset.noinsert!==undefined)return false;
-  if(el.tagName==='TEXTAREA')return true;
-  if(el.tagName==='INPUT')return /^(text|search|tel|url|email|)$/.test(el.type);
-  return false;
-}
-
-function copy(t){
-  try{
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).catch(function(){fallback(t)});return}
-  }catch(e){}
-  fallback(t);
-}
-function fallback(t){
-  try{var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}catch(e){}
-}
-
-function use(text){
-  var el=document.activeElement;
-  if(!isTextField(el))el=(lastTarget&&document.contains(lastTarget))?lastTarget:null;
-  copy(text);
-  if(el){
-    el.focus();
-    var s=el.selectionStart,n=el.selectionEnd;
-    if(typeof s==='number'){el.setRangeText(text,s,n,'end')}else{el.value+=text}
-    el.dispatchEvent(new Event('input',{bubbles:true}));
-    toast('✓ បានដាក់ចូល និង Copy');
-  }else{
-    toast('✓ បាន Copy — ចុច Ctrl+V ដើម្បី Paste');
-  }
-}
-
-document.addEventListener('focusin',function(e){if(isTextField(e.target))lastTarget=e.target});
-
-document.addEventListener('keydown',function(e){
-  if(capturing)return;
-  var c=comboFrom(e);if(!c)return;
-  for(var i=0;i<items.length;i++){
-    if(items[i].combo&&items[i].combo===c){
-      e.preventDefault();e.stopPropagation();
-      use(items[i].text);return;
-    }
-  }
-},true);
-
-/* combo recorder */
-var fc=$('#fCombo');
-fc.addEventListener('focus',function(){capturing=true;fc.classList.add('rec');if(!fc.value)fc.placeholder='កំពុងស្តាប់… ចុចគ្រាប់ចុច'});
-fc.addEventListener('blur',function(){capturing=false;fc.classList.remove('rec')});
-fc.addEventListener('keydown',function(e){
-  e.preventDefault();e.stopPropagation();
-  if(e.key==='Backspace'||e.key==='Delete'){fc.value='';return}
-  var c=comboFrom(e);if(!c)return;
-  fc.value=c;
-  var dup=items.filter(function(x){return x.combo===c&&x.id!==editingId})[0];
-  if(dup)toast('⚠ ផ្លូវកាត់នេះត្រូវបានប្រើរួចហើយ ("'+dup.name+'")');
-});
-
-/* CRUD */
-function reset(){editingId=null;$('#fName').value='';$('#fText').value='';fc.value='';$('#formTitle').textContent='បន្ថែមអក្សរគំរូថ្មី';$('#btnCancel').style.display='none'}
-$('#btnSave').onclick=function(){
-  var name=$('#fName').value.trim(),text=$('#fText').value,combo=fc.value.trim();
-  if(!text){toast('សូមបញ្ចូលអក្សរ');return}
-  if(!name)name=text.slice(0,20);
-  var dup=combo&&items.filter(function(x){return x.combo===combo&&x.id!==editingId})[0];
-  if(dup){toast('ផ្លូវកាត់ជាន់គ្នា ជាមួយ "'+dup.name+'"');return}
-  if(editingId){
-    items=items.map(function(x){return x.id===editingId?{id:x.id,name:name,text:text,combo:combo}:x});
-  }else{items.push({id:uid(),name:name,text:text,combo:combo})}
-  save();reset();render();toast('✓ បានរក្សាទុក');
-};
-$('#btnCancel').onclick=reset;
-
-function render(){
-  var L=$('#list');
-  if(!items.length){L.innerHTML='<div class="empty">មិនទាន់មានអក្សរគំរូ</div>';return}
-  L.innerHTML=items.map(function(x){
-    return '<div class="item" data-id="'+x.id+'"><div class="top"><b>'+esc(x.name)+'</b>'+
-      (x.combo?'<span class="kbd">'+esc(x.combo)+'</span>':'<span class="kbd">គ្មានផ្លូវកាត់</span>')+'</div>'+
-      '<div class="prev">'+esc(x.text)+'</div>'+
-      '<div class="row" style="margin-top:6px"><button class="pri" data-a="use">ដាក់ចូល</button><button data-a="edit">កែ</button><button class="dan" data-a="del">លុប</button></div></div>';
-  }).join('');
-}
-$('#list').addEventListener('click',function(e){
-  var b=e.target.closest('button');if(!b)return;
-  var id=b.closest('.item').dataset.id,it=items.filter(function(x){return x.id===id})[0];if(!it)return;
-  var a=b.dataset.a;
-  if(a==='use')use(it.text);
-  if(a==='edit'){editingId=id;$('#fName').value=it.name;$('#fText').value=it.text;fc.value=it.combo||'';$('#formTitle').textContent='កែអក្សរគំរូ';$('#btnCancel').style.display='';window.scrollTo({top:$('#formTitle').offsetTop-10,behavior:'smooth'})}
-  if(a==='del'&&confirm('លុប "'+it.name+'" មែនទេ?')){items=items.filter(function(x){return x.id!==id});save();render();if(editingId===id)reset()}
-});
-/* keep focus in test area when tapping "use" on phone */
-$('#list').addEventListener('mousedown',function(e){if(e.target.closest('button'))e.preventDefault()});
-
-/* backup */
-$('#btnExport').onclick=function(){
-  var b=new Blob([JSON.stringify(items,null,2)],{type:'application/json'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='text-shortcuts-backup.json';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(function(){toast('ប្រសិនបើមិនទាញយក សូមបើកទំព័រនេះក្នុង browser ផ្ទាល់')},600);
-};
-$('#btnImport').onclick=function(){$('#file').click()};
-$('#file').onchange=function(e){
-  var f=e.target.files[0];if(!f)return;
-  var r=new FileReader();
-  r.onload=function(){
-    try{var v=JSON.parse(r.result);if(!Array.isArray(v))throw 0;
-      items=v.filter(function(x){return x&&x.text}).map(function(x){return {id:x.id||uid(),name:x.name||'',text:x.text,combo:x.combo||''}});
-      save();render();toast('✓ បានស្តារ')}catch(err){toast('ឯកសារមិនត្រឹមត្រូវ')}
-  };
-  r.readAsText(f);e.target.value='';
-};
-render();
-})();
-</script>
-</body>
-</html>
+const $=id=>document.getElementById(id);
+let db={c:[],h:[],d:[],q:[],logo:{t:'វីរះប៊ុនថាំ ត្មាតពង ដឹកដល់ផ្ទះ',s:24,c:'#ffffff'}},editId=null;
+try{const x=JSON.parse(localStorage.getItem('dh')||'null');if(x)db=Object.assign(db,x)}catch(e){}
+if(db.auto===undefined)db.auto=true;
+if(db.msg===undefined)db.msg='សួស្តី {ឈ្មោះ} 🙏 ឥវ៉ាន់របស់លោកអ្នកកំពុងដឹកទៅដល់ផ្ទះ។ ថ្លៃសេវា {ថ្លៃ} សូមអរគុណ។';
+let DB=null,last={},tm=null;
+const setSt=t=>{$('st').textContent=t};
+const save=()=>{try{localStorage.setItem('dh',JSON.stringify(db))}catch(e){}clearTimeout(tm);tm=setTimeout(sync,700)};
+async function sync(){if(!DB)return;try{
+ const put=async(p,d)=>{const s=JSON.stringify(d);if(last[p]===s)return;await DB.doc(p).set(d);last[p]=s};
+ await put('cfg/main',{logo:db.logo,q:db.q,h:db.h.slice(0,300),auto:db.auto,msg:db.msg});
+ const ids=new Set(db.c.map(c=>'cust/'+c.id));
+ for(const c of db.c)await put('cust/'+c.id,c);
+ const days={};db.d.forEach(r=>(days[r.k]=days[r.k]||[]).push(r));
+ for(const k in days)await put('day/'+k,{rows:days[k]});
+ for(const p of Object.keys(last))if((p.startsWith('cust/')&&!ids.has(p))||(p.startsWith('day/')&&!days[p.slice(4)])){await DB.doc(p).delete();delete last[p]}
+ setSt('☁️ រក្សាទុករួច')}catch(e){setSt('⚠️ រក្សាទុក cloud មិនបាន')}}
+async function loadRemote(){try{
+ if(!window.claude){setSt('📱 រក្សាទុកក្នុងទូរស័ព្ទ');return}
+ DB=await claude.use('db');if(!DB){setSt('📱 រក្សាទុកក្នុងទូរស័ព្ទ');return}
+ const [cf,cs,ds]=await Promise.all([DB.doc('cfg/main').get(),DB.collection('cust').get(),DB.collection('day').get()]);
+ if(cf.exists||!cs.empty){const g=cf.exists?cf.data():{};
+  db.c=cs.docs.map(d=>d.data());db.logo=g.logo||db.logo;db.q=g.q||[];db.h=g.h||[];if(g.auto!==undefined)db.auto=g.auto;if(g.msg)db.msg=g.msg;
+  db.d=ds.docs.flatMap(d=>d.data().rows||[]).filter(r=>Date.now()-r.t<=33*864e5);
+  cs.docs.forEach(d=>last['cust/'+d.id]=JSON.stringify(d.data()));ds.docs.forEach(d=>last['day/'+d.id]=JSON.stringify(d.data()));if(cf.exists)last['cfg/main']=JSON.stringify(g);
+  try{localStorage.setItem('dh',JSON.stringify(db))}catch(e){}
+  renderLogo();$('auto').checked=db.auto;renderList();renderQ();renderHist();renderDaily()}
+ setSt('☁️ ភ្ជាប់ cloud');sync()}catch(e){setSt('📱 រក្សាទុកក្នុងទូរស័ព្ទ')}}
+const dkey=(t=Date.now())=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fmtD=k=>k.split('-').reverse().join('/');
+const money=n=>Number(n||0).toLocaleString('en-US')+' ៛';
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+db.d=db.d.filter(r=>Date.now()-r.t<=33*864e5);save();
+// tabs
+const tabs=['➕ បញ្ចូល','📋 ផ្ទុកព័ត៌មាន','🔍 ស្វែងរក','🕘 ប្រវត្តិ','💰 ប្រចាំថ្ងៃ'];
+$('nav').innerHTML=tabs.map((t,i)=>`<button onclick="tab(${i})">${t}</button>`).join('');
+function tab(i){document.querySelectorAll('.pg').forEach((p,j)=>p.classList.toggle('on',i===j));document.querySelectorAll('nav button').forEach((b,j)=>b.classList.toggle('on',i===j));
+ if(i===1)renderList();if(i===2){renderQ();$('sq').focus()}if(i===3)renderHist();if(i===4){if(!$('dd').value)$('dd').value=dkey();renderDaily()}}
+// logo
+function renderLogo(){const l=db.logo;$('logo').textContent=l.t;$('logo').style.fontSize=l.s+'px';$('logo').style.color=l.c;$('lt').value=l.t;$('mt').value=db.msg;$('ls').value=l.s;$('lc').value=l.c}
+function saveLogo(){db.logo={t:$('lt').value,s:+$('ls').value,c:$('lc').value};save();$('logo').textContent=db.logo.t;$('logo').style.fontSize=db.logo.s+'px';$('logo').style.color=db.logo.c}
+// form
+function addPhone(v){const n=$('phones').children.length;if(n>=5)return alert('ច្រើនបំផុត ៥ លេខ');const r=document.createElement('div');r.className='row';r.innerHTML=`<input inputmode="numeric" placeholder="លេខទូរស័ព្ទ" value="${esc(v)}"><button class="b r" onclick="this.parentNode.remove()">✕</button>`;$('phones').appendChild(r)}
+function qrImg(text,size,cb){const t=$('qtmp');t.innerHTML='';new QRCode(t,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});const c=t.querySelector('canvas');cb(c.toDataURL())}
+function prevQR(){const v=$('fl').value.trim();$('fqr').innerHTML='';if(v)qrImg(v,130,u=>$('fqr').innerHTML=`<img src="${u}" width="130" height="130" alt="QR">`)}
+function clearForm(){editId=null;['fn','fa','fl','ff','fnote'].forEach(i=>$(i).value='');$('phones').innerHTML='';addPhone('');$('fqr').innerHTML='';$('formTitle').textContent='ព័ត៌មានអតិថិជនថ្មី'}
+function saveCust(){const ph=[...$('phones').querySelectorAll('input')].map(i=>i.value.replace(/\s/g,'')).filter(Boolean);
+ if(!ph.length)return alert('សូមបញ្ចូលលេខទូរស័ព្ទ');
+ const o={id:editId||Date.now(),p:ph,n:$('fn').value.trim(),a:$('fa').value.trim(),l:$('fl').value.trim(),f:+$('ff').value||0,note:$('fnote').value.trim()};
+ const i=db.c.findIndex(x=>x.id===o.id);i>=0?db.c[i]=o:db.c.unshift(o);save();clearForm();alert('✅ បានរក្សាទុក')}
+function editCust(id){const c=db.c.find(x=>x.id===id);tab(0);editId=id;$('phones').innerHTML='';c.p.forEach(addPhone);$('fn').value=c.n;$('fa').value=c.a;$('fl').value=c.l;$('ff').value=c.f;$('fnote').value=c.note||'';prevQR();$('formTitle').textContent='កែព័ត៌មាន'}
+function delCust(id){if(confirm('លុបអតិថិជននេះ?')){db.c=db.c.filter(x=>x.id!==id);save();renderList()}}
+function renderList(){const q=$('lq').value.trim().toLowerCase();const a=db.c.filter(c=>!q||(c.p.join(' ')+' '+c.n+' '+c.a).toLowerCase().includes(q));
+ $('list').innerHTML=a.length?a.map(c=>`<div class="item"><div class="i"><b>${esc(c.p.join(' · '))}</b><small>${esc(c.n)} — ${esc(c.a)}</small><small>${money(c.f)}${c.note?' · '+esc(c.note):''}</small></div><button class="b g" onclick="tgMsg(${c.id},'${c.p[0]}')">✈️</button><button class="b" onclick="editCust(${c.id})">✏️</button><button class="b r" onclick="delCust(${c.id})">🗑️</button></div>`).join(''):'<small>មិនទាន់មានទិន្នន័យ</small>'}
+// search
+const allPhones=()=>db.c.flatMap(c=>c.p.map(p=>({cid:c.id,p})));
+function sugg(){const v=$('sq').value.trim();if(!v){$('sug').innerHTML='';return}
+ const m=allPhones().filter(x=>x.p.includes(v)).slice(0,8);
+ $('sug').innerHTML=m.length?'<div class="sug">'+m.map(x=>{const c=db.c.find(k=>k.id===x.cid);return `<div onclick="addQ(${x.cid},'${x.p}');$('sq').value='';$('sug').innerHTML=''"><b>${x.p}</b> <small>${esc(c.n)}</small></div>`}).join('')+'</div>':''}
+function addQ(cid,p){if(!db.q.some(x=>x.cid===cid&&x.p===p))db.q.push({cid,p});save();renderQ()}
+function doSearch(){const v=$('sq').value.trim();if(!v)return;const m=allPhones().filter(x=>x.p===v);const r=m.length?m:allPhones().filter(x=>x.p.includes(v));
+ if(!r.length)alert('រកមិនឃើញ');if(db.auto&&m.length===1&&r.length===1){const e=m[0],it=db.q.find(y=>y.cid===e.cid&&y.p===e.p);
+ if(it&&it.done)askDup(()=>{it.done=false;printEntry(e.cid,e.p,true)});
+ else{addQ(e.cid,e.p);printEntry(e.cid,e.p,true)}}
+else r.forEach(x=>addQ(x.cid,x.p));$('sq').value='';$('sug').innerHTML='';$('sq').focus()}
+function renderQ(){$('queue').innerHTML=db.q.length?db.q.map((x,i)=>{const c=db.c.find(k=>k.id===x.cid);if(!c)return'';return `<div class="item"><span>📤</span><div class="i"><b>${x.p}</b><small>${esc(c.n)} · ${money(c.f)}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><button class="b g" onclick="tgMsg(${x.cid},'${x.p}')">✈️</button><button class="b" onclick="printQ(${i})">ព្រីន</button><button class="b r" onclick="db.q.splice(${i},1);save();renderQ()">🗑️</button></div>`}).join(''):'<small>គ្មានលទ្ធផល</small>'}
+function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p)}
+function printEntry(cid,p,auto){const x={cid,p},c=db.c.find(k=>k.id===cid);if(!c)return;
+ const go=u=>{$('pa').innerHTML=`<h3>${esc(x.p)}</h3><div>${esc(c.n)}</div><div>${esc(c.a)}</div><div><b>ថ្លៃសេវា៖ ${money(c.f)}</b></div>${u?`<img src="${u}" width="150" height="150" alt="QR">`:''}`;
+  const img=$('pa').querySelector('img');const run=()=>{window.print();const qi=db.q.findIndex(y=>y.cid===x.cid&&y.p===x.p),it=db.q[qi];if(!it||!it.done){const now=Date.now();db.h.unshift({t:now,p:x.p,n:c.n,f:c.f});db.d.push({t:now,k:dkey(now),p:x.p,f:c.f})}if(it){if(auto)it.done=true;else db.q.splice(qi,1)}save();renderQ()};
+  img?(img.complete?run():img.onload=run):run()};
+ c.l?qrImg(c.l,150,go):go('')}
+function tgMsg(cid,p){const c=db.c.find(k=>k.id===cid);if(!c)return;
+ const t=db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f));
+ const n=p.replace(/\D/g,'').replace(/^0/,'855');
+ try{navigator.clipboard.writeText(t)}catch(e){}
+ setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ');window.open('https://t.me/+'+n,'_blank')}
+function askDup(cb){const m=$('dm');m.style.display='flex';$('dok').onclick=()=>{m.style.display='none';cb()};$('dno').onclick=()=>{m.style.display='none';$('sq').value='';$('sq').focus()}}
+// history
+function renderHist(){$('hist').innerHTML=db.h.length?db.h.map(r=>`<div class="item"><div class="i"><b>${r.p}</b><small>${esc(r.n)} · ${new Date(r.t).toLocaleString('en-GB')}</small></div><b>${money(r.f)}</b></div>`).join(''):'<small>គ្មានប្រវត្តិ</small>'}
+// daily
+function dayRows(){return db.d.filter(r=>r.k===$('dd').value)}
+function renderDaily(){const r=dayRows();$('dt').innerHTML=r.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p}</td><td>${money(x.f)}</td></tr>`).join('')||'<tr><td colspan="3"><small>គ្មានទិន្នន័យ</small></td></tr>';$('dtot').textContent='សរុប៖ '+money(r.reduce((s,x)=>s+x.f,0))}
+function tg(){const r=dayRows(),k=$('dd').value;const txt=`📦 ${db.logo.t}\nរបាយការណ៍ថ្ងៃទី ${fmtD(k)}\n`+r.map((x,i)=>`${i+1}. ${x.p} — ${money(x.f)}`).join('\n')+`\n━━━━━━\nចំនួន ${r.length} កញ្ចប់\n💰 សរុប៖ ${money(r.reduce((s,x)=>s+x.f,0))}`;
+ window.open('https://t.me/share/url?url=%20&text='+encodeURIComponent(txt),'_blank')}
+renderLogo();clearForm();tab(0);$('auto').checked=db.auto;loadRemote();
+</script></body></html>
