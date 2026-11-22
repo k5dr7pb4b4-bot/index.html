@@ -133,18 +133,15 @@ function renderList(){const q=$('lq').value.trim().toLowerCase();const a=db.c.fi
 const allPhones=()=>db.c.flatMap(c=>c.p.map(p=>({cid:c.id,p})));
 function sugg(){const v=$('sq').value.trim();if(!v){$('sug').innerHTML='';return}
  const m=allPhones().filter(x=>x.p.includes(v)).slice(0,8);
- $('sug').innerHTML=m.length?'<div class="sug">'+m.map(x=>{const c=db.c.find(k=>k.id===x.cid);return `<div onclick="addQ(${x.cid},'${x.p}');$('sq').value='';$('sug').innerHTML=''"><b>${x.p}</b> <small>${esc(c.n)}</small></div>`}).join('')+'</div>':''}
+ $('sug').innerHTML=m.length?'<div class="sug">'+m.map(x=>{const c=db.c.find(k=>k.id===x.cid);return `<div onclick="scanPhone(${x.cid},'${x.p}');$('sq').value='';$('sug').innerHTML=''"><b>${x.p}</b> <small>${esc(c.n)}</small></div>`}).join('')+'</div>':''}
 function addQ(cid,p){if(!db.q.some(x=>x.cid===cid&&x.p===p))db.q.push({cid,p});save();renderQ()}
 function doSearch(){const v=$('sq').value.trim();if(!v)return;const m=allPhones().filter(x=>x.p===v);const r=m.length?m:allPhones().filter(x=>x.p.includes(v));
- if(!r.length)alert('រកមិនឃើញ');if(db.auto&&m.length===1&&r.length===1){const e=m[0],it=db.q.find(y=>y.cid===e.cid&&y.p===e.p),td=dkey();
- if((it&&it.done)||db.d.some(z=>z.k===td&&z.p===e.p))askDup(()=>{addQ(e.cid,e.p);db.q.find(y=>y.cid===e.cid&&y.p===e.p).done=false;printEntry(e.cid,e.p,true)});
- else{addQ(e.cid,e.p);printEntry(e.cid,e.p,true)}}
-else r.forEach(x=>addQ(x.cid,x.p));$('sq').value='';$('sug').innerHTML='';$('sq').focus()}
+ if(!r.length)alert('រកមិនឃើញ');if(m.length===1)scanPhone(m[0].cid,m[0].p);else r.forEach(x=>addQ(x.cid,x.p));$('sq').value='';$('sug').innerHTML='';$('sq').focus()}
 function renderQ(){$('queue').innerHTML=db.q.length?db.q.map((x,i)=>{const c=db.c.find(k=>k.id===x.cid);if(!c)return'';return `<div class="item"><span>📤</span><div class="i"><b>${x.p}</b><small>${esc(c.n)} · ${money(c.f)}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><button class="b g" onclick="tgMsg(${x.cid},'${x.p}')">✈️</button><button class="b" onclick="printQ(${i})">ព្រីន</button><button class="b r" onclick="db.q.splice(${i},1);save();renderQ()">🗑️</button></div>`}).join(''):'<small>គ្មានលទ្ធផល</small>'}
-function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p)}
-function printEntry(cid,p,auto){const x={cid,p},c=db.c.find(k=>k.id===cid);if(!c)return;
+function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p,false,x)}
+function printEntry(cid,p,auto,qi){const x={cid,p},c=db.c.find(k=>k.id===cid);if(!c)return;
  const go=u=>{$('pa').innerHTML=`<h3>${esc(x.p)}</h3><div>${esc(c.n)}</div><div>${esc(c.a)}</div><div><b>ថ្លៃសេវា៖ ${money(c.f)}</b></div>${u?`<img src="${u}" width="150" height="150" alt="QR">`:''}`;
-  const img=$('pa').querySelector('img');const run=()=>{try{window.print()}catch(e){}const qi=db.q.findIndex(y=>y.cid===x.cid&&y.p===x.p),it=db.q[qi];if(!it||!it.done){const now=Date.now();db.h.unshift({t:now,p:x.p,n:c.n,f:c.f});db.d.push({t:now,k:dkey(now),p:x.p,f:c.f})}if(it){if(auto)it.done=true;else db.q.splice(qi,1)}save();renderQ()};
+  const img=$('pa').querySelector('img');const run=()=>{try{window.print()}catch(e){}const it=qi||db.q.find(y=>y.cid===x.cid&&y.p===x.p),ix=db.q.indexOf(it);if(!it||!it.done){const now=Date.now();db.h.unshift({t:now,p:x.p,n:c.n,f:c.f});db.d.push({t:now,k:dkey(now),p:x.p,f:c.f})}if(it){if(auto)it.done=true;else db.q.splice(ix,1)}save();renderQ()};
   img?(img.complete?run():img.onload=run):run()};
  c.l?qrImg(c.l,150,go):go('')}
 function tgMsg(cid,p){const c=db.c.find(k=>k.id===cid);if(!c)return;
@@ -152,6 +149,10 @@ function tgMsg(cid,p){const c=db.c.find(k=>k.id===cid);if(!c)return;
  const n=p.replace(/\D/g,'').replace(/^0/,'855');
  try{navigator.clipboard.writeText(t)}catch(e){}
  setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ');window.open('https://t.me/+'+n,'_blank')}
+function scanPhone(cid,p){const td=dkey(),it=db.q.find(y=>y.cid===cid&&y.p===p);
+ const seen=(it&&it.done)||db.d.some(z=>z.k===td&&z.p===p);
+ const go=()=>{const n={cid,p};db.q.push(n);save();renderQ();if(db.auto)printEntry(cid,p,true,n)};
+ if(seen)askDup(go);else if(it){if(db.auto)printEntry(cid,p,true,it)}else go()}
 function askDup(cb){const m=$('dm');m.style.display='flex';$('dok').onclick=()=>{m.style.display='none';cb()};$('dno').onclick=()=>{m.style.display='none';$('sq').value='';$('sq').focus()}}
 // history
 function renderHist(){$('hist').innerHTML=db.h.length?db.h.map(r=>`<div class="item"><div class="i"><b>${r.p}</b><small>${esc(r.n)} · ${new Date(r.t).toLocaleString('en-GB')}</small></div><b>${money(r.f)}</b></div>`).join(''):'<small>គ្មានប្រវត្តិ</small>'}
