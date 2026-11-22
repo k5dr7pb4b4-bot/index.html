@@ -65,13 +65,13 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px so
 <section class="pg" id="p3"><div class="card"><div class="row" style="justify-content:space-between;margin:0"><b>ប្រវត្តិព្រីន</b><button class="b r" onclick="if(confirm('លុបទាំងអស់?')){db.h=[];save();renderHist()}">🗑️</button></div><div id="hist"></div></div></section>
 
 <section class="pg" id="p4"><div class="card">
-<label>ជ្រើសថ្ងៃ (រក្សាទុក ៣៣ ថ្ងៃ)</label><input id="dd" type="date" onchange="renderDaily()">
+<label>ជ្រើសថ្ងៃ (រក្សាទុក ៣៣ ថ្ងៃ)</label><div class="row"><button class="b g" onclick="dayGo(-1)">◀</button><select id="dd" onchange="renderDaily()" style="flex:1;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit"></select><button class="b g" onclick="dayGo(1)">▶</button></div><button class="b g" style="width:100%;margin-top:6px" onclick="$('dd').value=dkey();renderDaily()">ថ្ងៃនេះ</button>
 <table style="margin-top:8px"><thead><tr><th>ល.រ</th><th>លេខទូរស័ព្ទ</th><th>ថ្លៃ</th></tr></thead><tbody id="dt"></tbody></table>
 <div class="tot" id="dtot"></div>
-<button class="b" style="width:100%;margin-top:10px" onclick="tg()">✈️ ផ្ញើចូល Telegram</button>
+<div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="tg()">✈️ ផ្ញើចូល Telegram</button><button class="b g" style="flex:1" onclick="printRep()">🖨️ ព្រីន</button></div>
 </div></section>
 </main>
-<div id="dm" style="display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:320px;width:100%;text-align:center;margin:0"><div style="font-size:17px;font-weight:700;margin-bottom:6px">លេខនេះធ្លាប់ស្គេនម្តងរួចហើយ</div><div style="color:var(--mut);margin-bottom:14px">បើចុចយល់ព្រម គឺត្រូវគិតថ្លៃសេវាដឹកម្តងទៀត</div><div class="row" style="justify-content:space-between"><button class="b" id="dok" style="background:#6ee7b7;color:#064e3b">យល់ព្រម</button><button class="b r" id="dno">បោះបង់</button></div></div></div>
+<div id="dm" style="display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:320px;width:100%;text-align:center;margin:0"><div style="font-size:17px;font-weight:700;margin-bottom:6px">⛄️ លេខនេះ ធ្លាប់ស្គេនរួចម្តងហើយ</div><div style="color:var(--mut);margin-bottom:14px">បើចុច “<span style="color:#059669;font-weight:800;font-size:1.25em">យល់ព្រម</span>” គឺត្រូវគិតថ្លៃសេវាដឹកម្តងទៀត</div><div class="row" style="justify-content:center;gap:12px"><button class="b" id="dok" style="background:#6ee7b7;color:#064e3b">យល់ព្រម</button><button class="b r" id="dno">បោះបង់</button></div></div></div>
 <div id="pa"></div>
 <div id="qtmp" style="display:none"></div>
 <script>
@@ -158,7 +158,15 @@ function askDup(cb){const m=$('dm');m.style.display='flex';$('dok').onclick=()=>
 function renderHist(){$('hist').innerHTML=db.h.length?db.h.map(r=>`<div class="item"><div class="i"><b>${r.p}</b><small>${esc(r.n)} · ${new Date(r.t).toLocaleString('en-GB')}</small></div><b>${money(r.f)}</b></div>`).join(''):'<small>គ្មានប្រវត្តិ</small>'}
 // daily
 function dayRows(){return db.d.filter(r=>r.k===$('dd').value)}
-function renderDaily(){const r=dayRows();$('dt').innerHTML=r.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p}</td><td>${money(x.f)}</td></tr>`).join('')||'<tr><td colspan="3"><small>គ្មានទិន្នន័យ</small></td></tr>';$('dtot').textContent='សរុប៖ '+money(r.reduce((s,x)=>s+x.f,0))}
+function dayOpts(){const sel=$('dd'),keep=sel.value||dkey();let h='';for(let i=0;i<33;i++){const k=dkey(Date.now()-i*864e5),n=db.d.filter(r=>r.k===k).length;h+=`<option value="${k}">${fmtD(k)}${i==0?' (ថ្ងៃនេះ)':''}${n?' · '+n+' កញ្ចប់':''}</option>`}sel.innerHTML=h;sel.value=keep}
+function dayGo(n){const s=$('dd'),i=s.selectedIndex-n;if(i>=0&&i<s.options.length){s.selectedIndex=i;renderDaily()}}
+function printRep(){const r=dayRows(),k=$('dd').value;$('pa').innerHTML=`<div style="white-space:pre-line;font-size:16px;line-height:1.7">📦 ${esc(db.logo.t)}
+
+របាយការណ៍ថ្ងៃទី ${fmtD(k)}
+
+ចំនួន ${r.length} កញ្ចប់
+💰 សរុប៖ ${money(r.reduce((s,x)=>s+x.f,0))}</div>`;try{window.print()}catch(e){}}
+function renderDaily(){dayOpts();const r=dayRows();$('dt').innerHTML=r.map((x,i)=>`<tr><td>${i+1}</td><td>${x.p}</td><td>${money(x.f)}</td></tr>`).join('')||'<tr><td colspan="3"><small>គ្មានទិន្នន័យ</small></td></tr>';$('dtot').textContent='សរុប៖ '+money(r.reduce((s,x)=>s+x.f,0))}
 function tg(){const r=dayRows(),k=$('dd').value;const txt=`📦 ${db.logo.t}\nរបាយការណ៍ថ្ងៃទី ${fmtD(k)}\n`+r.map((x,i)=>`${i+1}. ${x.p} — ${money(x.f)}`).join('\n')+`\n━━━━━━\nចំនួន ${r.length} កញ្ចប់\n💰 សរុប៖ ${money(r.reduce((s,x)=>s+x.f,0))}`;
  window.open('https://t.me/share/url?url=%20&text='+encodeURIComponent(txt),'_blank')}
 renderLogo();clearForm();tab(0);$('auto').checked=db.auto;loadRemote();
