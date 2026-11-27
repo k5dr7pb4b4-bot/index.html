@@ -254,7 +254,7 @@ let qf='p';
 function qFilter(k){const was=qf;if(was===k)return;qf=k;if(was==='sent'||qf==='sent'){renderQ();return}document.querySelectorAll('#qc .qp[onclick]').forEach(e=>e.classList.toggle('on',e.getAttribute('onclick')==="qFilter('"+qf+"')"));applyF()}
 function qSt(i,k){const x=db.q[i];if(!x)return;x.s=x.s===k?'':k;save();renderQ();toast({'':'↩️ ត្រូវហៅ',pickup:'✅ តេរួច',noans:'📵 មិនលើក',later:'📴 តេមិនចូល'}[x.s||''])}
 function cp(p){return `<button class="cp" data-p="${esc(p)}" onclick="cpNum(this)" aria-label="ចម្លងលេខ">ចម្លង</button>`}
-function cpNum(b){const t=b.dataset.p;const ok=()=>{b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='ចម្លង';b.classList.remove('ok')},900)};
+function cpNum(b){const t=b.dataset.p;const ok=()=>{b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='ចម្លង';b.classList.remove('ok')},500)};
  try{navigator.clipboard.writeText(t).then(ok,()=>{fb()})}catch(e){fb()}
  function fb(){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){toast('⚠️ ចម្លងមិនបាន')}a.remove()}}
 function renderQ(){const rk={'':0,noans:1,later:2,pickup:3},OR=['Smart','Metfone','Cellcard','Seatel','qb','CooTel'],oi=p=>{const k=OR.indexOf(phoneInfo(p).op);return k<0?99:k},on=p=>phoneInfo(p).op||'ផ្សេងៗ',SI={'':'',noans:'📵 ',later:'📴 ',pickup:'✅ '};
