@@ -63,6 +63,20 @@ header{background:linear-gradient(135deg,#312e81,#6d28d9 60%,#8b5cf6);color:#fff
 .gh .gar svg{width:14px;height:14px;display:block;stroke:var(--g);fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .gh.co .gar{transform:rotate(-90deg)}
 .gb.c{display:none}
+.item.q .sts{justify-content:space-between}
+.item.q .stb{flex:0 0 30%;padding-left:0;padding-right:0}
+.item .b.tel:active{filter:brightness(.8)}
+
+/* === qfix2: smaller status buttons, fast filter, no tap delay === */
+.item.q .stb{padding:1px 2px;font-size:11px;border-radius:8px;min-height:0;height:26px;border-width:1.5px}
+.item.q .stb .ei{min-width:18px;height:18px;font-size:11px;margin-right:4px;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.item.q .sts{gap:4px;margin-top:2px}
+#qc .qp,.item .b,.stb,.cp,.grp.gh{touch-action:manipulation}
+#queue[data-f="p"] [data-s]:not([data-s="p"]),#queue[data-f="pickup"] [data-s]:not([data-s="pickup"]),#queue[data-f="noans"] [data-s]:not([data-s="noans"]),#queue[data-f="later"] [data-s]:not([data-s="later"]){display:none!important}
+
+.ei{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:50%;min-width:26px;height:26px;font-size:14px;line-height:1;margin-right:6px;flex:none;overflow:hidden;vertical-align:middle;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.stb{display:inline-flex;align-items:center;justify-content:center;gap:0;white-space:nowrap}
+.qp .ei{margin-right:4px}
 .wn{flex-basis:100%;background:rgba(229,72,77,.12);color:#e5484d;border:1px solid rgba(229,72,77,.55);border-radius:10px;padding:6px 9px;font-size:13px;font-weight:700;line-height:1.5}
 .q-bad{background:rgba(185,28,28,.12);border:1.5px solid rgba(229,72,77,.6)}
 .cp{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.7);color:#fff;border-radius:8px;padding:1px 9px;margin-left:6px;font:inherit;font-size:11px;font-weight:700;line-height:1.55;vertical-align:middle;text-shadow:0 1px 1px rgba(0,60,80,.45);background:linear-gradient(160deg,#5eead4,#0ea5e9 55%,#0b7a75);box-shadow:0 2px 5px rgba(14,165,233,.4),inset 0 1px 0 rgba(255,255,255,.7)}
@@ -266,29 +280,29 @@ let qf='p';
 function qFilter(k){const was=qf;if(was===k)return;qf=k;if(was==='sent'||qf==='sent'){renderQ();return}document.querySelectorAll('#qc .qp[onclick]').forEach(e=>e.classList.toggle('on',e.getAttribute('onclick')==="qFilter('"+qf+"')"));applyF()}
 function qSt(i,k){const x=db.q[i];if(!x)return;x.s=x.s===k?'':k;save();renderQ();toast({'':'↩️ ត្រូវហៅ',pickup:'✅ តេរួច',noans:'📵 មិនលើក',later:'📴 តេមិនចូល'}[x.s||''])}
 function cp(p){return `<button class="cp" data-p="${esc(p)}" onclick="cpNum(this)" aria-label="ចម្លងលេខ">ចម្លង</button>`}
-function cpNum(b){const t=b.dataset.p;const ok=()=>{b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='ចម្លង';b.classList.remove('ok')},500)};
+function cpNum(b){const t=b.dataset.p;const ok=()=>{b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='ចម្លង';b.classList.remove('ok')},300)};
  try{navigator.clipboard.writeText(t).then(ok,()=>{fb()})}catch(e){fb()}
  function fb(){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){toast('⚠️ ចម្លងមិនបាន')}a.remove()}}
-const colG=new Set(),GAR='<svg viewBox="0 0 24 24"><path d="M12 4v15M5 12.5l7 7 7-7"/></svg>';
+const em=t=>String(t).replace(/^(\p{Extended_Pictographic}\uFE0F?)\s*/u,'<span class="ei">$1</span>'),colG=new Set(),GAR='<svg viewBox="0 0 24 24"><path d="M12 4v15M5 12.5l7 7 7-7"/></svg>';
 function togG(h){const k=h.dataset.g,c=!colG.has(k);c?colG.add(k):colG.delete(k);h.classList.toggle('co',c);h.setAttribute('aria-expanded',!c);const b=h.nextElementSibling;if(b&&b.classList.contains('gb'))b.classList.toggle('c',c)}
 function renderQ(){const rk={'':0,noans:1,later:2,pickup:3},OR=['Smart','Metfone','Cellcard','Seatel','qb','CooTel'],oi=p=>{const k=OR.indexOf(phoneInfo(p).op);return k<0?99:k},on=p=>phoneInfo(p).op||'ផ្សេងៗ',SI={'':'',noans:'📵 ',later:'📴 ',pickup:'✅ '};
  const R=x=>x.bad?0.5:rk[x.s||''];const rows=db.q.map((x,i)=>({x,i})).sort((a,b)=>(R(a.x)-R(b.x))||(oi(a.x.p)-oi(b.x.p))||(a.i-b.i));
  let vis=rows;const gc={};vis.forEach(({x})=>{const g=x.bad?'bad':(x.s||'')+'|'+on(x.p);gc[g]=(gc[g]||0)+1});
  const cnt={'':0,noans:0,later:0,pickup:0};db.q.forEach(x=>{cnt[x.bad?'':(x.s||'')]++});const badN=db.q.filter(x=>x.bad).length;
- const td=dkey(),rs=db.rs||0,sentRows=db.d.filter(r=>r.k===td&&r.t>=rs),sent=sentRows.length,unreg=db.q.filter(x=>!x.bad&&!db.c.some(k=>k.id===x.cid)).length;
- const ch=(k,bg,t,n)=>`<span class="qp${qf===k?' on':''}" style="background:${bg}" onclick="qFilter('${k}')">${t}<b>${n}</b></span>`;
+ const cm=new Map(db.c.map(k=>[k.id,k])),td=dkey(),rs=db.rs||0,sentRows=db.d.filter(r=>r.k===td&&r.t>=rs),sent=sentRows.length,unreg=0;
+ const ch=(k,bg,t,n)=>`<span class="qp${qf===k?' on':''}" style="background:${bg}" onclick="qFilter('${k}')">${em(t)}<b>${n}</b></span>`;
  $('qc').innerHTML=(db.q.length||sent)?ch('p','#0b7a75','ត្រូវហៅ',cnt[''])+ch('pickup','#16a34a','✅ តេរួច',cnt.pickup)+ch('noans','#e5484d','📵 មិនលើក',cnt.noans)+ch('later','#f59e0b','📴 តេមិនចូល',cnt.later)+ch('sent','#8b5cf6','ដឹកចេញ',sent):'';
- const sentHtml=sentRows.length?`<div class="grp" style="--g:#8b5cf6">ដឹកចេញ · ${sentRows.length}</div>`+sentRows.map(r=>{const c=db.c.find(k=>k.p.includes(r.p)),t=new Date(r.t),h=t.getHours(),tm=String(h%12||12).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' '+(h<12?'AM':'PM');return `<div class="item"><span>📤</span><div class="i"><b>${esc(r.p)}</b>${opb(r.p)}${cp(r.p)}<small>${esc(c?c.n:'')} · ${money(r.f)} · ${tm}</small></div></div>`}).join(''):'<small>មិនទាន់មានដឹកចេញ</small>';
+ const sentHtml=qf!=='sent'?'':sentRows.length?`<div class="grp" style="--g:#8b5cf6">ដឹកចេញ · ${sentRows.length}</div>`+sentRows.map(r=>{const c=db.c.find(k=>k.p.includes(r.p)),t=new Date(r.t),h=t.getHours(),tm=String(h%12||12).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' '+(h<12?'AM':'PM');return `<div class="item"><span>📤</span><div class="i"><b>${esc(r.p)}</b>${opb(r.p)}${cp(r.p)}<small>${esc(c?c.n:'')} · ${money(r.f)} · ${tm}</small></div></div>`}).join(''):'<small>មិនទាន់មានដឹកចេញ</small>';
  let last='';
- $('queue').innerHTML=qf==='sent'?sentHtml:vis.length?vis.map(({x,i})=>{const c=db.c.find(k=>k.id===x.cid),s=x.s||'',g=x.bad?'bad':s+'|'+on(x.p);let head='';
-  if(g!==last){const co=colG.has(g),pre=last?'</div>':'';last=g;const lab=x.bad?`❌ លេខខុស · ${gc[g]}`:`${SI[s]}${on(x.p)} · ${gc[g]}`,ds=x.bad?'p':(s||'p'),gcol=x.bad?'#b91c1c':(OPS[on(x.p)]||['#64748b'])[0];head=pre+`<div data-s="${ds}" class="grp gh${co?' co':''}" data-g="${esc(g)}" role="button" aria-expanded="${!co}" onclick="togG(this)" style="--g:${gcol}"><span>${lab}</span><span class="gar">${GAR}</span></div><div class="gb${co?' c':''}">`}
-  const b=(k,t)=>`<button class="stb${s===k?' on':''}" style="--k:${QS[k]}" onclick="qSt(${i},'${k}')">${t}</button>`,
+ $('queue').innerHTML=qf==='sent'?sentHtml:vis.length?vis.map(({x,i})=>{const c=cm.get(x.cid),s=x.s||'',g=x.bad?'bad':s+'|'+on(x.p);let head='';
+  if(g!==last){const co=colG.has(g),pre=last?'</div>':'';last=g;const lab=x.bad?`❌ លេខខុស · ${gc[g]}`:`${SI[s]}${on(x.p)} · ${gc[g]}`,ds=x.bad?'p':(s||'p'),gcol=x.bad?'#b91c1c':(OPS[on(x.p)]||['#64748b'])[0];head=pre+`<div data-s="${ds}" class="grp gh${co?' co':''}" data-g="${esc(g)}" role="button" aria-expanded="${!co}" onclick="togG(this)" style="--g:${gcol}"><span>${em(lab)}</span><span class="gar">${GAR}</span></div><div class="gb${co?' c':''}">`}
+  const b=(k,t)=>`<button class="stb${s===k?' on':''}" style="--k:${QS[k]}" onclick="qSt(${i},'${k}')">${em(t)}</button>`,
   sts=`<div class="sts">${b('pickup','✅ តេរួច')}${b('noans','📵 មិនលើក')}${b('later','📴 តេមិនចូល')}</div>`,
   wn=x.w?'<div class="wn">⚠️ ប្រុងប្រយ័ត្ន<br>លេខផ្ញើ ដូចលេខទទួល ពេលដកអីវ៉ាន់ ឆែកលេខភ្ញៀវ</div>':'';
   if(x.bad)return head+`<div data-s="p" class="item q q-bad"><span>❌</span><div class="i"><b>${esc(x.p)}</b>${cp(x.p)}<small class="bad">លេខខុស · ${x.p.length} ខ្ទង់${x.sn?' · អ្នកផ្ញើ '+esc(x.sn):''}</small></div>${x.sn?`<a class="b tel" href="tel:${esc(x.sn)}" aria-label="ហៅអ្នកផ្ញើ">📞</a>`:''}<button class="b" style="background:#f59e0b" onclick="fixBad(${i})" aria-label="កែលេខ">✏️</button><button class="b r" onclick="delBad(${i})" aria-label="លុប">🗑️</button></div>`;
-  if(!c)return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>⚠️</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}<small style="color:#e5484d">មិនទាន់បញ្ចូលព័ត៌មាន${x.k>1?' · 📦×'+x.k:''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b" style="background:#f59e0b" onclick="newFromQ(${i})" aria-label="បញ្ចូលព័ត៌មាន">＋</button>${sts}${wn}</div>`;
+  if(!c)return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>⚠️</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}<small style="color:#e5484d">មិនទាន់បញ្ចូលព័ត៌មាន${x.k>1?' · 📦×'+x.k:''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b" style="background:#2563eb;color:#fff;font-size:20px;font-weight:800" onclick="newFromQ(${i})" aria-label="បញ្ចូលព័ត៌មាន">＋</button>${sts}${wn}</div>`;
   return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}<small>${esc(c.n)} · ${money(c.f)}${x.k>1?' · 📦×'+x.k:''}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b logo-only" onclick="tgMsg(${x.cid},'${esc(x.p)}')">${TIMG2}</button><button class="b" onclick="printQ(${i})">ព្រីន</button>${sts}${wn}</div>`}).join('')+(last?'</div>':''):'<small>គ្មានលទ្ធផល</small>';applyF()}
-function applyF(){const k=qf&&qf!=='sent'?qf:'';let n=0;document.querySelectorAll('#queue [data-s]').forEach(e=>{const h=!!k&&e.dataset.s!==k&&!(k==='p'&&e.dataset.s==='bad');if(e.hidden!==h)e.hidden=h;if(!h&&e.classList.contains('item'))n++});const m=$('qempty');if(m)m.remove();if(k&&!n){const d=document.createElement('small');d.id='qempty';d.textContent='គ្មានលេខក្នុងក្រុមនេះ';$('queue').appendChild(d)}}
+function applyF(){const k=qf&&qf!=='sent'?qf:'',q=$('queue');if(q.dataset.f!==k)q.dataset.f=k;const m=$('qempty');if(m)m.remove();if(k&&!q.querySelector('.item[data-s="'+k+'"]')){const d=document.createElement('small');d.id='qempty';d.textContent='គ្មានលេខក្នុងក្រុមនេះ';q.appendChild(d)}}
 function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p,false,x)}
 function slip(p,c,u){const f=phoneInfo(p),t=new Date(),h=t.getHours(),tm=String(h%12||12).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' '+(h<12?'AM':'PM'),ds=String(t.getDate()).padStart(2,'0')+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+t.getFullYear();
  return `<div style="text-align:center">${u?`<img src="${u}" width="70" height="70" style="display:block;margin:0 auto 4px" alt="QR">`:''}<div style="font-size:24px;font-weight:600;line-height:1.3">${esc(p)}${f.op?` <span style="font-size:15px;font-weight:400">${f.op}</span>`:''}</div></div>
@@ -422,4 +436,9 @@ function renderDaily(){dayOpts();const r=dayRows();$('dt').innerHTML=r.map((x,i)
 function tg(){const r=dayRows(),k=$('dd').value;const txt=`📦 ${db.logo.t}\nរបាយការណ៍ថ្ងៃទី ${fmtD(k)}\n`+r.map((x,i)=>`${i+1}. ${x.p} — ${money(x.f)}`).join('\n')+`\n━━━━━━\nចំនួន ${r.length} កញ្ចប់\n💰 សរុប៖ ${money(r.reduce((s,x)=>s+x.f,0))}`;
  location.href='https://t.me/share/url?url=%20&text='+encodeURIComponent(txt)}
 renderLogo();clearForm();tab(0);$('auto').checked=db.auto;document.querySelectorAll('.tgi').forEach(e=>e.innerHTML=TIMG2);pruneQ();setInterval(pruneQ,60000);document.addEventListener('visibilitychange',pruneQ);loadRemote();
+
+(function(){const q=document.getElementById('queue');let sx=0,sy=0,dn=null;
+q.addEventListener('pointerdown',e=>{const a=e.target.closest&&e.target.closest('a.tel');dn=a||null;sx=e.clientX;sy=e.clientY},{passive:true});
+q.addEventListener('pointerup',e=>{const a=e.target.closest&&e.target.closest('a.tel');if(!a||a!==dn||e.pointerType==='mouse')return;if(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10)return;a._t=Date.now();location.href=a.getAttribute('href')},{passive:true});
+q.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a.tel');if(a&&a._t&&Date.now()-a._t<1500){e.preventDefault();a._t=0}});})();
 </script></body></html>
