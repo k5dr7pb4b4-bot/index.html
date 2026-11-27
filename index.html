@@ -52,6 +52,7 @@ header{background:linear-gradient(135deg,#312e81,#6d28d9 60%,#8b5cf6);color:#fff
 #qc{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}#qc:empty{display:none}
 .grp{display:inline-block;color:#fff;background:var(--g);font-size:12px;font-weight:700;padding:2px 11px;border-radius:999px;margin:10px 0 2px}
 .wn{flex-basis:100%;background:rgba(229,72,77,.12);color:#e5484d;border:1px solid rgba(229,72,77,.55);border-radius:10px;padding:6px 9px;font-size:13px;font-weight:700;line-height:1.5}
+.q-bad{background:rgba(185,28,28,.12);border:1.5px solid rgba(229,72,77,.6)}
 .qp.on{box-shadow:0 0 0 2px #fff,0 0 0 4px #8b5cf6;transform:translateY(-1px)}
 a{touch-action:manipulation}
 .sm{padding:8px 12px;margin-top:8px}
@@ -130,8 +131,8 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px so
 <div id="dm" style="display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:320px;width:100%;text-align:center;margin:0"><div id="dmt" style="font-size:17px;font-weight:700;margin-bottom:6px">⛄️ លេខនេះ ធ្លាប់ស្គេនរួចម្តងហើយ</div><div id="dms" style="color:var(--mut);margin-bottom:14px">បើចុច “<span style="color:#059669;font-weight:800;font-size:1.25em">យល់ព្រម</span>” គឺត្រូវគិតថ្លៃសេវាដឹកម្តងទៀត</div><div class="row" style="justify-content:center;gap:12px"><button class="b" id="dok" style="background:#6ee7b7;color:#064e3b">យល់ព្រម</button><button class="b r" id="dno">បោះបង់</button></div></div></div>
 <div id="pv"><div class="sh"><b>👓 ព័ត៌មានអតិថិជន</b><button class="b r" onclick="closePv()" aria-label="បិទ">✕ បិទ</button></div><div class="sb" id="pvb"></div></div>
 <div id="imp"><div class="sh"><b>📥 នាំចូលលេខ</b><button class="b r" onclick="$('imp').classList.remove('on')" aria-label="បិទ">✕ បិទ</button></div><div class="sb">
-<div class="card"><b>១. ជ្រើស រូបភាព (Screenshot/PNG) / PDF / Excel / .csv / .txt</b><button class="b" style="width:100%;margin-top:8px" onclick="$('impf').click()">📁 ជ្រើសឯកសារ</button><input id="impf" type="file" accept="image/*,.pdf,.xlsx,.csv,.txt,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none" onchange="impFile(this)"></div>
-<div class="card"><b>២. ឬ Paste លេខ (១ លេខមួយបន្ទាត់)</b><textarea id="impt" rows="7" style="margin-top:8px" oninput="impSum()" placeholder="015937947&#10;012123123&#10;096123123"></textarea><div id="imps" style="margin-top:8px;font-size:13px;font-weight:700;line-height:1.7"></div></div>
+<div class="card"><b>១. ជ្រើសឯកសារ PDF / Excel / .csv / .txt (ឬរូបភាពក្នុងទូរស័ព្ទ)</b><button class="b" style="width:100%;margin-top:8px" onclick="$('impf').click()">📁 ជ្រើសឯកសារ</button><input id="impf" type="file" accept="image/*,.pdf,.xlsx,.csv,.txt,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none" onchange="impFile(this)"></div>
+<div class="card"><b>២. Paste លេខ ឬ Paste រូបភាព (Screenshot/PNG)</b><textarea id="impt" rows="7" style="margin-top:8px" oninput="impSum()" onpaste="impPaste(event)" placeholder="Paste លេខ ឬរូបភាពនៅទីនេះ&#10;015937947&#10;012123123"></textarea><div id="imps" style="margin-top:8px;font-size:13px;font-weight:700;line-height:1.7"></div></div>
 <button class="b" style="width:100%" onclick="impAdd()">យល់ព្រម</button></div></div>
 <div id="pa"></div>
 <div id="qtmp" style="display:none"></div>
@@ -181,7 +182,7 @@ function renderLogo(){const l=db.logo;$('logo').textContent=l.t;$('logo').style.
 function saveLogo(){db.logo={t:$('lt').value,s:+$('ls').value,c:$('lc').value};save();$('logo').textContent=db.logo.t;$('logo').style.fontSize=db.logo.s+'px';$('logo').style.color=db.logo.c}
 function backup(){try{const b=new Blob([JSON.stringify(db)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='deliver-home-backup-'+dkey()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('✅ បានទាញ Backup')}catch(e){toast('⚠️ ទាញ Backup មិនបាន')}}
 function restore(inp){const f=inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.c))throw 0;if(!confirm('ស្តារទិន្នន័យ '+x.c.length+' អតិថិជន? ទិន្នន័យបច្ចុប្បន្ននឹងត្រូវជំនួស។'))return;db=Object.assign({c:[],h:[],d:[],q:[],logo:db.logo,auto:true,msg:db.msg},x);save();renderLogo();renderList();renderQ();renderHist();renderDaily();$('auto').checked=db.auto;toast('✅ បានស្តារទិន្នន័យ')}catch(e){toast('⚠️ ឯកសារមិនត្រឹមត្រូវ')}};r.readAsText(f)}
-function pruneQ(){const td=dkey(),n=db.q.length;db.q.forEach(x=>{if(!x.t)x.t=Date.now()});db.q=db.q.filter(x=>dkey(x.t)===td);if(db.q.length!==n){save();renderQ()}}
+function pruneQ(){const td=dkey(),n=db.q.length;db.q.forEach(x=>{if(!x.t)x.t=Date.now()});db.q=db.q.filter(x=>x.bad||dkey(x.t)===td);if(db.q.length!==n){save();renderQ()}}
 // form
 const OPS={Smart:['#16a34a','010 015 016 069 070 081 086 087 093 096 098'],Cellcard:['#f59e0b','011 012 014 017 061 076 077 078 085 089 092 095 099'],Metfone:['#0ea5e9','031 060 066 067 068 071 088 090 097'],qb:['#8b5cf6','013 080 083 084'],Seatel:['#0d9488','018'],CooTel:['#db2777','038']};
 const L10=new Set(['031','071','076','088','096','097','018']),PFX={};
@@ -235,19 +236,20 @@ let qf=null;
 function qFilter(k){qf=qf===k?null:k;renderQ()}
 function qSt(i,k){const x=db.q[i];if(!x)return;x.s=x.s===k?'':k;save();renderQ()}
 function renderQ(){const rk={'':0,noans:1,later:2,pickup:3},OR=['Smart','Metfone','Cellcard','Seatel','qb','CooTel'],oi=p=>{const k=OR.indexOf(phoneInfo(p).op);return k<0?99:k},on=p=>phoneInfo(p).op||'ផ្សេងៗ',SI={'':'',noans:'📵 ',later:'📴 ',pickup:'✅ '};
- const rows=db.q.map((x,i)=>({x,i})).sort((a,b)=>(rk[a.x.s||'']-rk[b.x.s||''])||(oi(a.x.p)-oi(b.x.p))||(a.i-b.i));
- let vis=rows;if(qf&&qf!=='sent')vis=rows.filter(({x})=>qf==='p'?!x.s:x.s===qf);const gc={};vis.forEach(({x})=>{const g=(x.s||'')+'|'+on(x.p);gc[g]=(gc[g]||0)+1});
- const cnt={'':0,noans:0,later:0,pickup:0};db.q.forEach(x=>{cnt[x.s||'']++});
- const td=dkey(),rs=db.rs||0,sentRows=db.d.filter(r=>r.k===td&&r.t>=rs),sent=sentRows.length,unreg=db.q.filter(x=>!db.c.some(k=>k.id===x.cid)).length;
+ const R=x=>x.bad?9:rk[x.s||''];const rows=db.q.map((x,i)=>({x,i})).sort((a,b)=>(R(a.x)-R(b.x))||(oi(a.x.p)-oi(b.x.p))||(a.i-b.i));
+ let vis=rows;if(qf==='bad')vis=rows.filter(({x})=>x.bad);else if(qf&&qf!=='sent')vis=rows.filter(({x})=>!x.bad&&(qf==='p'?!x.s:x.s===qf));const gc={};vis.forEach(({x})=>{const g=x.bad?'bad':(x.s||'')+'|'+on(x.p);gc[g]=(gc[g]||0)+1});
+ const cnt={'':0,noans:0,later:0,pickup:0};db.q.forEach(x=>{if(!x.bad)cnt[x.s||'']++});const badN=db.q.filter(x=>x.bad).length;
+ const td=dkey(),rs=db.rs||0,sentRows=db.d.filter(r=>r.k===td&&r.t>=rs),sent=sentRows.length,unreg=db.q.filter(x=>!x.bad&&!db.c.some(k=>k.id===x.cid)).length;
  const ch=(k,bg,t,n)=>`<span class="qp${qf===k?' on':''}" style="background:${bg}" onclick="qFilter('${k}')">${t} ${n}</span>`;
- $('qc').innerHTML=(db.q.length||sent)?ch('p','#0b7a75','ត្រូវហៅ',cnt[''])+ch('pickup','#16a34a','✅ តេរួច',cnt.pickup)+ch('noans','#e5484d','📵 មិនលើក',cnt.noans)+ch('later','#f59e0b','📴 តេមិនចូល',cnt.later)+ch('sent','#8b5cf6','ដឹកចេញ',sent)+(unreg?`<span class="qp" style="background:#64748b">⚠️ ${unreg}</span>`:''):'';
+ $('qc').innerHTML=(db.q.length||sent)?ch('p','#0b7a75','ត្រូវហៅ',cnt[''])+ch('pickup','#16a34a','✅ តេរួច',cnt.pickup)+ch('noans','#e5484d','📵 មិនលើក',cnt.noans)+ch('later','#f59e0b','📴 តេមិនចូល',cnt.later)+ch('sent','#8b5cf6','ដឹកចេញ',sent)+(badN?ch('bad','#b91c1c','❌ លេខខុស',badN):'')+(unreg?`<span class="qp" style="background:#64748b">⚠️ ${unreg}</span>`:''):'';
  const sentHtml=sentRows.length?`<div class="grp" style="--g:#8b5cf6">ដឹកចេញ · ${sentRows.length}</div>`+sentRows.map(r=>{const c=db.c.find(k=>k.p.includes(r.p)),t=new Date(r.t),h=t.getHours(),tm=String(h%12||12).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' '+(h<12?'AM':'PM');return `<div class="item"><span>📤</span><div class="i"><b>${esc(r.p)}</b>${opb(r.p)}<small>${esc(c?c.n:'')} · ${money(r.f)} · ${tm}</small></div></div>`}).join(''):'<small>មិនទាន់មានដឹកចេញ</small>';
  let last='';
- $('queue').innerHTML=qf==='sent'?sentHtml:vis.length?vis.map(({x,i})=>{const c=db.c.find(k=>k.id===x.cid),s=x.s||'',g=s+'|'+on(x.p);let head='';
-  if(g!==last){last=g;head=`<div class="grp" style="--g:${(OPS[on(x.p)]||['#64748b'])[0]}">${SI[s]}${on(x.p)} · ${gc[g]}</div>`}
+ $('queue').innerHTML=qf==='sent'?sentHtml:vis.length?vis.map(({x,i})=>{const c=db.c.find(k=>k.id===x.cid),s=x.s||'',g=x.bad?'bad':s+'|'+on(x.p);let head='';
+  if(g!==last){last=g;head=x.bad?`<div class="grp" style="--g:#b91c1c">❌ លេខខុស · ${gc[g]}</div>`:`<div class="grp" style="--g:${(OPS[on(x.p)]||['#64748b'])[0]}">${SI[s]}${on(x.p)} · ${gc[g]}</div>`}
   const b=(k,t)=>`<button class="stb${s===k?' on':''}" style="--k:${QS[k]}" onclick="qSt(${i},'${k}')">${t}</button>`,
   sts=`<div class="sts">${b('pickup','✅ តេរួច')}${b('noans','📵 មិនលើក')}${b('later','📴 តេមិនចូល')}</div>`,
   wn=x.w?'<div class="wn">⚠️ ប្រុងប្រយ័ត្ន<br>លេខផ្ញើ ដូចលេខទទួល ពេលដកអីវ៉ាន់ ឆែកលេខភ្ញៀវ</div>':'';
+  if(x.bad)return head+`<div class="item q q-bad"><span>❌</span><div class="i"><b>${esc(x.p)}</b><small class="bad">លេខខុស · ${x.p.length} ខ្ទង់${x.sn?' · អ្នកផ្ញើ '+esc(x.sn):''}</small></div>${x.sn?`<a class="b tel" href="tel:${esc(x.sn)}" aria-label="ហៅអ្នកផ្ញើ">📞</a>`:''}<button class="b" style="background:#f59e0b" onclick="fixBad(${i})" aria-label="កែលេខ">✏️</button><button class="b r" onclick="delBad(${i})" aria-label="លុប">🗑️</button></div>`;
   if(!c)return head+`<div class="item q q-${s||'p'}"><span>⚠️</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}<small style="color:#e5484d">មិនទាន់បញ្ចូលព័ត៌មាន${x.k>1?' · 📦×'+x.k:''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b" style="background:#f59e0b" onclick="newFromQ(${i})" aria-label="បញ្ចូលព័ត៌មាន">＋</button>${sts}${wn}</div>`;
   return head+`<div class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}<small>${esc(c.n)} · ${money(c.f)}${x.k>1?' · 📦×'+x.k:''}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b logo-only" onclick="tgMsg(${x.cid},'${esc(x.p)}')">${TIMG2}</button><button class="b" onclick="printQ(${i})">ព្រីន</button>${sts}${wn}</div>`}).join(''):'<small>'+(qf?'គ្មានលេខក្នុងក្រុមនេះ':'គ្មានលទ្ធផល')+'</small>'}
 function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p,false,x)}
@@ -286,24 +288,32 @@ function quickClear(){const w=editId;editId=null;['fn','fa','fl','ff','fnote'].f
 let retTab=null;
 function linkQ(o){db.q.forEach(x=>{if(x.cid==null&&o.p.includes(x.p))x.cid=o.id})}
 function newFromQ(i){const x=db.q[i];if(!x)return;retTab=2;tab(0);clearForm();setTimeout(()=>{const inp=$('phones').querySelector('input');if(inp){inp.value=x.p;chkDup(inp);chkPhone(inp)}$('fn').focus()},60)}
+function okNum(n){const f=phoneInfo(n);return !!f.op&&f.d.length===f.need}
+function tok(r,sd,same){return r+(same?' ⚠':'')+(!okNum(r)&&sd?' » '+sd:'')}
 function splitNums(str){const out=[];String(str||'').replace(/(?<!\d)0\d{8,19}(?!\d)/g,run=>{if(run.length>=18&&run.length<=20){for(const a of [9,10]){const b=run.length-a;if(b!==9&&b!==10)continue;const l=run.slice(0,a),r=run.slice(a),fl=phoneInfo(l),fr=phoneInfo(r);if(fl.op&&fl.d.length===fl.need&&fr.op&&fr.d.length===fr.need){out.push(l,r);return ''}}}out.push(run);return ''});return out}
 function tableNums(text){const lines=String(text).split(/\r?\n/);let hi=-1,ci=-1,qi=-1,si=-1;
  for(let i=0;i<lines.length;i++){if(!lines[i].includes('\t'))continue;const cells=lines[i].split('\t').map(c=>c.trim()),r=cells.findIndex(c=>/លេខ\s*(អ្នក)?\s*ទទួល|receiver|recipient|consignee/i.test(c));if(r>=0){hi=i;ci=r;si=cells.findIndex(c=>/លេខ\s*(អ្នក)?\s*ផ្ញើ|sender|shipper/i.test(c));qi=cells.findIndex(c=>/ចំនួនអីវ៉ាន់|ចំនួនកញ្ចប់|qty|quantity/i.test(c));break}}
  if(hi<0)return null;const out=[];let rows=0;
- for(let i=hi+1;i<lines.length;i++){const cells=lines[i].split('\t');if(cells.length<=ci)continue;const v=(cells[ci]||'').trim();if(!v)continue;rows++;let q=qi>=0?(parseInt((cells[qi]||'1').replace(/\D/g,''))||1):1;q=Math.min(q,50);const sv=si>=0?(cells[si]||'').replace(/\D/g,''):'',fl=sv&&sv===v.replace(/\D/g,'');for(let k=0;k<q;k++)out.push(fl?v+' ⚠':v)}
+ for(let i=hi+1;i<lines.length;i++){const cells=lines[i].split('\t');if(cells.length<=ci)continue;const v=(cells[ci]||'').trim();if(!v)continue;rows++;let q=qi>=0?(parseInt((cells[qi]||'1').replace(/\D/g,''))||1):1;q=Math.min(q,50);const sv=si>=0?(cells[si]||'').replace(/\D/g,''):'',fl=sv&&sv===v.replace(/\D/g,'');for(let k=0;k<q;k++)out.push(tok(v,sv,fl))}
  return{nums:out,rows}}
-function callListNums(text){const parts=String(text).split(/\d{2}\/\d{2}\/\d{4}/);parts.shift();const nums=[];let miss=0;parts.forEach(seg=>{const a=splitNums(seg);if(a.length>=2)nums.push(a[1]+(a[0]===a[1]?' ⚠':''));else miss++});return{nums,miss}}
+function callListNums(text){const parts=String(text).split(/\d{2}\/\d{2}\/\d{4}/);parts.shift();const nums=[];let miss=0;parts.forEach(seg=>{const a=splitNums(seg);if(a.length>=2)nums.push(tok(a[1],a[0],a[0]===a[1]));else miss++});return{nums,miss}}
 function parseNums(text){text=String(text||'');let tokens,mode='plain',miss=0;
  const tb=tableNums(text);if(tb){tokens=tb.nums;mode='table'}else if((text.match(/\d{2}\/\d{2}\/\d{4}/g)||[]).length>=3){const r=callListNums(text);tokens=r.nums;miss=r.miss;mode='call'}else tokens=text.split(/[\n\r\t,;|]+/);
  const seen=new Set(),cnt={},warn={},ok=[],bad=[];let dup=0;
- tokens.forEach(t=>{const raw=String(t).trim(),wf=/⚠/.test(raw);if(!raw)return;if(raw.replace(/\D/g,'').length<7)return;let d=normPhone(raw);if(d&&d[0]!=='0'){const z='0'+d,g=phoneInfo(z);if(g.op&&z.length===g.need)d=z}const f=phoneInfo(d);if(!d||!f.op||d.length!==f.need){bad.push(raw);return}if(wf)warn[d]=1;if(seen.has(d)){dup++;cnt[d]++;return}seen.add(d);cnt[d]=1;ok.push(d)});
+ const badSeen=new Set();
+ tokens.forEach(t=>{const parts=String(t).split('»'),raw=parts[0].trim(),sn=(parts[1]||'').replace(/\D/g,''),wf=/⚠/.test(raw);if(!raw)return;if(raw.replace(/\D/g,'').length<7)return;let d=normPhone(raw);if(d&&d[0]!=='0'){const z='0'+d,g=phoneInfo(z);if(g.op&&z.length===g.need)d=z}const f=phoneInfo(d);if(!d||!f.op||d.length!==f.need){const bd=raw.replace(/\D/g,'');if(!badSeen.has(bd)){badSeen.add(bd);bad.push({r:bd,sn})}return}if(wf)warn[d]=1;if(seen.has(d)){dup++;cnt[d]++;return}seen.add(d);cnt[d]=1;ok.push(d)});
  return{ok,bad,dup,cnt,warn,mode,miss}}
 function impOpen(){$('impt').value='';$('imps').innerHTML='';$('imp').classList.add('on');$('imp').scrollTop=0}
 function impSum(){const r=parseNums($('impt').value),known=r.ok.filter(p=>db.c.some(c=>c.p.includes(p))).length,inq=r.ok.filter(p=>db.q.some(x=>x.p===p)).length;
- $('imps').innerHTML=r.ok.length||r.bad.length?(r.mode==='table'?`📄 តារាងទទួលអីវ៉ាន់៖ យកតែជួរ <u>“លេខទទួល”</u> (រាប់តាមចំនួនអីវ៉ាន់)<br>`:r.mode==='call'?`📄 តារាងហៅ៖ យកតែ <u>លេខអ្នកទទួល</u><br>`:'')+`✅ លេខត្រឹមត្រូវ ${r.ok.length}<br>🟢 មានក្នុង “ផ្ទុកព័ត៌មាន” ${known} · ⚠️ មិនទាន់បញ្ចូល ${r.ok.length-known}`+(r.dup?`<br>♻️ ស្ទួន ${r.dup} (រាប់ជាចំនួនកញ្ចប់ ×)`:'')+(inq?`<br>📋 មានក្នុងបញ្ជីរួច ${inq} (រំលង)`:'')+(Object.keys(r.warn).length?`<br><span class="bad">⚠️ លេខផ្ញើ ដូចលេខទទួល ${Object.keys(r.warn).length}</span>`:'')+(r.miss?`<br><span class="bad">⚠️ ជួរខ្វះលេខ ${r.miss}</span>`:'')+(r.bad.length?`<br><span class="bad">❌ មិនត្រឹមត្រូវ ${r.bad.length}៖ ${r.bad.slice(0,8).map(esc).join(', ')}${r.bad.length>8?'…':''}</span>`:''):''}
-function impAdd(){const r=parseNums($('impt').value);if(!r.ok.length)return toast('⚠️ មិនមានលេខត្រឹមត្រូវ');let add=0,unk=0;
+ $('imps').innerHTML=r.ok.length||r.bad.length?(r.mode==='table'?`📄 តារាងទទួលអីវ៉ាន់៖ យកតែជួរ <u>“លេខទទួល”</u> (រាប់តាមចំនួនអីវ៉ាន់)<br>`:r.mode==='call'?`📄 តារាងហៅ៖ យកតែ <u>លេខអ្នកទទួល</u><br>`:'')+`✅ លេខត្រឹមត្រូវ ${r.ok.length}<br>🟢 មានក្នុង “ផ្ទុកព័ត៌មាន” ${known} · ⚠️ មិនទាន់បញ្ចូល ${r.ok.length-known}`+(r.dup?`<br>♻️ ស្ទួន ${r.dup} (រាប់ជាចំនួនកញ្ចប់ ×)`:'')+(inq?`<br>📋 មានក្នុងបញ្ជីរួច ${inq} (រំលង)`:'')+(Object.keys(r.warn).length?`<br><span class="bad">⚠️ លេខផ្ញើ ដូចលេខទទួល ${Object.keys(r.warn).length}</span>`:'')+(r.miss?`<br><span class="bad">⚠️ ជួរខ្វះលេខ ${r.miss}</span>`:'')+(r.bad.length?`<br><span class="bad">❌ លេខខុស ${r.bad.length} (នឹងបន្ថែមជាក្រុម “លេខខុស”)៖ ${r.bad.slice(0,8).map(b=>esc(b.r)).join(', ')}${r.bad.length>8?'…':''}</span>`:''):''}
+function impAdd(){const r=parseNums($('impt').value);if(!r.ok.length&&!r.bad.length)return toast('⚠️ មិនមានលេខ');let add=0,unk=0,nb=0;
  r.ok.forEach(p=>{if(db.q.some(x=>x.p===p))return;const c=db.c.find(k=>k.p.includes(p)),o={cid:c?c.id:null,p,t:Date.now()};if(r.cnt[p]>1)o.k=r.cnt[p];if(r.warn[p])o.w=1;db.q.push(o);add++;if(!c)unk++});
- qf=null;save();renderQ();$('imp').classList.remove('on');toast('✅ បន្ថែម '+add+' លេខ'+(unk?' · ⚠️ '+unk+' មិនទាន់បញ្ចូល':''))}
+ r.bad.forEach(b=>{if(!b.r||db.q.some(x=>x.p===b.r))return;const o={cid:null,p:b.r,t:Date.now(),bad:1};if(b.sn)o.sn=b.sn;db.q.push(o);nb++});
+ qf=null;save();renderQ();$('imp').classList.remove('on');toast('✅ បន្ថែម '+add+' លេខ'+(unk?' · ⚠️ '+unk+' មិនទាន់បញ្ចូល':'')+(nb?' · ❌ '+nb+' លេខខុស':''))}
+function fixBad(i){const x=db.q[i];if(!x)return;const v=prompt('វាយលេខត្រឹមត្រូវ'+(x.sn?' (អ្នកផ្ញើ '+x.sn+')':''),x.p);if(v==null)return;const d=normPhone(v),f=phoneInfo(d);if(!d||!f.op||d.length!==f.need){toast('⛔ លេខនៅតែមិនត្រឹមត្រូវ');return}
+ if(db.q.some((y,j)=>j!==i&&!y.bad&&y.p===d))db.q.splice(i,1);else{x.p=d;delete x.bad;delete x.sn;const c=db.c.find(k=>k.p.includes(d));x.cid=c?c.id:null}
+ qf=null;save();renderQ();toast('✅ កែលេខរួច')}
+function delBad(i){if(db.q[i]&&confirm('លុបលេខខុសនេះ?')){db.q.splice(i,1);save();renderQ()}}
 async function inflateRaw(u8){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(u8);w.close();return new Uint8Array(await new Response(ds.readable).arrayBuffer())}
 async function unzipX(buf){const u=new Uint8Array(buf),dv=new DataView(buf);let e=u.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw new Error('zip');
  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out={},td=new TextDecoder();
@@ -324,14 +334,14 @@ async function pdfReceivers(buf){const lib=await loadPdfjs(),doc=await lib.getDo
  for(let pn=1;pn<=doc.numPages;pn++){const pg=await doc.getPage(pn),tc=await pg.getTextContent(),toks=[];
   tc.items.forEach(it=>{if(!it.str)return;const x=it.transform[4],y=it.transform[5];splitNums(it.str).forEach((n,j)=>toks.push({x:x+j*0.01,y,n}))});
   toks.sort((a,b)=>b.y-a.y||a.x-b.x);const cl=[];toks.forEach(t=>{const c=cl[cl.length-1];if(c&&Math.abs(c.y-t.y)<=4)c.t.push(t);else cl.push({y:t.y,t:[t]})});
-  cl.forEach(c=>{c.t.sort((a,b)=>a.x-b.x);rows++;if(c.t.length>=2)nums.push(c.t[1].n+(c.t[0].n===c.t[1].n?' ⚠':''))})}
+  cl.forEach(c=>{c.t.sort((a,b)=>a.x-b.x);rows++;if(c.t.length>=2)nums.push(tok(c.t[1].n,c.t[0].n,c.t[0].n===c.t[1].n))})}
  return{nums,rows,pages:doc.numPages}}
 function ocrRows(words){const toks=[];words.forEach(w=>{splitNums(String(w.t).replace(/\s/g,'')).forEach((n,j)=>toks.push({n,x:w.x0+j,cx:(w.x0+w.x1)/2+j,y:(w.y0+w.y1)/2,h:w.y1-w.y0}))});
  if(!toks.length)return{lines:[],rows:0,usePair:false,skip:0};const hs=toks.map(t=>t.h).sort((a,b)=>a-b),tol=Math.max(6,hs[hs.length>>1]*0.6);
  toks.sort((a,b)=>a.y-b.y||a.x-b.x);const rows=[];toks.forEach(t=>{const r=rows[rows.length-1];if(r&&Math.abs(r.y-t.y)<=tol){r.t.push(t);r.y=(r.y*(r.t.length-1)+t.y)/r.t.length}else rows.push({y:t.y,t:[t]})});
  rows.forEach(r=>r.t.sort((a,b)=>a.x-b.x));const pairs=rows.filter(r=>r.t.length>=2),usePair=pairs.length>=Math.max(1,rows.length*0.6),lines=[];let skip=0;
  if(usePair){const med=a=>a.slice().sort((x,y)=>x-y)[a.length>>1],mL=med(pairs.map(r=>r.t[0].cx)),mR=med(pairs.map(r=>r.t[1].cx));
-  rows.forEach(r=>{if(r.t.length>=2)lines.push(r.t[1].n+(r.t[0].n===r.t[1].n?' ⚠':''));else{const t=r.t[0];if(Math.abs(t.cx-mR)<Math.abs(t.cx-mL))lines.push(t.n);else skip++}})}
+  rows.forEach(r=>{if(r.t.length>=2)lines.push(tok(r.t[1].n,r.t[0].n,r.t[0].n===r.t[1].n));else{const t=r.t[0];if(Math.abs(t.cx-mR)<Math.abs(t.cx-mL))lines.push(t.n);else skip++}})}
  else rows.forEach(r=>r.t.forEach(t=>lines.push(t.n)));
  return{lines,rows:rows.length,usePair,skip}}
 async function prepImage(file){const bmp=await createImageBitmap(file),sc=Math.min(1,2400/Math.max(bmp.width,bmp.height)),W=Math.round(bmp.width*sc),H=Math.round(bmp.height*sc),c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(bmp,0,0,W,H);
@@ -343,14 +353,16 @@ async function prepImage(file){const bmp=await createImageBitmap(file),sc=Math.m
  for(let i=0;i<W*H;i++){px[i*4]=px[i*4+1]=px[i*4+2]=L[i];px[i*4+3]=255}g.putImageData(d,0,0);return c}
 async function loadTess(){if(window.Tesseract)return window.Tesseract;await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)});return window.Tesseract}
 async function ocrNums(file){const T=await loadTess(),w=await T.createWorker('eng');try{await w.setParameters({tessedit_pageseg_mode:'11',tessedit_char_whitelist:'0123456789'});let src=file;try{src=await prepImage(file)}catch(e){}const r=await w.recognize(src);return ocrRows((r.data.words||[]).map(x=>({t:x.text,x0:x.bbox.x0,y0:x.bbox.y0,x1:x.bbox.x1,y1:x.bbox.y1})))}finally{await w.terminate()}}
-async function impFile(inp){const f=inp.files[0];inp.value='';if(!f)return;const nm=f.name.toLowerCase();
+async function impFile(inp){const f=inp.files[0];inp.value='';if(f)impProcess(f,false)}
+function impPaste(e){const cd=e.clipboardData;if(!cd)return;let f=null;for(const it of (cd.items||[])){if(it.kind==='file'&&/^image\//.test(it.type)){f=it.getAsFile();break}}if(!f&&cd.files&&cd.files.length&&/^image\//.test(cd.files[0].type))f=cd.files[0];if(f){e.preventDefault();impProcess(f,true)}}
+async function impProcess(f,append){const nm=(f.name||'').toLowerCase();
  try{let lines;
   if(f.type.startsWith('image/')||/\.(png|jpe?g|webp|heic|heif|gif|bmp)$/.test(nm)){toast('⏳ កំពុងអានរូបភាព… (លើកដំបូងអាចយូរ)');const r=await ocrNums(f);lines=r.lines;toast('🖼️ អានរូបភាព៖ '+r.rows+' ជួរ · '+lines.length+' លេខ'+(r.skip?' · រំលង '+r.skip:'')+' — សូមពិនិត្យមើលឡើងវិញ')}
   else if(nm.endsWith('.pdf')){toast('⏳ កំពុងអាន PDF…');const r=await pdfReceivers(await f.arrayBuffer());lines=r.nums;toast('📄 PDF '+r.pages+' ទំព័រ · '+r.rows+' ជួរ · អ្នកទទួល '+r.nums.length)}
   else if(nm.endsWith('.xlsx')){lines=pickCol(xlsxRows(await unzipX(await f.arrayBuffer())))}
   else if(nm.endsWith('.xls')){return toast('⚠️ សូមរក្សាទុកជា .xlsx ឬ .csv')}
   else{lines=pickCol((await f.text()).split(/\r?\n/).map(l=>(l.match(/("([^"]*)"|[^,;\t]+)/g)||[]).map(c=>c.replace(/^"|"$/g,''))))}
-  $('impt').value=lines.join('\n');impSum();if(!parseNums($('impt').value).ok.length)toast('⚠️ រកមិនឃើញលេខត្រឹមត្រូវ')}catch(e){toast('⚠️ អានឯកសារមិនបាន — សូមចម្លងអត្ថបទ ហើយ Paste ជំនួស')}}
+  const prev=append?$('impt').value.trim():'';$('impt').value=(prev?prev+'\n':'')+lines.join('\n');impSum();if(!parseNums($('impt').value).ok.length)toast('⚠️ រកមិនឃើញលេខត្រឹមត្រូវ')}catch(e){toast('⚠️ អានឯកសារមិនបាន — សូមចម្លងអត្ថបទ ហើយ Paste ជំនួស')}}
 function askBox(t,sb,cb){const m=$('dm');$('dmt').textContent=t;$('dms').innerHTML=sb;m.style.display='flex';$('dok').onclick=()=>{m.style.display='none';cb()};$('dno').onclick=()=>{m.style.display='none';$('sq').value='';$('sq').focus()}}
 function askDup(cb){askBox(DUPT,DUPS,cb)}
 function lqEnter(){const v=normPhone($('lq').value);if(v.length>=9&&!allPhones().some(x=>x.p.includes(v)))askBox(NEWT,NEWS,()=>newFromSearch(v))}
