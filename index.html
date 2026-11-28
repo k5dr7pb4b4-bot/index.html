@@ -110,7 +110,7 @@ button.r{background:var(--red)}button.g{background:var(--mut)}
 <div class="row" style="justify-content:space-between;margin:0;gap:8px"><b>ស្វែងរកលេខទូរស័ព្ទ</b><label style="display:flex;gap:6px;align-items:center;color:var(--tx);margin:0;font-size:12px;line-height:1.3"><input id="auto" type="checkbox" style="width:auto;margin:0" checked onchange="db.auto=this.checked;save()">🖨️ ព្រីនភ្លាមៗពេល scan / Enter</label></div>
 <div class="row"><input id="sq" inputmode="numeric" placeholder="វាយ ឬ scan លេខ..." oninput="sugg()" onkeydown="if(event.key==='Enter')doSearch()"><button class="b" onclick="doSearch()">ស្វែងរក</button></div>
 <div id="sug"></div></div>
-<div class="card" style="padding-top:6px"><div class="row" style="justify-content:space-between;margin:0"><b style="color:#2f8bff;font-size:16px;-webkit-text-stroke:.5px #2f8bff;text-shadow:0 1px 1px rgba(37,99,235,.12)">លទ្ធផល</b><span style="display:flex;gap:6px"><button class="b" style="padding:4px 10px;font-size:12px;border-radius:9px;background:#8b5cf6" onclick="impOpen()">📥 នាំចូល</button><button class="b r" style="padding:4px 10px;font-size:12px;border-radius:9px" onclick="if(confirm('Reset លេខទាំងអស់ (ត្រូវហៅ · តេរួច · មិនលើក · តេមិនចូល · ដឹកចេញ)?')){db.q=[];db.rs=Date.now();qf='p';save();renderQ()}">Reset</button></span></div><div id="qc"></div><div id="queue"></div></div></section>
+<div class="card" style="padding-top:6px"><div class="row" style="justify-content:space-between;margin:0"><b style="color:#2f8bff;font-size:16px;-webkit-text-stroke:.5px #2f8bff;text-shadow:0 1px 1px rgba(37,99,235,.12)">លទ្ធផល</b><span style="display:flex;gap:6px"><button id="tgall" class="b" style="padding:4px 10px;font-size:12px;border-radius:9px;background:#229ed9;display:flex;align-items:center;gap:4px" onclick="tgAll()"></button><button class="b" style="padding:4px 10px;font-size:12px;border-radius:9px;background:#8b5cf6" onclick="impOpen()">📥 នាំចូល</button><button class="b r" style="padding:4px 10px;font-size:12px;border-radius:9px" onclick="if(confirm('Reset លេខទាំងអស់ (ត្រូវហៅ · តេរួច · មិនលើក · តេមិនចូល · ដឹកចេញ)?')){db.q=[];db.rs=Date.now();qf='p';save();renderQ()}">Reset</button></span></div><div id="qc"></div><div id="queue"></div></div></section>
 
 
 </main>
@@ -212,8 +212,8 @@ function renderQ(){const rk={'':0,noans:1,later:2,pickup:3},OR=['Smart','Metfone
   sts=`<div class="sts">${b('pickup','✅ តេរួច')}${b('noans','📵 មិនលើក')}${b('later','📴 តេមិនចូល')}</div>`,
   wn=x.w?'<div class="wn">⚠️ ប្រុងប្រយ័ត្ន<br>លេខផ្ញើ ដូចលេខទទួល ពេលដកអីវ៉ាន់ ឆែកលេខភ្ញៀវ</div>':'';
   if(x.bad)return head+`<div data-s="p" class="item q q-bad"><span>❌</span><div class="i"><b>${esc(x.p)}</b>${cp(x.p)}<small class="bad">លេខខុស · ${x.p.length} ខ្ទង់${x.sn?' · អ្នកផ្ញើ '+esc(x.sn):''}</small></div>${x.sn?`<a class="b tel" href="tel:${esc(x.sn)}" aria-label="ហៅអ្នកផ្ញើ">📞</a>`:''}<button class="b" style="background:#f59e0b" onclick="fixBad(${i})" aria-label="កែលេខ">✏️</button><button class="b r" onclick="delBad(${i})" aria-label="លុប">🗑️</button></div>`;
-  if(!c)return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}${x.k>1?'<small>📦×'+x.k+'</small>':''}</div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b logo-only" onclick="tgNum('${esc(x.p)}')" aria-label="Telegram">${TIMG2}</button>${sts}${wn}</div>`;
-  return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}<small>${esc(c.n)} · ${money(c.f)}${x.k>1?' · 📦×'+x.k:''}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a><button class="b logo-only" onclick="tgMsg(${x.cid},'${esc(x.p)}')">${TIMG2}</button><button class="b" onclick="printQ(${i})">ព្រីន</button>${sts}${wn}</div>`}).join('')+(last?'</div>':''):'<small>គ្មានលទ្ធផល</small>';applyF()}
+  if(!c)return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}${x.k>1?'<small>📦×'+x.k+'</small>':''}</div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a>${x.tg===1?'':`<button class="b logo-only" onclick="tgOne('${esc(x.p)}')" aria-label="Telegram">${TIMG2}</button>`}${sts}${wn}</div>`;
+  return head+`<div data-s="${s||'p'}" class="item q q-${s||'p'}"><span>📤</span><div class="i"><b>${esc(x.p)}</b>${opb(x.p)}${cp(x.p)}<small>${esc(c.n)} · ${money(c.f)}${x.k>1?' · 📦×'+x.k:''}${x.done?' · 🖨️ ព្រីនរួច':''}</small></div><a class="b tel" href="tel:${esc(x.p)}" aria-label="ហៅ">📞</a>${x.tg===1?'':`<button class="b logo-only" onclick="tgOne('${esc(x.p)}')" aria-label="Telegram">${TIMG2}</button>`}<button class="b" onclick="printQ(${i})">ព្រីន</button>${sts}${wn}</div>`}).join('')+(last?'</div>':''):'<small>គ្មានលទ្ធផល</small>';applyF()}
 function applyF(){const k=qf&&qf!=='sent'?qf:'',q=$('queue');if(q.dataset.f!==k)q.dataset.f=k;const m=$('qempty');if(m)m.remove();if(k&&!q.querySelector('.item[data-s="'+k+'"]')){const d=document.createElement('small');d.id='qempty';d.textContent='គ្មានលេខក្នុងក្រុមនេះ';q.appendChild(d)}}
 function printQ(i){const x=db.q[i];if(x)printEntry(x.cid,x.p,false,x)}
 function slip(p,c,u){const f=phoneInfo(p),t=new Date(),h=t.getHours(),tm=String(h%12||12).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' '+(h<12?'AM':'PM'),ds=String(t.getDate()).padStart(2,'0')+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+t.getFullYear();
@@ -226,12 +226,15 @@ function printEntry(cid,p,auto,qi){const x={cid,p},c=db.c.find(k=>k.id===cid);if
   const go2=()=>{let ready;try{ready=document.fonts&&document.fonts.ready}catch(e){}ready?ready.then(run,run):run()};img?(img.complete?go2():img.onload=go2):go2()};
  c.l?qrImg(c.l,150,go):go('')}
 const ARR_MSG='វីរះប៊ុនថាំ ត្មាតពង សូមជំរាបសួរ🙏 អីវ៉ាន់របស់លោកអ្នកបានមកដល់ហើយ សូមអរគុណ';
-function tgNum(p){try{navigator.clipboard.writeText(ARR_MSG)}catch(e){}setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ');location.href='https://t.me/+'+p.replace(/\D/g,'').replace(/^0/,'855')}
-function tgMsg(cid,p){const c=db.c.find(k=>k.id===cid);if(!c)return;
- const t=db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f));
- const n=p.replace(/\D/g,'').replace(/^0/,'855');
- try{navigator.clipboard.writeText(t)}catch(e){}
- setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ');location.href='https://t.me/+'+n}
+function tgText(x){const c=db.c.find(k=>k.id===x.cid);return c?db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f)):ARR_MSG}
+let tgRun=null;
+function tgAll(){const l=db.q.filter(x=>!x.bad&&!x.tg).map(x=>x.p);if(!l.length){toast('គ្មានលេខត្រូវផ្ញើ');return}tgRun={l,i:0};tgOpen()}
+function tgOne(p){tgRun={l:[p],i:0};tgOpen()}
+function tgOpen(){const p=tgRun.l[tgRun.i],x=db.q.find(y=>y.p===p);if(!x){tgMark(0);return}try{navigator.clipboard.writeText(tgText(x))}catch(e){}tgBar();location.href='https://t.me/+'+p.replace(/\D/g,'').replace(/^0/,'855')}
+function tgBar(){let b=$('tgbar');if(!b){b=document.createElement('div');b.id='tgbar';b.style.cssText='position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;background:#0b7a75;color:#fff;border-radius:14px;padding:10px;box-shadow:0 6px 18px rgba(0,0,0,.3)';document.body.appendChild(b)}
+ const n=tgRun.l.length,p=tgRun.l[tgRun.i];b.innerHTML=`<div style="font-weight:700;margin-bottom:8px;text-align:center">📋 បានចម្លងសារ · Paste ក្នុង Telegram រួចចុចផ្ញើ<br>${esc(p)} · ${tgRun.i+1}/${n}</div><div class="row" style="margin:0;gap:8px;justify-content:center"><button class="b" style="background:#16a34a" onclick="tgMark(1)">✅ បានផ្ញើ</button><button class="b" style="background:#f59e0b" onclick="tgMark(-1)">❌ គ្មាន Telegram</button><button class="b r" onclick="tgStop()">⏹ ឈប់</button></div>`}
+function tgMark(v){const p=tgRun.l[tgRun.i],x=db.q.find(y=>y.p===p);if(x&&v){x.tg=v;save()}tgRun.i++;renderQ();if(tgRun.i>=tgRun.l.length){tgStop();toast('✅ ចប់ការផ្ញើ Telegram');return}tgOpen()}
+function tgStop(){tgRun=null;const b=$('tgbar');if(b)b.remove();renderQ()}
 function scanPhone(cid,p){const td=dkey(),it=db.q.find(y=>y.cid===cid&&y.p===p);
  const seen=(it&&it.done)||db.d.some(z=>z.k===td&&z.p===p);
  const go=()=>{const n={cid,p,t:Date.now()};db.q.push(n);qf='p';save();renderQ();if(db.auto)printEntry(cid,p,true,n)};
@@ -317,7 +320,7 @@ async function impProcess(f,append){const nm=(f.name||'').toLowerCase();
   const prev=append?$('impt').value.trim():'';$('impt').value=(prev?prev+'\n':'')+lines.join('\n');impSum();if(!parseNums($('impt').value).ok.length)toast('⚠️ រកមិនឃើញលេខត្រឹមត្រូវ')}catch(e){toast('⚠️ អានឯកសារមិនបាន — សូមចម្លងអត្ថបទ ហើយ Paste ជំនួស')}}
 function askBox(t,sb,cb){const m=$('dm');$('dmt').textContent=t;$('dms').innerHTML=sb;m.style.display='flex';$('dok').onclick=()=>{m.style.display='none';cb()};$('dno').onclick=()=>{m.style.display='none';$('sq').value='';$('sq').focus()}}
 function askDup(cb){askBox(DUPT,DUPS,cb)}
-renderLogo();$('auto').checked=db.auto;renderQ();$('sq').focus({preventScroll:true});pruneQ();setInterval(pruneQ,60000);document.addEventListener('visibilitychange',pruneQ);loadRemote();
+renderLogo();$('tgall').innerHTML=TIMG2+' ផ្ញើទាំងអស់';$('auto').checked=db.auto;renderQ();$('sq').focus({preventScroll:true});pruneQ();setInterval(pruneQ,60000);document.addEventListener('visibilitychange',pruneQ);loadRemote();
 
 (function(){const q=document.getElementById('queue');let sx=0,sy=0,dn=null;
 q.addEventListener('pointerdown',e=>{const a=e.target.closest&&e.target.closest('a.tel');dn=a||null;sx=e.clientX;sy=e.clientY},{passive:true});
