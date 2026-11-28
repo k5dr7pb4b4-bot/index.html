@@ -208,7 +208,7 @@ const ARR_MSG='វីរះប៊ុនថាំ ត្មាតពង សូម
 const tn=p=>p.replace(/\D/g,'').replace(/^0/,'855');
 let tgPend=null,tgHid=0;
 function tgGo(p,cid){let t=ARR_MSG;const c=cid&&db.c.find(k=>k.id===cid);if(c)t=db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f));try{navigator.clipboard.writeText(t)}catch(e){}tgPend=p;tgHid=0;setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ')}
-document.addEventListener('visibilitychange',()=>{if(!tgPend)return;if(document.hidden){tgHid=Date.now();return}if(!tgHid)return;const sec=(Date.now()-tgHid)/1000,p=tgPend,x=db.q.find(y=>y.p===p);tgPend=null;tgHid=0;if(!x)return;if(sec>=(db.tgSec||7)){x.tg=1;save();renderQ()}else toast('⚠️ '+p+' ប្រហែលគ្មាន Telegram — រក្សាប៊ូតុងទុក')});
+document.addEventListener('visibilitychange',()=>{if(!tgPend)return;if(document.hidden){tgHid=Date.now();return}if(!tgHid)return;const sec=(Date.now()-tgHid)/1000,lim=db.tgSec||7;tgHid=0;if(sec<1.5)return;const p=tgPend,x=db.q.find(y=>y.p===p);tgPend=null;if(!x)return;if(sec>=lim){x.tg=1;save();renderQ()}else toast('ត្រឡប់មកវិញក្នុង '+sec.toFixed(1)+' វិនាទី (តិចជាង '+lim+') → មិនទាន់ចាត់ទុកថាផ្ញើ រក្សាប៊ូតុងទុក')});
 function okNum(n){const f=phoneInfo(n);return !!f.op&&f.d.length===f.need}
 function tok(r,sd,same){return r+(same?' ⚠':'')+(!okNum(r)&&sd?' » '+sd:'')}
 function splitNums(str){const out=[];String(str||'').replace(/(?<!\d)0\d{8,19}(?!\d)/g,run=>{if(run.length>=18&&run.length<=20){for(const a of [9,10]){const b=run.length-a;if(b!==9&&b!==10)continue;const l=run.slice(0,a),r=run.slice(a),fl=phoneInfo(l),fr=phoneInfo(r);if(fl.op&&fl.d.length===fl.need&&fr.op&&fr.d.length===fr.need){out.push(l,r);return ''}}}out.push(run);return ''});return out}
