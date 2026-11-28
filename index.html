@@ -228,7 +228,7 @@ function printEntry(cid,p,auto,qi){const x={cid,p},c=db.c.find(k=>k.id===cid);if
 const ARR_MSG='វីរះប៊ុនថាំ ត្មាតពង សូមជំរាបសួរ🙏 អីវ៉ាន់របស់លោកអ្នកបានមកដល់ហើយ សូមអរគុណ';
 function tgText(x){const c=db.c.find(k=>k.id===x.cid);return c?db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f)):ARR_MSG}
 let tgRun=null;
-function tgAll(){const l=db.q.filter(x=>!x.bad&&!x.tg).map(x=>x.p);if(!l.length){toast('គ្មានលេខត្រូវផ្ញើ');return}tgRun={l,i:0};tgOpen()}
+function tgAll(){try{navigator.clipboard.writeText(ARR_MSG)}catch(e){}location.href='https://t.me/share/url?url=&text='+encodeURIComponent(ARR_MSG)}
 function tgOne(p){tgRun={l:[p],i:0};tgOpen()}
 function tgOpen(){const p=tgRun.l[tgRun.i],x=db.q.find(y=>y.p===p);if(!x){tgMark(0);return}try{navigator.clipboard.writeText(tgText(x))}catch(e){}tgBar();location.href='https://t.me/+'+p.replace(/\D/g,'').replace(/^0/,'855')}
 function tgBar(){let b=$('tgbar');if(!b){b=document.createElement('div');b.id='tgbar';b.style.cssText='position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;background:#0b7a75;color:#fff;border-radius:14px;padding:10px;box-shadow:0 6px 18px rgba(0,0,0,.3)';document.body.appendChild(b)}
