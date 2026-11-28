@@ -205,7 +205,7 @@ function printEntry(cid,p,auto,qi){const x={cid,p},c=db.c.find(k=>k.id===cid);if
   const go2=()=>{let ready;try{ready=document.fonts&&document.fonts.ready}catch(e){}ready?ready.then(run,run):run()};img?(img.complete?go2():img.onload=go2):go2()};
  c.l?qrImg(c.l,150,go):go('')}
 const ARR_MSG='វីរះប៊ុនថាំ ត្មាតពង សូមជំរាបសួរ🙏 អីវ៉ាន់របស់លោកអ្នកបានមកដល់ហើយ សូមអរគុណ';
-const tn=p=>p.replace(/\D/g,'').replace(/^0/,'855');
+const tn=p=>{let d=p.replace(/\D/g,'');d=d.replace(/^00855/,'855');if(d.startsWith('855'))return d;if(d.startsWith('0'))return '855'+d.slice(1);return '855'+d};
 let tgPend=null,tgHid=0;
 function tgGo(p,cid){let t=ARR_MSG;const c=cid&&db.c.find(k=>k.id===cid);if(c)t=db.msg.replace('{ឈ្មោះ}',c.n).replace('{ថ្លៃ}',money(c.f));try{navigator.clipboard.writeText(t)}catch(e){}tgPend=p;tgHid=0;setSt('📋 បានចម្លងសារ — Paste ក្នុង Telegram រួចចុចផ្ញើ')}
 document.addEventListener('visibilitychange',()=>{if(!tgPend)return;if(document.hidden){tgHid=Date.now();return}if(!tgHid)return;const sec=(Date.now()-tgHid)/1000,lim=db.tgSec||7;tgHid=0;if(sec<1.5)return;const p=tgPend,x=db.q.find(y=>y.p===p);tgPend=null;if(!x)return;if(sec>=lim){x.tg=1;save();renderQ()}else toast('ត្រឡប់មកវិញក្នុង '+sec.toFixed(1)+' វិនាទី (តិចជាង '+lim+') → មិនទាន់ចាត់ទុកថាផ្ញើ រក្សាប៊ូតុងទុក')});
